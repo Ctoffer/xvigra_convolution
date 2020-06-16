@@ -16,7 +16,6 @@ template <typename ElementType>
 void benchmark_separableConvolve1D_inputSize_channelFirst(benchmark::State& state) {
 	int inputWidth = static_cast<int>(state.range(0));
 	int inputChannels = 3;
-	int outputChannels = 3;
 	int kernelWidth = 7;
 	
 	std::array<int, 2> inputShape{inputChannels, inputWidth};
@@ -51,7 +50,6 @@ template <typename ElementType>
 void benchmark_separableConvolve1D_inputSize_channelLast(benchmark::State& state) {
 	int inputWidth = static_cast<int>(state.range(0));
 	int inputChannels = 3;
-	int outputChannels = 3;
 	int kernelWidth = 7;
 	
 	std::array<int, 2> inputShape{inputWidth, inputChannels};
@@ -90,7 +88,6 @@ template <typename ElementType>
 void benchmark_separableConvolve_1D_inputSize_channelFirst(benchmark::State& state) {
 	int inputWidth = static_cast<int>(state.range(0));
 	int inputChannels = 3;
-	int outputChannels = 3;
 	int kernelWidth = 1;
 	
 	std::array<int, 2> inputShape{inputChannels, inputWidth};
@@ -125,7 +122,6 @@ template <typename ElementType>
 void benchmark_separableConvolve_1D_inputSize_channelLast(benchmark::State& state) {
 	int inputWidth = static_cast<int>(state.range(0));
 	int inputChannels = 3;
-	int outputChannels = 3;
 	int kernelWidth = 7;
 	
 	std::array<int, 2> inputShape{inputWidth, inputChannels};

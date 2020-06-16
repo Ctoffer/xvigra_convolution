@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project(bachelor_xvigra_convolution LANGUAGES CXX)
 
-# Force compiler to run in C++17 mode, with all warnings and optimization 3
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -47,14 +46,6 @@ find_package(xtensor-io CONFIG REQUIRED)
 find_package(xtensor-blas CONFIG REQUIRED)
 
 message(STATUS "xtensor_VERSION: " ${xtensor_VERSION})
-
-configure_file("original.png" "original.png" COPYONLY)
-configure_file("relief-filter_0x0_1x1_1x1.png" "relief-filter_0x0_1x1_1x1.png" COPYONLY)
-configure_file("relief-filter_5x4_1x1_1x1.png" "relief-filter_5x4_1x1_1x1.png" COPYONLY)
-configure_file("relief-filter_0x0_3x2_1x1.png" "relief-filter_0x0_3x2_1x1.png" COPYONLY)
-configure_file("relief-filter_0x0_1x1_3x4.png" "relief-filter_0x0_1x1_3x4.png" COPYONLY)
-configure_file("relief-filter_5x4_3x2_3x4.png" "relief-filter_5x4_3x2_3x4.png" COPYONLY)
-
 
 add_subdirectory(src)
 
