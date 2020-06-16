@@ -1,0 +1,54 @@
+data:
+  groups:
+    group_1F: benchmark_convolve1D_inputSize_channelFirst
+    group_1L: benchmark_convolve1D_inputSize_channelLast
+    group_2F: benchmark_convolve1D_inputSize_channelFirst_v2
+    group_2L: benchmark_convolve1D_inputSize_channelLast_v2
+    group_3F: benchmark_convolve1D_inputSize_channelFirst_v3
+    group_3L: benchmark_convolve1D_inputSize_channelLast_v3
+    group_4F: benchmark_convolve1D_inputSize_channelFirst_v4
+    group_4L: benchmark_convolve1D_inputSize_channelLast_v4
+
+  aggregate: "min"
+  specialization: "std::uint16_t"
+
+graph:
+  x-axis:
+    name: Width W
+    mode: normal
+    ticks: "python: np.arange(100, 2100, 100)"
+
+  y-axis:
+    name: Minimum Time
+    mode: normal
+
+  legend:
+    group_1F: Version 1 (Channel First)
+    group_1L: Version 1 (Channel Last)
+    group_2F: Version 2 (Channel First)
+    group_2L: Version 2 (Channel Last)
+    group_3F: Version 3 (Channel First)
+    group_3L: Version 3 (Channel Last)
+    group_4F: Version 4 (Channel First)
+    group_4L: Version 4 (Channel Last)
+
+  line-style:
+    group_1F: "-"
+    group_1L: ":"
+    group_2F: "-"
+    group_2L: ":"
+    group_3F: "-"
+    group_3L: ":"
+    group_4F: "-"
+    group_4L: ":"
+
+  line-color:
+    group_1F: "#55868C"
+    group_1L: "#55868C"
+    group_2F: "#EEC584"
+    group_2L: "#EEC584"
+    group_3F: "#CE4257"
+    group_3L: "#CE4257"
+    group_4F: "#59546C"
+    group_4L: "#59546C"
+
