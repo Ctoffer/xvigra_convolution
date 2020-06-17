@@ -6,6 +6,10 @@
 #include <type_traits>
 #include <vector>
 
+#ifdef VOID
+#undef VOID
+#endif
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
@@ -19,9 +23,21 @@ namespace xvigra {
     // ║ utility - begin                                                                                              ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-    template <std::size_t Dim>
+    /*
+     * <p>
+     * Calculates the maximal index for a 'N'-dimensional shape for a flattened index.
+     * Only axises between 'startAxis' and 'endAxis' without the 'currentAxis' are used.
+     * </p>
+     *
+     * @tparam N number of dimensions in the shape.
+     * @param currentAxis axis which should be ignored.
+     * @param startAxis (inclusive) the first axis that should be used.
+     * @param endAxis (exclusive) the last axis that should be used.
+     * @return the product of all axis in the given range, which are not the 'currentAxis'.
+     */
+    template <std::size_t N>
     std::size_t calculateMaxIndex(
-        const std::array<std::size_t, Dim>& shape, 
+        const std::array<std::size_t, N>& shape, 
         std::size_t currentAxis,
         std::size_t startAxis, 
         std::size_t endAxis
@@ -117,7 +133,7 @@ namespace xvigra {
             }
 
             xt::xtensor<InputType, 1> row(xt::strided_view(input, sliceVector));
-            xt::xtensor<ResultType, 1> convolvedRow = xvigra::convolve1DImplicit(row, kernel, options);
+            auto convolvedRow = xvigra::convolve1DImplicit(row, kernel, options);
             xt::strided_view(result, sliceVector) = convolvedRow;
         }
 

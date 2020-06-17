@@ -1,7 +1,8 @@
 set(TARGETS
-    test_image_io
-    test_explicit_convolution
     test_convolution_util
+    test_explicit_convolution
+    test_image_io
+    test_separable_convolution
 )
 
 FOREACH(TARGET ${TARGETS})

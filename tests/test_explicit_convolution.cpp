@@ -1,6 +1,7 @@
 #include <limits>
 #include <stdexcept>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "doctest/doctest.h"
@@ -16,33 +17,18 @@
 #include "xvigra/convolution_util.hpp"
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-// ║ struct TypePair - begin                                                                                          ║
-// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-
-template <typename First, typename Second>
-struct TypePair {
-    using FirstType = First;
-    using SecondType = Second;
-};
-
-// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-// ║ struct TypePair - end                                                                                            ║
-// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-
-
-// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ define - begin                                                                                                   ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 #define TYPE_PAIRS \
-    TypePair<short, float>, \
-    TypePair<short, double>, \
-    TypePair<int, float>, \
-    TypePair<int, double>
+    std::pair<short, float>, \
+    std::pair<short, double>, \
+    std::pair<int, float>, \
+    std::pair<int, double>
 
 #define FLOATING_TYPE_PAIRS \
-    TypePair<double, float>, \
-    TypePair<double, double>
+    std::pair<double, float>, \
+    std::pair<double, double>
 
 #define EXPECTED_UNPADDED_RESULT\
     8.7f, 12.7f, 16.7f, 20.7f, 24.7f, 28.7f, 32.7f
@@ -138,21 +124,42 @@ void checkConvolution1DImplicit(
 
     auto actual = xvigra::convolve1DImplicit(input, kernel, options);
 
-    CHECK(actual.dimension() == expected.dimension());
+    checkExpressions(actual, expected, epsilon);
+}
+
+
+template <typename I, typename K, typename R>
+void checkConvolution2D(
+    const xt::xexpression<I>& inputExpression,
+    const xt::xexpression<K>& kernelExpression,
+    const xvigra::KernelOptions2D& options,
+    const xt::xexpression<R>& expectedExpression,
+    double epsilon = FLOAT_EPSILON
+) {
+    auto input = inputExpression.derived_cast();
+    auto kernel = kernelExpression.derived_cast();
+    auto expected = expectedExpression.derived_cast();
+
+    auto actual = xvigra::convolve2D(input, kernel, options);
 
     checkExpressions(actual, expected, epsilon);
 }
 
 
-template <typename InputType, typename KernelType, typename ResultType, std::size_t Dim=3>
-void checkConvolution2D(
-    const xt::xtensor<InputType, Dim>& input,
-    const xt::xtensor<KernelType, 4>& kernel,
-    const xvigra::KernelOptions2D& options,
-    const xt::xtensor<ResultType, Dim>& expected,
+template <typename I, typename K, typename R>
+void checkConvolution2DImplicit(
+    const xt::xexpression<I>& inputExpression,
+    const xt::xexpression<K>& kernelExpression,
+    xvigra::KernelOptions2D& options,
+    const xt::xexpression<R>& expectedExpression,
     double epsilon = FLOAT_EPSILON
 ) {
-    xt::xtensor<ResultType, Dim> actual = xvigra::convolve2D(input, kernel, options);
+    auto input = inputExpression.derived_cast();
+    auto kernel = kernelExpression.derived_cast();
+    auto expected = expectedExpression.derived_cast();
+
+    auto actual = xvigra::convolve2DImplicit(input, kernel, options);
+
     checkExpressions(actual, expected, epsilon);
 }
 
@@ -308,8 +315,8 @@ TEST_CASE("Test getBorderIndex") {
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 TEST_CASE_TEMPLATE("Convolve1D: Test Default Options", T, TYPE_PAIRS) {
-    using InputType = typename T::FirstType;
-    using KernelType = typename T::SecondType;
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
     using ResultType = std::common_type_t<InputType, KernelType>;
 
     xvigra::KernelOptions options;
@@ -333,8 +340,8 @@ TEST_CASE_TEMPLATE("Convolve1D: Test Default Options", T, TYPE_PAIRS) {
 
 
 TEST_CASE_TEMPLATE("Convolve1D: Test Channel Position", T, TYPE_PAIRS) {
-    using InputType = typename T::FirstType;
-    using KernelType = typename T::SecondType;
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
     using ResultType = typename std::common_type_t<InputType, KernelType>;
 
     xt::xtensor<KernelType, 3> kernel{{{1.0f, 1.3f, 1.7f}}};
@@ -367,8 +374,8 @@ TEST_CASE_TEMPLATE("Convolve1D: Test Channel Position", T, TYPE_PAIRS) {
 
 
 TEST_CASE_TEMPLATE("Convolve1D: Test Border Treatment", T, TYPE_PAIRS) {
-    using InputType = typename T::FirstType;
-    using KernelType = typename T::SecondType;
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
     using ResultType = typename std::common_type_t<InputType, KernelType>;
 
     xt::xtensor<InputType, 2> input{{1, 2, 3, 4, 5, 6, 7, 8, 9}};
@@ -446,8 +453,8 @@ TEST_CASE_TEMPLATE("Convolve1D: Test Border Treatment", T, TYPE_PAIRS) {
 
 
 TEST_CASE_TEMPLATE("Convolve1D: Test Different Padding, Stride, Dilation", T, TYPE_PAIRS) {
-    using InputType = typename T::FirstType;
-    using KernelType = typename T::SecondType;
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
     using ResultType = typename std::common_type_t<InputType, KernelType>;
 
     xt::xtensor<InputType, 2> input{{1, 2, 3, 4, 5, 6, 7, 8, 9}};
@@ -495,19 +502,121 @@ TEST_CASE_TEMPLATE("Convolve1D: Test Different Padding, Stride, Dilation", T, TY
 
 
 TEST_CASE_TEMPLATE("Convolve1D: Test Invalid Configurations", T, TYPE_PAIRS) {
-    using InputType = typename T::FirstType;
-    using KernelType = typename T::SecondType;
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
+
+    SUBCASE("Input wrong dimension") {
+        xt::xarray<float> inputTooSmall(std::vector<std::size_t>{7});
+        xt::xarray<float> inputTooBig(std::vector<std::size_t>{7, 5, 3});
+
+        xt::xarray<float> kernel(std::vector<std::size_t>{1, 1, 3});
+
+        xvigra::KernelOptions options;
+        options.channelPosition = xvigra::ChannelPosition::LAST;
+
+        CHECK(inputTooSmall.dimension() == 1);
+        CHECK(inputTooBig.dimension() == 3);
+        CHECK(kernel.dimension() == 3);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve1D(inputTooSmall, kernel, options),
+            "convolve1D(): Need 2 dimensional (W x C or C x W) input!",
+            std::invalid_argument
+        );
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve1D(inputTooBig, kernel, options),
+            "convolve1D(): Need 2 dimensional (W x C or C x W) input!",
+            std::invalid_argument
+        );
+    }
+
+    SUBCASE("Kernel wrong dimension") {
+        xt::xarray<float> input(std::vector<std::size_t>{7, 3});
+        xt::xarray<float> kernelTooSmall(std::vector<std::size_t>{1, 1});
+        xt::xarray<float> kernelTooBig(std::vector<std::size_t>{1, 1, 3, 1});
+
+        xvigra::KernelOptions options;
+        options.channelPosition = xvigra::ChannelPosition::LAST;
+
+        CHECK(input.dimension() == 2);
+        CHECK(kernelTooSmall.dimension() == 2);
+        CHECK(kernelTooBig.dimension() == 4);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve1D(input, kernelTooSmall, options),
+            "convolve1D(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!",
+            std::invalid_argument
+        );
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve1D(input, kernelTooBig, options),
+            "convolve1D(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!",
+            std::invalid_argument
+        );
+    }
+
+    SUBCASE("Implicit: Input wrong dimension") {
+        xt::xarray<float> inputTooSmall(std::vector<std::size_t>{});
+        xt::xarray<float> inputTooBig(std::vector<std::size_t>{7, 3});
+
+        xt::xarray<float> kernel(std::vector<std::size_t>{1, 1, 3});
+
+        xvigra::KernelOptions options;
+        options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
+
+        CHECK(inputTooSmall.dimension() == 0);
+        CHECK(inputTooBig.dimension() == 2);
+        CHECK(kernel.dimension() == 3);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve1DImplicit(inputTooSmall, kernel, options),
+            "convolve1DImplicit(): Need 1 dimensional (W) input!",
+            std::invalid_argument
+        );
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve1DImplicit(inputTooBig, kernel, options),
+            "convolve1DImplicit(): Need 1 dimensional (W) input!",
+            std::invalid_argument
+        );
+    }
+
+    SUBCASE("Implicit: Kernel wrong dimension") {
+        xt::xarray<float> input(std::vector<std::size_t>{7});
+        xt::xarray<float> kernelTooSmall(std::vector<std::size_t>{1, 1});
+        xt::xarray<float> kernelTooBig(std::vector<std::size_t>{1, 1, 3, 1});
+
+        xvigra::KernelOptions options;
+        options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
+
+        CHECK(input.dimension() == 1);
+        CHECK(kernelTooSmall.dimension() == 2);
+        CHECK(kernelTooBig.dimension() == 4);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve1DImplicit(input, kernelTooSmall, options),
+            "convolve1DImplicit(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!",
+            std::invalid_argument
+        );
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve1DImplicit(input, kernelTooBig, options),
+            "convolve1DImplicit(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!",
+            std::invalid_argument
+        );
+    }
 
     SUBCASE("Implicit Input, Explicit Option") {
-        xt::xtensor<InputType, 1> input{1, 2, 3, 4, 5, 6, 7, 8, 9};
-        xt::xtensor<KernelType, 3> kernel{{{1.0f, 1.3f, 1.7f}}};
+        xt::xarray<InputType> input(std::vector<std::size_t>{9});
+        xt::xarray<KernelType> kernel(std::vector<std::size_t>{1, 1, 3});
 
         xvigra::KernelOptions options;
         options.channelPosition = xvigra::ChannelPosition::FIRST;
 
         CHECK_THROWS_WITH_AS(
             xvigra::convolve1DImplicit(input, kernel, options),
-            "convolve1D(): Expected implicit channels in options!",
+            "convolve1DImplicit(): Expected implicit channels in options!",
             std::domain_error
         );
     }
@@ -565,8 +674,8 @@ TEST_CASE_TEMPLATE("Convolve1D: Test Invalid Configurations", T, TYPE_PAIRS) {
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 TEST_CASE_TEMPLATE("Convolve2D: Test Default Options", T, TYPE_PAIRS) {
-    using InputType = typename T::FirstType;
-    using KernelType = typename T::SecondType;
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
     using ResultType = std::common_type_t<InputType, KernelType>;
 
     xvigra::KernelOptions2D options;
@@ -590,7 +699,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Default Options", T, TYPE_PAIRS) {
             {{625.86f}, {663.07f}}, 
         };
 
-        checkConvolution2D<InputType, KernelType, ResultType, 3>(input, kernel, options, expected);
+        checkConvolution2D(input, kernel, options, expected);
     }
 
     SUBCASE("Asymmetric Kernel") {
@@ -612,13 +721,82 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Default Options", T, TYPE_PAIRS) {
             {{288.8f}, {304.8f}, {320.8f}}
         };
 
-        checkConvolution2D<InputType, KernelType, ResultType, 3>(input, kernel, options, expected);
+        checkConvolution2D(input, kernel, options, expected);
     }
 }
 
+
+TEST_CASE_TEMPLATE("Convolve2D: Test Channel Position", T, TYPE_PAIRS) {
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
+    using ResultType = typename std::common_type_t<InputType, KernelType>;
+
+    xt::xtensor<KernelType, 4> kernel{{{
+            {1.00f, 1.30f, 1.70f},
+            {1.30f, 1.69f, 2.21f},
+            {1.70f, 2.21f, 2.89f}
+    }}};
+    xvigra::KernelOptions2D options;
+
+    SUBCASE("Channel First") {
+        options.setChannelPosition(xvigra::ChannelPosition::FIRST);   
+        xt::xtensor<InputType, 3> input{{
+            { 1,  2,  3,  4,  5}, 
+            { 6,  7,  8,  9, 10}, 
+            {11, 12, 13, 14, 15}, 
+            {16, 17, 18, 19, 20}, 
+            {21, 22, 23, 24, 25}
+        }};
+        xt::xtensor<ResultType, 3> expected{{
+            {128.8f, 144.8f, 160.8f}, 
+            {208.8f, 224.8f, 240.8f}, 
+            {288.8f, 304.8f, 320.8f}
+        }};
+
+        checkConvolution2D(input, kernel, options, expected);
+    }
+
+    SUBCASE("Channel Last") {
+        options.setChannelPosition(xvigra::ChannelPosition::LAST);
+        xt::xtensor<InputType, 3> input{
+            {{ 1}, { 2}, { 3}, { 4}, { 5}}, 
+            {{ 6}, { 7}, { 8}, { 9}, {10}}, 
+            {{11}, {12}, {13}, {14}, {15}}, 
+            {{16}, {17}, {18}, {19}, {20}}, 
+            {{21}, {22}, {23}, {24}, {25}}
+        };
+        xt::xtensor<ResultType, 3> expected{
+            {{128.8f}, {144.8f}, {160.8f}}, 
+            {{208.8f}, {224.8f}, {240.8f}}, 
+            {{288.8f}, {304.8f}, {320.8f}}
+        };
+
+        checkConvolution2D(input, kernel, options, expected);
+    }
+
+    SUBCASE("Channel Implicit") {
+        options.setChannelPosition(xvigra::ChannelPosition::IMPLICIT);
+        xt::xtensor<InputType, 2> input{
+            { 1,  2,  3,  4,  5}, 
+            { 6,  7,  8,  9, 10}, 
+            {11, 12, 13, 14, 15}, 
+            {16, 17, 18, 19, 20}, 
+            {21, 22, 23, 24, 25}
+        };
+        xt::xtensor<ResultType, 2> expected{
+            {128.8f, 144.8f, 160.8f}, 
+            {208.8f, 224.8f, 240.8f}, 
+            {288.8f, 304.8f, 320.8f}
+        };
+
+        checkConvolution2DImplicit(input, kernel, options, expected);
+    }
+}
+
+
 TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
-    using InputType = typename T::FirstType;
-    using KernelType = typename T::SecondType;
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
     using ResultType = typename std::common_type_t<InputType, KernelType>;
 
     xt::xtensor<InputType, 3> input{{
@@ -648,7 +826,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
             {133.81f, 184.01f, 193.21f, 202.41f, 118.45f}
         }};
 
-        checkConvolution2D<InputType, KernelType, ResultType>(input, kernel, options, expected, 1e-5);
+        checkConvolution2D(input, kernel, options, expected, 1e-5);
     }
 
     SUBCASE("BorderTreatment::constant(2)") {
@@ -661,7 +839,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
             {152.01f, 197.61f, 206.81f, 216.01f, 139.87f}
         }};
 
-        checkConvolution2D<InputType, KernelType, ResultType>(input, kernel, options, expected, 1e-5);
+        checkConvolution2D(input, kernel, options, expected, 1e-5);
     }
 
     SUBCASE("BorderTreatment::asymmetricReflect()") {
@@ -674,7 +852,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
             {292.80f, 300.80f, 316.80f, 332.80f, 335.20f}
         }};
 
-        checkConvolution2D<InputType, KernelType, ResultType>(input, kernel, options, expected);
+        checkConvolution2D(input, kernel, options, expected);
     }
 
     SUBCASE("BorderTreatment::avoid()") {
@@ -685,7 +863,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
             {288.8f, 304.8f, 320.8f},
         }};
 
-        checkConvolution2D<InputType, KernelType, ResultType>(input, kernel, options, expected);
+        checkConvolution2D(input, kernel, options, expected);
     }
 
     SUBCASE("BorderTreatment::repeat()") {
@@ -698,7 +876,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
             {322.80f, 334.80f, 350.80f, 366.80f, 376.00f}
         }};
 
-        checkConvolution2D<InputType, KernelType, ResultType>(input, kernel, options, expected);
+        checkConvolution2D(input, kernel, options, expected);
     }
 
     SUBCASE("BorderTreatment::symmetricReflect()") {
@@ -711,7 +889,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
                {322.80f, 334.80f, 350.80f, 366.80f, 376.00f}
         }};
 
-        checkConvolution2D<InputType, KernelType, ResultType>(input, kernel, options, expected);
+        checkConvolution2D(input, kernel, options, expected);
     }
 
     SUBCASE("BorderTreatment::wrap()") {
@@ -724,7 +902,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
             {202.80f, 198.80f, 214.80f, 230.80f, 212.80f}
         }};
 
-        checkConvolution2D<InputType, KernelType, ResultType>(input, kernel, options, expected);
+        checkConvolution2D(input, kernel, options, expected);
     }
 
     SUBCASE("(asymmetricReflect, avoid) (avoid, avoid)") {
@@ -737,7 +915,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
             {288.80f, 304.80f, 320.80f}
         }};
 
-        checkConvolution2D<InputType, KernelType, ResultType>(input, kernel, options, expected);
+        checkConvolution2D(input, kernel, options, expected);
     }
 
     SUBCASE("(asymmetricReflect, avoid) (avoid, asymmetricReflect)") {
@@ -750,13 +928,14 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
             {288.80f, 304.80f, 320.80f, 323.20f}
         }};
 
-        checkConvolution2D<InputType, KernelType, ResultType>(input, kernel, options, expected);
+        checkConvolution2D(input, kernel, options, expected);
     }
 }
 
+
 TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
-    using InputType = typename T::FirstType;
-    using KernelType = typename T::SecondType;
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
     using ResultType = typename std::common_type_t<InputType, KernelType>;
 
     xvigra::KernelOptions2D options;
@@ -1839,6 +2018,199 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                 );
             }
         }
+    }
+}
+
+
+TEST_CASE_TEMPLATE("Convolve2D: Test Invalid Configurations", T, TYPE_PAIRS) {
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
+
+    SUBCASE("Input wrong dimension") {
+        xt::xarray<float> inputTooSmall(std::vector<std::size_t>{7, 6});
+        xt::xarray<float> inputTooBig(std::vector<std::size_t>{7, 6, 5, 3});
+
+        xt::xarray<float> kernel(std::vector<std::size_t>{1, 1, 1, 3});
+
+        xvigra::KernelOptions2D options;
+        options.setChannelPosition(xvigra::ChannelPosition::LAST);
+
+        CHECK(inputTooSmall.dimension() == 2);
+        CHECK(inputTooBig.dimension() == 4);
+        CHECK(kernel.dimension() == 4);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2D(inputTooSmall, kernel, options),
+            "convolve2D(): Need 3 dimensional (H x W x C or C x H x W) input!",
+            std::invalid_argument
+        );
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2D(inputTooBig, kernel, options),
+            "convolve2D(): Need 3 dimensional (H x W x C or C x H x W) input!",
+            std::invalid_argument
+        );
+    }
+
+    SUBCASE("Kernel wrong dimension") {
+        xt::xarray<float> input(std::vector<std::size_t>{7, 3, 3});
+        xt::xarray<float> kernelTooSmall(std::vector<std::size_t>{1, 1});
+        xt::xarray<float> kernelTooBig(std::vector<std::size_t>{1, 1, 3, 1, 3});
+
+        xvigra::KernelOptions2D options;
+        options.setChannelPosition(xvigra::ChannelPosition::LAST);
+
+        CHECK(input.dimension() == 3);
+        CHECK(kernelTooSmall.dimension() == 2);
+        CHECK(kernelTooBig.dimension() == 5);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2D(input, kernelTooSmall, options),
+            "convolve2D(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!",
+            std::invalid_argument
+        );
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2D(input, kernelTooBig, options),
+            "convolve2D(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!",
+            std::invalid_argument
+        );
+    }
+
+    SUBCASE("Implicit: Input wrong dimension") {
+        xt::xarray<float> inputTooSmall(std::vector<std::size_t>{});
+        xt::xarray<float> inputTooBig(std::vector<std::size_t>{7, 3, 3});
+
+        xt::xarray<float> kernel(std::vector<std::size_t>{1, 1, 1, 3});
+
+        xvigra::KernelOptions2D options;
+        options.setChannelPosition(xvigra::ChannelPosition::IMPLICIT);
+
+        CHECK(inputTooSmall.dimension() == 0);
+        CHECK(inputTooBig.dimension() == 3);
+        CHECK(kernel.dimension() == 4);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2DImplicit(inputTooSmall, kernel, options),
+            "convolve2DImplicit(): Need 2 dimensional (H x W) input!",
+            std::invalid_argument
+        );
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2DImplicit(inputTooBig, kernel, options),
+            "convolve2DImplicit(): Need 2 dimensional (H x W) input!",
+            std::invalid_argument
+        );
+    }
+
+    SUBCASE("Implicit: Kernel wrong dimension") {
+        xt::xarray<float> input(std::vector<std::size_t>{7, 5});
+        xt::xarray<float> kernelTooSmall(std::vector<std::size_t>{1, 1});
+        xt::xarray<float> kernelTooBig(std::vector<std::size_t>{1, 1, 3, 1, 3});
+
+        xvigra::KernelOptions2D options;
+        options.setChannelPosition(xvigra::ChannelPosition::IMPLICIT);
+
+        CHECK(input.dimension() == 2);
+        CHECK(kernelTooSmall.dimension() == 2);
+        CHECK(kernelTooBig.dimension() == 5);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2DImplicit(input, kernelTooSmall, options),
+            "convolve2DImplicit(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!",
+            std::invalid_argument
+        );
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2DImplicit(input, kernelTooBig, options),
+            "convolve2DImplicit(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!",
+            std::invalid_argument
+        );
+    }
+
+    SUBCASE("Implicit Input, Explicit Option") {
+        xt::xarray<InputType> input(std::vector<std::size_t>{9});
+        xt::xarray<KernelType> kernel(std::vector<std::size_t>{1, 1, 3});
+
+        xvigra::KernelOptions options;
+        options.channelPosition = xvigra::ChannelPosition::FIRST;
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve1DImplicit(input, kernel, options),
+            "convolve1DImplicit(): Expected implicit channels in options!",
+            std::domain_error
+        );
+    }
+
+    SUBCASE("Implicit Input, Explicit Option") {
+        xt::xarray<InputType> input(std::vector<std::size_t>{5, 4});
+        xt::xarray<KernelType> kernel(std::vector<std::size_t>{1, 1, 3, 3});
+        xvigra::KernelOptions2D options;
+        options.setChannelPosition(xvigra::ChannelPosition::FIRST);
+
+        CHECK(input.dimension() == 2);
+        CHECK(kernel.dimension() == 4);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2DImplicit(input, kernel, options),
+            "convolve2DImplicit(): Expected implicit channels in options!",
+            std::domain_error
+        );
+    }
+
+    SUBCASE("Explicit Input, Implicit Option") {
+        xt::xarray<InputType> input(std::vector<std::size_t>{7, 5, 3});
+        xt::xarray<KernelType> kernel(std::vector<std::size_t>{1, 1, 3, 3});
+
+        xvigra::KernelOptions2D options;
+        options.setChannelPosition(xvigra::ChannelPosition::IMPLICIT);
+
+        CHECK(input.dimension() == 3);
+        CHECK(kernel.dimension() == 4);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2D(input, kernel, options),
+            "convolve2D(): Implicit channel option is not supported for explicit channels in input!",
+            std::invalid_argument
+        );
+    }
+
+    SUBCASE("Input Channel Mismatch In Input And Kernel") {
+        xt::xarray<InputType> input(std::vector<std::size_t>{7, 5, 3});
+        xt::xarray<KernelType> kernel(std::vector<std::size_t>{1, 1, 3, 3});
+
+        xvigra::KernelOptions2D options;
+        options.setChannelPosition(xvigra::ChannelPosition::LAST);
+
+        CHECK(input.dimension() == 3);
+        CHECK(kernel.dimension() == 4);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2D(input, kernel, options),
+            "convolve2D(): Input channels of input and kernel do not align!",
+            std::invalid_argument
+        );
+    }
+
+    SUBCASE("Kernel Too Big") {
+        xt::xarray<InputType> input(std::vector<std::size_t>{5, 5, 3});
+        xt::xarray<KernelType> kernelTooTall(std::vector<std::size_t>{3, 3, 6, 4});
+        xt::xarray<KernelType> kernelTooWide(std::vector<std::size_t>{3, 3, 4, 6});
+
+        xvigra::KernelOptions2D options;
+        options.setChannelPosition(xvigra::ChannelPosition::LAST);
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2D(input, kernelTooTall, options),
+            "convolve2D(): Kernel height is greater than padded input height!",
+            std::invalid_argument
+        );
+
+        CHECK_THROWS_WITH_AS(
+            xvigra::convolve2D(input, kernelTooWide, options),
+            "convolve2D(): Kernel width is greater than padded input width!",
+            std::invalid_argument
+        );
     }
 }
 

@@ -1,0 +1,14 @@
+{
+  "context": {
+    "date": "2020-06-17 16:15:47",
+    "host_name": "Dusk",
+    "executable": "./build-linux/benchmarks/xvigra/xvigra_benchmark_separableConvolve1D_inputSize",
+    "num_cpus": 8,
+    "mhz_per_cpu": 4001,
+    "cpu_scaling_enabled": false,
+    "caches": [
+    ],
+    "load_avg": [0.52,0.58,0.59],
+    "library_build_type": "release"
+  },
+  "benchmarks": [

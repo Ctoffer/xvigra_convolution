@@ -29,6 +29,16 @@ template <typename T>
 using Tensor5D = typename xt::xtensor<T, 5>;
 
 
+inline int calculateOutputSize(
+    int inputSize, 
+    int kernelSize, 
+    int paddingTotal,
+    int stride,
+    int dilation
+) {
+    return static_cast<int>(std::floor((static_cast<double>(inputSize + paddingTotal - dilation * (kernelSize - 1) - 1) / stride) + 1));
+}
+
 template <typename InputType, typename KernelType>
 Tensor2D<typename std::common_type_t<InputType, KernelType>> convolve1D_v1(
     const Tensor2D<InputType>& input,
@@ -386,7 +396,7 @@ Tensor2D<typename std::common_type_t<InputType, KernelType>> convolve1D_v2(
                             - dilation * (radius);
     }
 
-    int outputWidth = xvigra::calculateOutputSize(inputWidth, size, paddingTotal, stride, dilation);
+    int outputWidth = xvigra_legacy::calculateOutputSize(inputWidth, size, paddingTotal, stride, dilation);
     std::vector<int> inputWidthIndices = xvigra::range(inputWidthMinimum, inputWidthMaximum, stride);
 
     // calculate result
@@ -675,7 +685,7 @@ Tensor2D<typename std::common_type_t<InputType, KernelType>> convolve1D_v3(
                             - dilation * (radius);
     }
 
-    int outputWidth = xvigra::calculateOutputSize(inputWidth, size, paddingTotal, stride, dilation);
+    int outputWidth = xvigra_legacy::calculateOutputSize(inputWidth, size, paddingTotal, stride, dilation);
     std::vector<int> inputWidthIndices = xvigra::range(inputWidthMinimum, inputWidthMaximum, stride);
 
     // calculate result

@@ -17,12 +17,29 @@ namespace xvigra {
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
     enum class ChannelPosition;
+
     enum class BorderTreatmentType;
+
     class BorderTreatment;
+
     class KernelOptions;
 
+    class KernelOptions2D;
+
     int truePadding(int, const BorderTreatment&);
-    template <typename T = int> std::vector<T> range(T, T, T);
+
+    template <typename T>
+    T roundValue(const T, int);
+
+    template <typename T, int Dim>
+    xt::xtensor<T, Dim> roundTensor(const xt::xtensor<T, Dim>&, int);
+
+    template <typename T = int> 
+    std::vector<T> range(const T&, const T&, const T&);
+
+    template <typename T>
+    xt::xtensor<T, 3> normalizeAfterConvolution(const xt::xtensor<T, 3>&);
+
     inline int calculateOutputSize(int, int, const KernelOptions&);
 
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -193,16 +210,22 @@ namespace xvigra {
           borderTreatmentEnd(BorderTreatment::constant(0))
         {}
 
+        int getPadding() const;
+
+        int paddingTotal() const;
+        int paddingBegin() const;
+        int paddingEnd() const;
+        void setPadding(int);
+
+        void setStride(int);
+        void setDilation(int);
+        void setChannelPosition(const ChannelPosition&);
+
         void setBorderTreatment(const BorderTreatment&);
         void setBorderTreatment(const BorderTreatment&, const BorderTreatment&);
         void setBorderTreatmentBegin(const BorderTreatment&);
         void setBorderTreatmentEnd(const BorderTreatment&);
 
-        int getPadding() const;
-        int paddingTotal() const;
-        int paddingBegin() const;
-        int paddingEnd() const;
-        void setPadding(int);
     }; // KernelOptions
 
     std::ostream& operator<<(std::ostream& out, const KernelOptions& options) {
@@ -215,23 +238,6 @@ namespace xvigra {
                    << ", borderTreatmentBegin=" << options.borderTreatmentBegin
                    << ", borderTreatmentEnd=" << options.borderTreatmentEnd
                    <<  "}";
-    }
-
-    void KernelOptions::setBorderTreatment(const BorderTreatment& borderTreatment) {
-        setBorderTreatment(borderTreatment, borderTreatment);
-    }
-
-    void KernelOptions::setBorderTreatment(const BorderTreatment& beginTreatment, const BorderTreatment& endTreatment) {
-        setBorderTreatmentBegin(beginTreatment);
-        setBorderTreatmentEnd(endTreatment);
-    }
-
-    void KernelOptions::setBorderTreatmentBegin(const BorderTreatment& beginTreatment) {
-        this->borderTreatmentBegin = beginTreatment;
-    }
-
-    void KernelOptions::setBorderTreatmentEnd(const BorderTreatment& endTreatment) {
-        this->borderTreatmentEnd = endTreatment;
     }
 
     int KernelOptions::getPadding() const {
@@ -260,6 +266,35 @@ namespace xvigra {
 
     void KernelOptions::setPadding(int padding) {
         this->padding = padding;
+    }
+
+    void KernelOptions::setStride(int stride) {
+        this->stride = stride;
+    }
+
+    void KernelOptions::setDilation(int dilation) {
+        this->dilation = dilation;
+    }
+
+    void KernelOptions::setChannelPosition(const ChannelPosition& channelPosition) {
+        this->channelPosition = channelPosition;
+    }
+
+    void KernelOptions::setBorderTreatment(const BorderTreatment& borderTreatment) {
+        setBorderTreatment(borderTreatment, borderTreatment);
+    }
+
+    void KernelOptions::setBorderTreatment(const BorderTreatment& beginTreatment, const BorderTreatment& endTreatment) {
+        setBorderTreatmentBegin(beginTreatment);
+        setBorderTreatmentEnd(endTreatment);
+    }
+
+    void KernelOptions::setBorderTreatmentBegin(const BorderTreatment& beginTreatment) {
+        this->borderTreatmentBegin = beginTreatment;
+    }
+
+    void KernelOptions::setBorderTreatmentEnd(const BorderTreatment& endTreatment) {
+        this->borderTreatmentEnd = endTreatment;
     }
 
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -359,11 +394,19 @@ namespace xvigra {
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
     // ║ class KernelOptions2D - end                                                                                  ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+    
 
+    // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    // ║ general utility - begin                                                                                      ║
+    // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
     template <typename T>
-    std::vector<T> range(T start, T stop, T step) {
-        std::vector<int> result;
+    std::vector<T> range(
+        const T& start, 
+        const T& stop, 
+        const T& step
+    ) {
+        std::vector<T> result;
         for(T index = start; index < stop; index += step) {
             result.push_back(index);
         }
@@ -371,7 +414,10 @@ namespace xvigra {
     }
 
     template <typename T>
-    T roundValue(T value, int decimals) {
+    T roundValue(
+        const T value, 
+        int decimals
+    ) {
         if constexpr (std::is_floating_point_v<T>) {
             int d = 0;
             int factor = std::pow(10, decimals);
@@ -385,22 +431,11 @@ namespace xvigra {
         }
     }
 
-    inline int calculateOutputSize(int inputSize, 
-                                   int kernelSize, 
-                                   const KernelOptions& options) {
-        return static_cast<int>(std::floor((static_cast<double>(inputSize + options.paddingTotal() - options.dilation * (kernelSize - 1) - 1) / options.stride) + 1));
-    }
-
-    inline int calculateOutputSize(int inputSize, 
-                                   int kernelSize, 
-                                   int paddingTotal,
-                                   int stride,
-                                   int dilation) {
-        return static_cast<int>(std::floor((static_cast<double>(inputSize + paddingTotal - dilation * (kernelSize - 1) - 1) / stride) + 1));
-    }
-
     template <typename T, int Dim>
-    xt::xtensor<T, Dim> roundTensor(const xt::xtensor<T, Dim>& tensor, int decimals) {
+    xt::xtensor<T, Dim> roundTensor(
+        const xt::xtensor<T, Dim>& tensor, 
+        int decimals
+    ) {
         xt::xtensor<T, Dim> copiedTensor(tensor);
         auto sourceIter = tensor.begin();
         auto sourceEnd = tensor.end();
@@ -414,7 +449,9 @@ namespace xvigra {
     }
 
     template <typename T>
-    xt::xtensor<T, 3> normalizeAfterConvolution(const xt::xtensor<T, 3>& originalTensor) {
+    xt::xtensor<T, 3> normalizeAfterConvolution(
+        const xt::xtensor<T, 3>& originalTensor
+    ) {
         xt::xtensor<T, 3> arr(originalTensor);
         arr -= xt::amin(arr)[0];
         arr /= xt::amax(arr)[0];
@@ -426,7 +463,17 @@ namespace xvigra {
         }
     }
 
-    
+    inline int calculateOutputSize(
+        int inputSize, 
+        int kernelSize, 
+        const KernelOptions& options
+    ) {
+        return static_cast<int>(std::floor((static_cast<double>(inputSize + options.paddingTotal() - options.dilation * (kernelSize - 1) - 1) / options.stride) + 1));
+    }
+
+    // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    // ║ general utility - end                                                                                        ║
+    // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 } // xvigra
 
 #endif // XVIGRA_CONVOLUTION_UTIL_HPP

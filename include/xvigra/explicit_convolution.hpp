@@ -16,6 +16,9 @@
 #include "xvigra/convolution_util.hpp"
 
 namespace xvigra {
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ type definitions - begin                                                                                         ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 template <typename T>
 using Tensor1D = typename xt::xtensor<T, 1>;
@@ -24,10 +27,16 @@ using Tensor2D = typename xt::xtensor<T, 2>;
 template <typename T>
 using Tensor3D = typename xt::xtensor<T, 3>;
 template <typename T>
-using Tensor4D = typename xt::xtensor<T, 4>;
-template <typename T>
 using Tensor5D = typename xt::xtensor<T, 5>;
 
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ type definitions - end                                                                                           ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ utility - begin                                                                                                  ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 template <bool isBegin>
 int getBorderIndex(const BorderTreatment& treatment, int index, int size) {
@@ -90,6 +99,14 @@ int getBorderIndex(const BorderTreatment& treatment, int index, int size) {
     }   
 }
 
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ utility - end                                                                                                    ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ convolve1D - begin                                                                                               ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 template <typename T, typename O>
 auto convolve1D(
@@ -113,11 +130,11 @@ auto convolve1D(
     }
 
     if (input.dimension() != 2) {
-        throw std::invalid_argument("convolve1D(): Need 2 dimensional input!");
+        throw std::invalid_argument("convolve1D(): Need 2 dimensional (W x C or C x W) input!");
     }
 
     if (kernel.dimension() != 3) {
-        throw std::invalid_argument("convolve1D(): Need a full 3D kernel to operate!");
+        throw std::invalid_argument("convolve1D(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!");
     }
 
     // Input Parameters
@@ -276,42 +293,65 @@ auto convolve1D(
 }
 
 
-template <typename InputType, typename KernelType>
-Tensor1D<typename std::common_type_t<InputType, KernelType>> convolve1DImplicit(
-    const Tensor1D<InputType>& input, 
-    const Tensor3D<KernelType>& kernel,
+template <typename T, typename O>
+auto convolve1DImplicit(
+    const xt::xexpression<T>& inputExpression, 
+    const xt::xexpression<O>& kernelExpression,
     const xvigra::KernelOptions& options
 ) {
+    using InputContainerType = typename xt::xexpression<T>::derived_type;
+    using InputType = typename InputContainerType::value_type;
+    using KernelContainerType = typename xt::xexpression<O>::derived_type;
+    using KernelType = typename KernelContainerType::value_type;
     using ResultType = typename std::common_type_t<InputType, KernelType>;
 
+    InputContainerType input = inputExpression.derived_cast();
+    KernelContainerType kernel = kernelExpression.derived_cast();
+
     if (options.channelPosition != xvigra::ChannelPosition::IMPLICIT) {
-        throw std::domain_error("convolve1D(): Expected implicit channels in options!");
+        throw std::domain_error("convolve1DImplicit(): Expected implicit channels in options!");
+    }
+
+    if (input.dimension() != 1) {
+        throw std::invalid_argument("convolve1DImplicit(): Need 1 dimensional (W) input!");
+    }
+
+    if (kernel.dimension() != 3) {
+        throw std::invalid_argument("convolve1DImplicit(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!");
     }
 
     xvigra::KernelOptions tempOptions(options);
     tempOptions.channelPosition = xvigra::ChannelPosition::LAST;
-    Tensor2D<InputType> normalizedInput(xt::reshape_view(input, {static_cast<int>(input.shape()[0]), 1}));
-    Tensor2D<ResultType> result = convolve1D(normalizedInput, kernel, tempOptions);
+    auto normalizedInput = xt::reshape_view(input, {static_cast<int>(input.shape()[0]), 1});
+    auto result = convolve1D(normalizedInput, kernel, tempOptions);
 
-    return xt::reshape_view(result, {result.shape()[0]});
+    return Tensor1D<ResultType>(xt::reshape_view(result, {result.shape()[0]}));
 }
 
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ convolve1D - end                                                                                                 ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 
-// ================================================================================================
-// ================================================================================================
-// ================================================================================================
-// ================================================================================================
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ convolve2D - begin                                                                                               ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-
-template <typename InputType, typename KernelType>
-Tensor3D<typename std::common_type_t<InputType, KernelType>> convolve2D(
-    const Tensor3D<InputType>& input,
-    const Tensor4D<KernelType>& filter,
+template <typename T, typename O>
+auto convolve2D(
+    const xt::xexpression<T>& inputExpression,
+    const xt::xexpression<O>& kernelExpression,
     const xvigra::KernelOptions& optionsY,
     const xvigra::KernelOptions& optionsX
 ) {
+    using InputContainerType = typename xt::xexpression<T>::derived_type;
+    using InputType = typename InputContainerType::value_type;
+    using KernelContainerType = typename xt::xexpression<O>::derived_type;
+    using KernelType = typename KernelContainerType::value_type;
     using ResultType = typename std::common_type_t<InputType, KernelType>;
+
+    InputContainerType input = inputExpression.derived_cast();
+    KernelContainerType kernel = kernelExpression.derived_cast();
 
     if (optionsY.channelPosition != optionsX.channelPosition) {
         throw std::invalid_argument(
@@ -323,6 +363,14 @@ Tensor3D<typename std::common_type_t<InputType, KernelType>> convolve2D(
         throw std::invalid_argument(
             "convolve2D(): Implicit channel option is not supported for explicit channels in input!"
         );
+    }
+
+    if (input.dimension() != 3) {
+        throw std::invalid_argument("convolve2D(): Need 3 dimensional (H x W x C or C x H x W) input!");
+    }
+
+    if (kernel.dimension() != 4) {
+        throw std::invalid_argument("convolve2D(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!");
     }
 
     int inputChannels;
@@ -339,11 +387,11 @@ Tensor3D<typename std::common_type_t<InputType, KernelType>> convolve2D(
         inputChannels = input.shape()[2];
     }
     
-    int outputChannels = filter.shape()[0];
-    int kernelHeight = filter.shape()[2];
-    int kernelWidth = filter.shape()[3];
+    int outputChannels = kernel.shape()[0];
+    int kernelHeight = kernel.shape()[2];
+    int kernelWidth = kernel.shape()[3];
     
-    if(inputChannels != static_cast<int>(filter.shape()[1])) {// dimension mismatch
+    if(inputChannels != static_cast<int>(kernel.shape()[1])) {// dimension mismatch
         throw std::invalid_argument("convolve2D(): Input channels of input and kernel do not align!");
     }
     
@@ -439,7 +487,7 @@ Tensor3D<typename std::common_type_t<InputType, KernelType>> convolve2D(
             }
         }
         
-        auto reshapedKernel = xt::reshape_view(filter, {outputChannels, inputChannels * kernelHeight * kernelWidth});
+        auto reshapedKernel = xt::reshape_view(kernel, {outputChannels, inputChannels * kernelHeight * kernelWidth});
         auto reshapedPatch = xt::reshape_view(patch, {inputChannels * kernelHeight * kernelWidth, outputHeight * outputWidth});
         result = xt::reshape_view(xt::linalg::dot(reshapedKernel, reshapedPatch), {outputChannels, outputHeight, outputWidth});
         
@@ -505,7 +553,7 @@ Tensor3D<typename std::common_type_t<InputType, KernelType>> convolve2D(
             }
         }
         
-        auto reshapedKernel = xt::transpose(xt::reshape_view(filter, {outputChannels, inputChannels * kernelHeight * kernelWidth}));
+        auto reshapedKernel = xt::transpose(xt::reshape_view(kernel, {outputChannels, inputChannels * kernelHeight * kernelWidth}));
         auto reshapedPatch = xt::reshape_view(patch, {outputHeight*outputWidth, inputChannels*kernelHeight*kernelWidth});
         result = xt::reshape_view(xt::linalg::dot(reshapedPatch, reshapedKernel), {outputHeight, outputWidth, outputChannels});
     }
@@ -514,16 +562,66 @@ Tensor3D<typename std::common_type_t<InputType, KernelType>> convolve2D(
 }
 
 
-template <typename InputType, typename KernelType>
-Tensor3D<typename std::common_type_t<InputType, KernelType>> convolve2D(
-    const Tensor3D<InputType>& input,
-    const Tensor4D<KernelType>& filter,
+template <typename T, typename O>
+inline auto convolve2D(
+    const xt::xexpression<T>& inputExpression,
+    const xt::xexpression<O>& kernelExpression,
     const xvigra::KernelOptions2D& options2D
 ) {
-    return convolve2D<InputType, KernelType>(input, filter, options2D.optionsY, options2D.optionsX);
+    return convolve2D(
+        inputExpression.derived_cast(), 
+        kernelExpression.derived_cast(), 
+        options2D.optionsY, 
+        options2D.optionsX
+    );
 }
 
 
+template <typename T, typename O>
+auto convolve2DImplicit(
+    const xt::xexpression<T>& inputExpression, 
+    const xt::xexpression<O>& kernelExpression,
+    const xvigra::KernelOptions2D& options2D
+) {
+    using InputContainerType = typename xt::xexpression<T>::derived_type;
+    using InputType = typename InputContainerType::value_type;
+    using KernelContainerType = typename xt::xexpression<O>::derived_type;
+    using KernelType = typename KernelContainerType::value_type;
+    using ResultType = typename std::common_type_t<InputType, KernelType>;
+
+    InputContainerType input = inputExpression.derived_cast();
+    KernelContainerType kernel = kernelExpression.derived_cast();
+
+    if (options2D.optionsY.channelPosition != xvigra::ChannelPosition::IMPLICIT) {
+        throw std::domain_error("convolve2DImplicit(): Expected implicit channels in options!");
+    }
+
+    if (input.dimension() != 2) {
+        throw std::invalid_argument("convolve2DImplicit(): Need 2 dimensional (H x W) input!");
+    }
+
+    if (kernel.dimension() != 4) {
+        throw std::invalid_argument("convolve2DImplicit(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!");
+    }
+
+    xvigra::KernelOptions2D tempOptions(options2D);
+    tempOptions.setChannelPosition(xvigra::ChannelPosition::LAST);
+    auto normalizedInput = xt::reshape_view(input, {
+        static_cast<int>(input.shape()[0]), 
+        static_cast<int>(input.shape()[1]),
+        1
+    });
+    auto result = convolve2D(normalizedInput, kernel, tempOptions);
+
+    return Tensor2D<ResultType>(xt::reshape_view(result, {
+        result.shape()[0],
+        result.shape()[1]
+    }));
+}
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ convolve2D - end                                                                                                 ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 } // xvigra
 
 #endif // XVIGRA_EXPLICIT_CONVOLUTION_HPP
