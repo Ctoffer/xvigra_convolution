@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 
+#define DOCTEST_CONFIG_SUPER_FAST_ASSERTS
 #include "doctest/doctest.h"
 
 #ifdef VOID
@@ -18,6 +19,23 @@
 #include "xvigra/explicit_convolution.hpp"
 #include "xvigra/separable_convolution.hpp"
 #include "xvigra/image_io.hpp"
+#include "xvigra/io_util.hpp"
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ define - begin                                                                                                   ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+#define TYPE_PAIRS \
+    std::pair<short, float>, \
+    std::pair<short, double>, \
+    std::pair<int, float>, \
+    std::pair<int, double>
+    
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ define - end                                                                                                     ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ constexpr - begin                                                                                                ║
@@ -61,7 +79,10 @@ void checkExpressions(
     auto endExpected = expected.end();
 
     for (; iterExpected != endExpected; ++iterActual, ++iterExpected) {
-        CHECK(*iterActual == doctest::Approx(*iterExpected).epsilon(epsilon));
+        CHECK_MESSAGE(
+            *iterActual == doctest::Approx(*iterExpected).epsilon(epsilon), 
+            "actual: " << *iterActual << ", expected: " << *iterExpected
+        );
     }
 }
 
@@ -74,36 +95,637 @@ void checkExpressions(
 // ║ Test separableConvolve1D - begin                                                                                 ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-TEST_CASE_TEMPLATE("SeparableConvolve1D: Test Default Options", T, std::pair<int, double>) {
+// TEST_CASE_TEMPLATE("SeparableConvolve1D: Test Default Options", T, TYPE_PAIRS) {
+//     using InputType = typename T::first_type;
+//     using KernelType = typename T::second_type;
+
+//     xvigra::KernelOptions options;
+
+//     SUBCASE("Symmetric Kernel") {
+//         xt::xtensor<InputType, 2> input{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}};
+//         xt::xtensor<KernelType, 1> kernel{1.0f, 1.3f, 1.7f, 2.11f};
+//         xt::xtensor<KernelType, 3> fullKernel{{{1.0f, 1.3f, 1.7f, 2.11f}}};
+
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::LAST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("Asymmetric Kernel") {
+//         xt::xtensor<InputType, 2> input{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}};
+//         xt::xtensor<KernelType, 1> kernel{1.0f, 1.3f, 1.7f};
+//         xt::xtensor<KernelType, 3> fullKernel{{{1.0f, 1.3f, 1.7f}}};
+
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::LAST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+// }
+
+
+// TEST_CASE_TEMPLATE("SeparableConvolve1D: Test Channel Position", T, TYPE_PAIRS) {
+//     using InputType = typename T::first_type;
+//     using KernelType = typename T::second_type;
+
+//     xt::xtensor<KernelType, 1> kernel{1.0f, 1.3f, 1.7f};
+//     xt::xtensor<KernelType, 3> fullKernel{{{1.0f, 1.3f, 1.7f}}};
+//     xvigra::KernelOptions options;
+
+//     SUBCASE("Channel First") {
+//         options.channelPosition = xvigra::ChannelPosition::FIRST;   
+//         xt::xtensor<InputType, 2> input{{1, 2, 3, 4, 5, 6, 7, 8, 9}};
+
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("Channel Last") {
+//         options.channelPosition = xvigra::ChannelPosition::LAST;
+//         xt::xtensor<InputType, 2> input{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}};
+        
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::LAST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     // SUBCASE("Channel Implicit") {
+//     //     options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
+//     //     xt::xtensor<InputType, 1> input{1, 2, 3, 4, 5, 6, 7, 8, 9};
+        
+//     //     auto expected = xvigra::convolve1D(input, fullKernel, options);
+//     //     auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::LAST>(input, kernel, options);
+
+//     //     checkExpressions(actual, expected);
+//     // }
+// }
+
+
+// TEST_CASE_TEMPLATE("SeparableConvolve1D: Test Border Treatment", T, TYPE_PAIRS) {
+//     using InputType = typename T::first_type;
+//     using KernelType = typename T::second_type;
+
+//     xt::xtensor<InputType, 2> input{{1, 2, 3, 4, 5, 6, 7, 8, 9}};
+//     xt::xtensor<KernelType, 1> kernel{1.0f, 1.3f, 1.7f};
+//     xt::xtensor<KernelType, 3> fullKernel{{{1.0f, 1.3f, 1.7f}}};
+
+//     xvigra::KernelOptions options;
+//     options.channelPosition = xvigra::ChannelPosition::FIRST;
+//     options.setPadding(2);
+    
+
+//     SUBCASE("BorderTreatment::constant(0)") {
+//         options.setBorderTreatment(xvigra::BorderTreatment::constant(0));
+
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("BorderTreatment::constant(2)") {
+//         options.setBorderTreatment(xvigra::BorderTreatment::constant(2));
+        
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("BorderTreatment::asymmetricReflect()") {
+//         options.setBorderTreatment(xvigra::BorderTreatment::asymmetricReflect());
+        
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("BorderTreatment::avoid()") {
+//         options.setBorderTreatment(xvigra::BorderTreatment::avoid());
+        
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("BorderTreatment::repeat()") {
+//         options.setBorderTreatment(xvigra::BorderTreatment::repeat());
+        
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("BorderTreatment::symmetricReflect()") {
+//         options.setBorderTreatment(xvigra::BorderTreatment::symmetricReflect());
+        
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("BorderTreatment::wrap()") {
+//         options.setBorderTreatment(xvigra::BorderTreatment::wrap());
+        
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("BorderTreatment::avoid() & BorderTreatment::asymmetricReflect()") {
+//         options.setBorderTreatmentBegin(xvigra::BorderTreatment::avoid());
+//         options.setBorderTreatmentEnd(xvigra::BorderTreatment::asymmetricReflect());
+        
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("BorderTreatment::asymmetricReflect() & BorderTreatment::avoid()") {
+//         options.setBorderTreatmentBegin(xvigra::BorderTreatment::asymmetricReflect());
+//         options.setBorderTreatmentEnd(xvigra::BorderTreatment::avoid());
+        
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+// }
+
+
+// TEST_CASE_TEMPLATE("SeparableConvolve1D: Test Different Padding, Stride, Dilation", T, TYPE_PAIRS) {
+//     using InputType = typename T::first_type;
+//     using KernelType = typename T::second_type;
+
+//     xt::xtensor<InputType, 2> input{{1, 2, 3, 4, 5, 6, 7, 8, 9}};
+//     xt::xtensor<KernelType, 1> kernel{1.0f, 1.3f, 1.7f};
+//     xt::xtensor<KernelType, 3> fullKernel{{{1.0f, 1.3f, 1.7f}}};
+
+//     xvigra::KernelOptions options;
+//     options.channelPosition = xvigra::ChannelPosition::FIRST;
+
+//     SUBCASE("Padding=1, Stride=1, Dilation=1") {
+//         options.setPadding(1);
+//         options.setStride(1);
+//         options.setDilation(1);
+
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("Padding=0, Stride=2, Dilation=1") {
+//         options.setPadding(0);
+//         options.setStride(2);
+//         options.setDilation(1);
+
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("Padding=0, Stride=1, Dilation=2") {
+//         options.setPadding(0);
+//         options.setStride(1);
+//         options.setDilation(2);
+
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("Padding=1, Stride=2, Dilation=2") {
+//         options.setPadding(1);
+//         options.setStride(2);
+//         options.setDilation(2);
+
+//         auto expected = xvigra::convolve1D(input, fullKernel, options);
+//         auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(input, kernel, options);
+
+//         checkExpressions(actual, expected);
+//     }
+// }
+
+
+// TEST_CASE_TEMPLATE("SeparableConvolve1D: Test Invalid Configurations", T, TYPE_PAIRS) {
+//     using InputType = typename T::first_type;
+//     using KernelType = typename T::second_type;
+
+//     SUBCASE("Unsupported ChannelPosition") {
+//         xt::xtensor<InputType, 2> input{{1, 2, 3, 4, 5, 6, 7, 8, 9}};
+//         xt::xtensor<KernelType, 1> kernel{1.0f, 1.3f, 1.7f};
+//         xvigra::KernelOptions options;
+
+//         auto function = [&](){return xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::IMPLICIT>(input, kernel, options);};
+
+//         CHECK_THROWS_WITH_AS(
+//             function(),
+//             "separableConvolve1D(): ChannelPosition for input can't be IMPLICIT.",
+//             std::invalid_argument
+//         );
+//     }
+// }
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ Test separableConvolve1D - end                                                                                   ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ Test separableConvolve2D - begin                                                                                 ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+// TEST_CASE_TEMPLATE("SeparableConvolve2D: Test Default Options", T, TYPE_PAIRS) {
+//     using InputType = typename T::first_type;
+//     using KernelType = typename T::second_type;
+
+//     xvigra::KernelOptions2D options2D;
+
+//     SUBCASE("Symmetric Kernel") {
+//         xt::xtensor<InputType, 3> input{
+//             {{ 1}, { 2}, { 3}, { 4}, { 5}}, 
+//             {{ 6}, { 7}, { 8}, { 9}, {10}}, 
+//             {{11}, {12}, {13}, {14}, {15}}, 
+//             {{16}, {17}, {18}, {19}, {20}}, 
+//             {{21}, {22}, {23}, {24}, {25}}
+//         };
+//         xt::xtensor<KernelType, 1> kernel{1.00f, 1.30f, 1.70f, 2.10f};
+//         xt::xtensor<KernelType, 4> fullKernel{{{
+//             {1.00f, 1.30f, 1.70f, 2.10f},
+//             {1.30f, 1.69f, 2.21f, 2.73f},
+//             {1.70f, 2.21f, 2.89f, 3.57f},
+//             {2.10f, 2.73f, 3.57f, 4.41f}
+//         }}};
+
+//         auto expected = xvigra::convolve2D(input, fullKernel, options2D);
+//         auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::LAST>(
+//             input, 
+//             kernel, 
+//             options2D
+//         );
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("Asymmetric Kernel") {
+//         xt::xtensor<InputType, 3> input{
+//             {{ 1}, { 2}, { 3}, { 4}, { 5}}, 
+//             {{ 6}, { 7}, { 8}, { 9}, {10}}, 
+//             {{11}, {12}, {13}, {14}, {15}}, 
+//             {{16}, {17}, {18}, {19}, {20}}, 
+//             {{21}, {22}, {23}, {24}, {25}}
+//         };
+//         xt::xtensor<KernelType, 1> kernel{1.00f, 1.30f, 1.70f};
+//         xt::xtensor<KernelType, 4> fullKernel{{{
+//             {1.00f, 1.30f, 1.70f},
+//             {1.30f, 1.69f, 2.21f},
+//             {1.70f, 2.21f, 2.89f}
+//         }}};
+
+//         auto expected = xvigra::convolve2D(input, fullKernel, options2D);
+//         auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::LAST>(
+//             input, 
+//             kernel, 
+//             options2D
+//         );
+
+//         checkExpressions(actual, expected);
+//     }
+// }
+
+
+// TEST_CASE_TEMPLATE("SeparableConvolve2D: Test Channel Position", T, TYPE_PAIRS) {
+//     using InputType = typename T::first_type;
+//     using KernelType = typename T::second_type;
+
+//     xt::xtensor<KernelType, 1> kernel{1.00f, 1.30f, 1.70f};
+//     xt::xtensor<KernelType, 4> fullKernel{{{
+//         {1.00f, 1.30f, 1.70f},
+//         {1.30f, 1.69f, 2.21f},
+//         {1.70f, 2.21f, 2.89f}
+//     }}};
+//     xvigra::KernelOptions2D options2D;
+
+//     SUBCASE("Channel First") {
+//         options2D.setChannelPosition(xvigra::ChannelPosition::FIRST);   
+//         xt::xtensor<InputType, 3> input{{
+//             { 1,  2,  3,  4,  5}, 
+//             { 6,  7,  8,  9, 10}, 
+//             {11, 12, 13, 14, 15}, 
+//             {16, 17, 18, 19, 20}, 
+//             {21, 22, 23, 24, 25}
+//         }};
+
+//         auto expected = xvigra::convolve2D(input, fullKernel, options2D);
+//         auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+//             input, 
+//             kernel, 
+//             options2D
+//         );
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("Channel Last") {
+//         options2D.setChannelPosition(xvigra::ChannelPosition::LAST);
+//         xt::xtensor<InputType, 3> input{
+//             {{ 1}, { 2}, { 3}, { 4}, { 5}}, 
+//             {{ 6}, { 7}, { 8}, { 9}, {10}}, 
+//             {{11}, {12}, {13}, {14}, {15}}, 
+//             {{16}, {17}, {18}, {19}, {20}}, 
+//             {{21}, {22}, {23}, {24}, {25}}
+//         };
+        
+//         auto expected = xvigra::convolve2D(input, fullKernel, options2D);
+//         auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::LAST>(
+//             input, 
+//             kernel, 
+//             options2D
+//         );
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     // SUBCASE("Channel Implicit") {
+//     //     options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
+//     //     xt::xtensor<InputType, 1> input{1, 2, 3, 4, 5, 6, 7, 8, 9};
+        
+//     //     auto expected = xvigra::convolve1D(input, fullKernel, options);
+//     //     auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::LAST>(input, kernel, options);
+
+//     //     checkExpressions(actual, expected);
+//     // }
+// }
+
+
+TEST_CASE_TEMPLATE("SeparableConvolve1D: Test Border Treatment", T, std::pair<short, double>) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
-    using ResultType = std::common_type_t<InputType, KernelType>;
 
-    xvigra::KernelOptions options;
+    xt::xtensor<InputType, 3> input{{
+        { 1,  2,  3,  4,  5}, 
+        { 6,  7,  8,  9, 10}, 
+        {11, 12, 13, 14, 15}, 
+        {16, 17, 18, 19, 20}, 
+        {21, 22, 23, 24, 25}
+    }};
+    xt::xtensor<KernelType, 1> kernel{1.00f, 1.30f, 1.70f};
+    xt::xtensor<KernelType, 4> fullKernel{{{
+        {1.00f, 1.30f, 1.70f},
+        {1.30f, 1.69f, 2.21f},
+        {1.70f, 2.21f, 2.89f}
+    }}};
 
-    // SUBCASE("Symmetric Kernel") {
-    //     xt::xtensor<InputType, 2> input{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}};
-    //     xt::xtensor<KernelType, 1> kernel{1.0f, 1.3f, 1.7f, 2.11f};
-    //     xt::xtensor<KernelType, 3> fullKernel{{{1.0f, 1.3f, 1.7f, 2.11f}}};
+    xvigra::KernelOptions2D options;
+    options.setChannelPosition(xvigra::ChannelPosition::FIRST);
+    options.setPadding(2);
+    
 
-    //     auto expected = xvigra::convolve1D(input, fullKernel, options);
-    //     auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::LAST>(input, kernel, options);
+    // SUBCASE("BorderTreatment::constant(0)") {
+    //     options.setBorderTreatment(xvigra::BorderTreatment::constant(0));
 
-    //     checkExpressions(expected, actual);
+    //     auto expected = xvigra::convolve2D(input, fullKernel, options);
+    //     auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+    //         input, 
+    //         kernel, 
+    //         options
+    //     );
+
+    //     checkExpressions(actual, expected);
     // }
 
-    SUBCASE("Asymmetric Kernel") {
-        xt::xtensor<InputType, 2> input{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}};
-        xt::xtensor<KernelType, 1> kernel{1.0f, 1.3f, 1.7f};
-        xt::xtensor<KernelType, 3> fullKernel{{{1.0f, 1.3f, 1.7f}}};
+    SUBCASE("BorderTreatment::constant(2)") {
+        options.setBorderTreatment(xvigra::BorderTreatment::constant(2));
+        
+        auto expected = xvigra::convolve2D(input, fullKernel, options);
+        std::cout << "Expected" << std::endl;
+        printTensor(xt::xtensor<double, 3>(xt::reshape_view(expected, {7, 7, 1})));
+        std::cout << "-------------------------------------------" << std::endl;
 
-        auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::LAST>(input, kernel, options);
+        auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+            input, 
+            kernel, 
+            options
+        );
 
-        checkExpressions(expected, actual);
+        std::cout << "-------------------------------------------" << std::endl;
+        std::cout << "Actual" << std::endl;
+        printTensor(xt::xtensor<double, 3>(xt::reshape_view(actual, {7, 7, 1})));
+        // checkExpressions(actual, expected);
     }
+
+    // SUBCASE("BorderTreatment::asymmetricReflect()") {
+    //     options.setBorderTreatment(xvigra::BorderTreatment::asymmetricReflect());
+        
+    //     auto expected = xvigra::convolve2D(input, fullKernel, options);
+    //     auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+    //         input, 
+    //         kernel, 
+    //         options
+    //     );
+
+    //     checkExpressions(actual, expected);
+    // }
+
+    // SUBCASE("BorderTreatment::avoid()") {
+    //     options.setBorderTreatment(xvigra::BorderTreatment::avoid());
+        
+    //     auto expected = xvigra::convolve2D(input, fullKernel, options);
+    //     auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+    //         input, 
+    //         kernel, 
+    //         options
+    //     );
+
+    //     checkExpressions(actual, expected);
+    // }
+
+    // SUBCASE("BorderTreatment::repeat()") {
+    //     options.setBorderTreatment(xvigra::BorderTreatment::repeat());
+        
+    //     auto expected = xvigra::convolve2D(input, fullKernel, options);
+    //     auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+    //         input, 
+    //         kernel, 
+    //         options
+    //     );
+
+    //     checkExpressions(actual, expected);
+    // }
+
+    // SUBCASE("BorderTreatment::symmetricReflect()") {
+    //     options.setBorderTreatment(xvigra::BorderTreatment::symmetricReflect());
+        
+    //     auto expected = xvigra::convolve2D(input, fullKernel, options);
+    //     auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+    //         input, 
+    //         kernel, 
+    //         options
+    //     );
+
+    //     checkExpressions(actual, expected);
+    // }
+
+    // SUBCASE("BorderTreatment::wrap()") {
+    //     options.setBorderTreatment(xvigra::BorderTreatment::wrap());
+        
+    //     auto expected = xvigra::convolve2D(input, fullKernel, options);
+    //     auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+    //         input, 
+    //         kernel, 
+    //         options
+    //     );
+
+    //     checkExpressions(actual, expected);
+    // }
+
+    // SUBCASE("BorderTreatment::avoid() & BorderTreatment::asymmetricReflect()") {
+    //     options.setBorderTreatmentBegin(xvigra::BorderTreatment::avoid());
+    //     options.setBorderTreatmentEnd(xvigra::BorderTreatment::asymmetricReflect());
+        
+    //     auto expected = xvigra::convolve2D(input, fullKernel, options);
+    //     auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+    //         input, 
+    //         kernel, 
+    //         options
+    //     );
+
+    //     checkExpressions(actual, expected);
+    // }
+
+    // SUBCASE("BorderTreatment::asymmetricReflect() & BorderTreatment::avoid()") {
+    //     options.setBorderTreatmentBegin(xvigra::BorderTreatment::asymmetricReflect());
+    //     options.setBorderTreatmentEnd(xvigra::BorderTreatment::avoid());
+        
+    //     auto expected = xvigra::convolve2D(input, fullKernel, options);
+    //     auto actual = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+    //         input, 
+    //         kernel, 
+    //         options
+    //     );
+
+    //     checkExpressions(actual, expected);
+    // }
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-// ║ Test separableConvolve1D - end                                                                                 ║
+// ║ Test separableConvolve2D - end                                                                                   ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ Test separableConvolve<2> - begin                                                                                ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+// TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Default Options", T, TYPE_PAIRS) {
+//     using InputType = typename T::first_type;
+//     using KernelType = typename T::second_type;
+
+//     xt::xtensor<InputType, 3> input{
+//         {{ 1}, { 2}, { 3}, { 4}, { 5}}, 
+//         {{ 6}, { 7}, { 8}, { 9}, {10}}, 
+//         {{11}, {12}, {13}, {14}, {15}}, 
+//         {{16}, {17}, {18}, {19}, {20}}, 
+//         {{21}, {22}, {23}, {24}, {25}}
+//     };
+//     xvigra::KernelOptions2D options2D;
+
+//     SUBCASE("convolve2D: Symmetric Kernel") {
+//         xt::xtensor<KernelType, 1> kernel{1.00f, 1.30f, 1.70f, 2.10f};
+//         xt::xtensor<KernelType, 4> fullKernel{{{
+//             {1.00f, 1.30f, 1.70f, 2.10f},
+//             {1.30f, 1.69f, 2.21f, 2.73f},
+//             {1.70f, 2.21f, 2.89f, 3.57f},
+//             {2.10f, 2.73f, 3.57f, 4.41f}
+//         }}};
+
+//         auto expected = xvigra::convolve2D(input, fullKernel, options2D);
+//         auto actual = xvigra::separableConvolve<InputType, KernelType, xvigra::ChannelPosition::LAST, 2>(
+//             input, 
+//             {kernel, kernel}, 
+//             {options2D.optionsY, options2D.optionsX}
+//         );
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("convolve2D: Asymmetric Kernel") {
+//         xt::xtensor<KernelType, 1> kernel{1.00f, 1.30f, 1.70f};
+//         xt::xtensor<KernelType, 4> fullKernel{{{
+//             {1.00f, 1.30f, 1.70f},
+//             {1.30f, 1.69f, 2.21f},
+//             {1.70f, 2.21f, 2.89f}
+//         }}};
+
+//         auto expected = xvigra::convolve2D(input, fullKernel, options2D);
+//         auto actual = xvigra::separableConvolve<InputType, KernelType, xvigra::ChannelPosition::LAST, 2>(
+//             input, 
+//             {kernel, kernel}, 
+//             {options2D.optionsY, options2D.optionsX}
+//         );
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("separableConvolve2D: Symmetric Kernel") {
+//         xt::xtensor<KernelType, 1> kernel{1.00f, 1.30f, 1.70f, 2.10f};
+//         xt::xtensor<KernelType, 4> fullKernel{{{
+//             {1.00f, 1.30f, 1.70f, 2.10f},
+//             {1.30f, 1.69f, 2.21f, 2.73f},
+//             {1.70f, 2.21f, 2.89f, 3.57f},
+//             {2.10f, 2.73f, 3.57f, 4.41f}
+//         }}};
+
+//         auto expected = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::LAST>(
+//             input, 
+//             {kernel, kernel}, 
+//             {options2D.optionsY, options2D.optionsX}
+//         );
+//         auto actual = xvigra::separableConvolve<InputType, KernelType, xvigra::ChannelPosition::LAST, 2>(
+//             input, 
+//             {kernel, kernel}, 
+//             {options2D.optionsY, options2D.optionsX}
+//         );
+
+//         checkExpressions(actual, expected);
+//     }
+
+//     SUBCASE("separableConvolve2D: Asymmetric Kernel") {
+//         xt::xtensor<KernelType, 1> kernel{1.00f, 1.30f, 1.70f};
+//         xt::xtensor<KernelType, 4> fullKernel{{{
+//             {1.00f, 1.30f, 1.70f},
+//             {1.30f, 1.69f, 2.21f},
+//             {1.70f, 2.21f, 2.89f}
+//         }}};
+
+//         auto expected = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::LAST>(
+//             input, 
+//             {kernel, kernel}, 
+//             {options2D.optionsY, options2D.optionsX}
+//         );
+//         auto actual = xvigra::separableConvolve<InputType, KernelType, xvigra::ChannelPosition::LAST, 2>(
+//             input, 
+//             {kernel, kernel}, 
+//             {options2D.optionsY, options2D.optionsX}
+//         );
+
+//         checkExpressions(actual, expected);
+//     }
+// }
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ Test separableConvolve<2> - end                                                                                  ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝

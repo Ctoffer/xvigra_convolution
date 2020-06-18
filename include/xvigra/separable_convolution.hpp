@@ -17,6 +17,7 @@
 
 #include "xvigra/explicit_convolution.hpp"
 #include "xvigra/convolution_util.hpp"
+#include "xvigra/io_util.hpp"
 
 namespace xvigra {
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -107,7 +108,7 @@ namespace xvigra {
         } else if constexpr (channelPosition == xvigra::ChannelPosition::FIRST) {
             locationOfChannel = 0;
         } else {
-            throw std::invalid_argument("ChannelPosition for input can't be IMPLICIT.");
+            throw std::invalid_argument("separableConvolve1D(): ChannelPosition for input can't be IMPLICIT.");
         }
         
         std::size_t channels = inputShape[locationOfChannel];
@@ -182,7 +183,7 @@ namespace xvigra {
              endAxis = numberOfDimensions;
         }
      
-        xt::xtensor<ResultType, 3> result(input);
+        xt::xtensor<ResultType, 3> result = xt::cast<ResultType>(input);
         std::array<std::size_t, 3> resultShape = result.shape();
 
         for (std::size_t currentAxis = startAxis; currentAxis < endAxis; ++currentAxis) {
@@ -206,17 +207,48 @@ namespace xvigra {
                     xt::xstrided_slice_vector sliceVector = xvigra::decomposeIndex<3>(compoundIndex, resultShape, currentAxis, startAxis, endAxis);
                     sliceVector[locationOfChannel] = channel;
 
-                    xt::xtensor<InputType, 1> row(xt::strided_view(result, sliceVector));
+                    xt::xtensor<ResultType, 1> row(xt::strided_view(result, sliceVector));
+                    std::cout << "   Row: " << row << std::endl;
                     xt::xtensor<ResultType, 1> convolvedRow = xvigra::convolve1DImplicit(row, kernel, options);
+                    std::cout << "   -> : " << convolvedRow << std::endl;
                     xt::strided_view(tmp, sliceVector) = convolvedRow;
                 }
             }
 
+            std::cout << tmp << std::endl;
             result = tmp;
         }
 
         return result;
-    }   
+    }
+
+
+    template <typename InputType, typename KernelType, xvigra::ChannelPosition channelPosition>
+    xt::xtensor<typename std::common_type_t<InputType, KernelType>, 3> separableConvolve2D(
+        const xt::xtensor<InputType, 3>& input,
+        const xt::xtensor<KernelType, 1>& rawKernel,
+        const xvigra::KernelOptions& options
+    ) {
+        return separableConvolve2D<InputType, KernelType, channelPosition>(
+            input, 
+            {rawKernel, rawKernel}, 
+            {options, options}
+        );
+    }
+
+
+    template <typename InputType, typename KernelType, xvigra::ChannelPosition channelPosition>
+    xt::xtensor<typename std::common_type_t<InputType, KernelType>, 3> separableConvolve2D(
+        const xt::xtensor<InputType, 3>& input,
+        const xt::xtensor<KernelType, 1>& rawKernel,
+        const xvigra::KernelOptions2D& options
+    ) {
+        return separableConvolve2D<InputType, KernelType, channelPosition>(
+            input, 
+            {rawKernel, rawKernel}, 
+            {options.optionsY, options.optionsX}
+        );
+    }
 
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
     // ║ separableConvolve2D - end                                                                                    ║
@@ -283,7 +315,7 @@ namespace xvigra {
                     xt::xstrided_slice_vector sliceVector = xvigra::decomposeIndex<N + 1>(compoundIndex, resultShape, currentAxis, startAxis, endAxis);
                     sliceVector[locationOfChannel] = channel;
 
-                    xt::xtensor<InputType, 1> row(xt::strided_view(result, sliceVector));
+                    xt::xtensor<ResultType, 1> row(xt::strided_view(result, sliceVector));
                     xt::xtensor<ResultType, 1> convolvedRow = xvigra::convolve1DImplicit(row, kernel, options);
                     xt::strided_view(tmp, sliceVector) = convolvedRow;
                 }

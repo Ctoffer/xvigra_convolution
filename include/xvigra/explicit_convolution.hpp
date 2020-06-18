@@ -195,7 +195,7 @@ auto convolve1D(
     Tensor2D<ResultType> result;
 
     if (options.channelPosition == xvigra::ChannelPosition::FIRST) {
-        Tensor3D<InputType> patch = xt::zeros<InputType>({
+        Tensor3D<ResultType> patch = xt::zeros<ResultType>({
             inputChannels, 
             kernelSize, 
             outputWidth
@@ -211,7 +211,7 @@ auto convolve1D(
                     auto inputX = inputWidthIndices.at(outIndex) + kernelOffsetX;
                     
                     if(0 <= inputX && inputX < inputWidth) {
-                        patch(inputChannel, patchKernelX, outIndex) = input(inputChannel, inputX);  
+                        patch(inputChannel, patchKernelX, outIndex) = static_cast<ResultType>(input(inputChannel, inputX));  
                     } else {
                         xvigra::BorderTreatment treatment = xvigra::BorderTreatment::avoid();
                         int index = -1;
@@ -231,7 +231,7 @@ auto convolve1D(
                             value = input(inputChannel, index);
                         }
 
-                        patch(inputChannel, patchKernelX, outIndex) = value;
+                        patch(inputChannel, patchKernelX, outIndex) = static_cast<ResultType>(value);
                     }
                 }
             }
@@ -241,7 +241,7 @@ auto convolve1D(
         auto reshapedPatch = xt::reshape_view(patch, {inputChannels * kernelSize, outputWidth});
         result = xt::linalg::dot(reshapedKernel, reshapedPatch);
     } else {
-        Tensor3D<InputType> patch = xt::zeros<InputType>({
+        Tensor3D<ResultType> patch = xt::zeros<InputType>({
             outputWidth,
             inputChannels, 
             kernelSize
@@ -256,7 +256,7 @@ auto convolve1D(
 
                 if(0 <= inputX && inputX < inputWidth) {
                     for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
-                        patch(outIndex, inputChannel, patchKernelX) = input(inputX, inputChannel); 
+                        patch(outIndex, inputChannel, patchKernelX) = static_cast<ResultType>(input(inputX, inputChannel)); 
                     }
                 } else {
                      for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
@@ -278,7 +278,7 @@ auto convolve1D(
                             value = input(index, inputChannel);
                         }
 
-                        patch(outIndex, inputChannel, patchKernelX) = value;
+                        patch(outIndex, inputChannel, patchKernelX) = static_cast<ResultType>(value);
                     }
                 }
             }
@@ -428,7 +428,7 @@ auto convolve2D(
     
     xt::xtensor<ResultType, 3> result;
     if (optionsY.channelPosition == xvigra::ChannelPosition::FIRST) {
-       Tensor5D<InputType> patch = xt::zeros<InputType>({inputChannels, kernelHeight, kernelWidth, outputHeight, outputWidth});
+       Tensor5D<ResultType> patch = xt::zeros<ResultType>({inputChannels, kernelHeight, kernelWidth, outputHeight, outputWidth});
         
         for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
             for (auto kernelY = kernelHeightMinimum; kernelY < kernelHeightMaximum; ++kernelY) {
@@ -442,7 +442,7 @@ auto convolve2D(
                             auto outKernelX = kernelX + std::abs(kernelWidthMinimum);
                             
                             if((0 <= inputY && inputY < inputHeight) && (0 <= inputX && inputX < inputWidth)) {
-                                patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = input(inputChannel, inputY, inputX);
+                                patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = static_cast<ResultType>(input(inputChannel, inputY, inputX));
                             } else {
                                 xvigra::BorderTreatment treatmentY = xvigra::BorderTreatment::avoid();
                                 int indexY = inputY;
@@ -479,7 +479,7 @@ auto convolve2D(
                                     value = input(inputChannel, indexY, indexX);
                                 }
 
-                                patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = value;  
+                                patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = static_cast<ResultType>(value);  
                             }
                         }
                     }
@@ -492,7 +492,7 @@ auto convolve2D(
         result = xt::reshape_view(xt::linalg::dot(reshapedKernel, reshapedPatch), {outputChannels, outputHeight, outputWidth});
         
     } else {
-        Tensor5D<InputType> patch= xt::zeros<InputType>({outputHeight, outputWidth, inputChannels, kernelHeight, kernelWidth});
+        Tensor5D<ResultType> patch= xt::zeros<ResultType>({outputHeight, outputWidth, inputChannels, kernelHeight, kernelWidth});
         
         for (std::size_t outIndexY = 0; outIndexY < inputHeightIndices.size(); ++outIndexY) {
             for (std::size_t outIndexX = 0; outIndexX < inputWidthIndices.size(); ++outIndexX) {
@@ -506,7 +506,7 @@ auto convolve2D(
                         
                         if((0 <= inputY && inputY < inputHeight) && (0 <= inputX && inputX < inputWidth)){
                             for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
-                                patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = input(inputY, inputX, inputChannel);
+                                patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = static_cast<ResultType>(input(inputY, inputX, inputChannel));
                             }
                         } else {
                             for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
@@ -545,7 +545,7 @@ auto convolve2D(
                                     value = input(indexY, indexX, inputChannel);
                                 }
 
-                                patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = value;  
+                                patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = static_cast<ResultType>(value); 
                             }
                         }
                     }
