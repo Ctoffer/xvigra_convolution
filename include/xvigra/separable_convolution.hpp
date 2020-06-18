@@ -11,6 +11,7 @@
 #endif
 
 #include "xtensor/xarray.hpp"
+#include "xtensor/xmath.hpp"
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"
@@ -151,6 +152,61 @@ namespace xvigra {
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 
+    template <typename ConstantType, typename KernelType, std::size_t N, bool isBegin>
+    void calculateNewConstantValue(
+        xvigra::KernelOptions& toModify,
+        std::size_t currentIndex,
+        const std::array<xt::xtensor<KernelType, 1>, N>& rawKernels
+    ) {
+        ConstantType initialValue;
+        if constexpr (isBegin) {
+            initialValue = toModify.borderTreatmentBegin.getValue<ConstantType>();
+        } else {
+            initialValue = toModify.borderTreatmentEnd.getValue<ConstantType>();
+        }
+        if (initialValue == static_cast<ConstantType>(0)) {
+            return;
+        }
+        ConstantType result{initialValue};
+
+        for (std::size_t i = 0; i < currentIndex; ++i) {
+            result = xt::eval(xt::sum(rawKernels[i] * result))[0];
+        }
+
+         if constexpr (isBegin) {
+            toModify.borderTreatmentBegin = xvigra::BorderTreatment::constant<ConstantType>(result);
+        } else {
+            toModify.borderTreatmentEnd = xvigra::BorderTreatment::constant<ConstantType>(result);
+        }
+    }
+
+    template <typename KernelType, typename ConstantType, std::size_t N>
+    void updateConstantValueIfNecessary(
+        xvigra::KernelOptions& toModify,
+        std::size_t currentIndex,
+        const std::array<xt::xtensor<KernelType, 1>, N>& rawKernels
+    ) {
+        auto treatmentBegin = toModify.borderTreatmentBegin;
+        auto treatmentEnd = toModify.borderTreatmentEnd;
+
+        if (treatmentBegin.getType() == xvigra::BorderTreatmentType::CONSTANT) {
+            calculateNewConstantValue<ConstantType, KernelType, N, true>(
+                toModify, 
+                currentIndex, 
+                rawKernels
+            );
+        } 
+
+        if (treatmentEnd.getType() == xvigra::BorderTreatmentType::CONSTANT) {
+            calculateNewConstantValue<ConstantType, KernelType, N, false>(
+                toModify, 
+                currentIndex, 
+                rawKernels
+            );
+        }
+    }
+
+
     template <typename InputType, typename KernelType, xvigra::ChannelPosition channelPosition>
     xt::xtensor<typename std::common_type_t<InputType, KernelType>, 3> separableConvolve2D(
         const xt::xtensor<InputType, 3>& input,
@@ -190,6 +246,11 @@ namespace xvigra {
             std::size_t index = currentAxis - startAxis;
             xvigra::KernelOptions options(kernelOptions[index]);
             options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
+            updateConstantValueIfNecessary<KernelType, ResultType, 2>(
+                options, 
+                currentAxis - startAxis, 
+                rawKernels
+            );
 
             xt::xtensor<KernelType, 1> rawKernel = rawKernels[index];
             std::size_t kernelSize = rawKernel.shape()[0];
@@ -200,22 +261,30 @@ namespace xvigra {
             resultShape[currentAxis] = static_cast<std::size_t>(size);
 
             xt::xtensor<ResultType, 3> tmp(resultShape);
-             std::size_t maxIndex = xvigra::calculateMaxIndex<3>(resultShape, currentAxis, startAxis, endAxis);
+            std::size_t maxIndex = xvigra::calculateMaxIndex<3>(
+                resultShape, 
+                currentAxis, 
+                startAxis, 
+                endAxis
+            );
 
             for (std::size_t channel = 0; channel < channels; ++channel) {
                 for (std::size_t compoundIndex = 0; compoundIndex < maxIndex; ++compoundIndex) {
-                    xt::xstrided_slice_vector sliceVector = xvigra::decomposeIndex<3>(compoundIndex, resultShape, currentAxis, startAxis, endAxis);
+                    xt::xstrided_slice_vector sliceVector = xvigra::decomposeIndex<3>(
+                        compoundIndex, 
+                        resultShape, 
+                        currentAxis, 
+                        startAxis,
+                        endAxis
+                    );
                     sliceVector[locationOfChannel] = channel;
 
                     xt::xtensor<ResultType, 1> row(xt::strided_view(result, sliceVector));
-                    std::cout << "   Row: " << row << std::endl;
                     xt::xtensor<ResultType, 1> convolvedRow = xvigra::convolve1DImplicit(row, kernel, options);
-                    std::cout << "   -> : " << convolvedRow << std::endl;
                     xt::strided_view(tmp, sliceVector) = convolvedRow;
                 }
             }
 
-            std::cout << tmp << std::endl;
             result = tmp;
         }
 
@@ -298,6 +367,11 @@ namespace xvigra {
             std::size_t index = currentAxis - startAxis;
             xvigra::KernelOptions options(kernelOptions[index]);
             options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
+            updateConstantValueIfNecessary<KernelType, ResultType, N>(
+                options, 
+                currentAxis - startAxis, 
+                rawKernels
+            );
 
             xt::xtensor<KernelType, 1> rawKernel = rawKernels[index];
             std::size_t kernelSize = rawKernel.shape()[0];

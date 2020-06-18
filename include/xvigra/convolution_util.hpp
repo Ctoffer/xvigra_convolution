@@ -122,7 +122,8 @@ namespace xvigra {
         BorderTreatmentType type;
         double value;
 
-        BorderTreatment(const BorderTreatmentType& type, double value=0.0) 
+        template <typename ValueType=double>
+        BorderTreatment(const BorderTreatmentType& type, ValueType value=0.0) 
         : type(type), value(value) {}
 
     public:
@@ -147,7 +148,8 @@ namespace xvigra {
             return BorderTreatment(BorderTreatmentType::WRAP);
         }
 
-        static BorderTreatment constant(double value=0.0) {
+        template <typename ValueType=double>
+        static BorderTreatment constant(ValueType value=0) {
             return BorderTreatment(BorderTreatmentType::CONSTANT, value);
         }
 
@@ -225,7 +227,6 @@ namespace xvigra {
         void setBorderTreatment(const BorderTreatment&, const BorderTreatment&);
         void setBorderTreatmentBegin(const BorderTreatment&);
         void setBorderTreatmentEnd(const BorderTreatment&);
-
     }; // KernelOptions
 
     std::ostream& operator<<(std::ostream& out, const KernelOptions& options) {
