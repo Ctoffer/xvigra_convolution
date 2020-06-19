@@ -97,9 +97,8 @@ namespace xvigra {
         using ResultType = typename std::common_type_t<InputType, KernelType>;
         auto inputShape = input.shape();
         std::size_t kernelWidth = rawKernel.shape()[0];
-        xt::xtensor<KernelType, 3> kernel(xt::reshape_view(rawKernel, {1, 1, static_cast<int>(kernelWidth)}));
+        
         xvigra::KernelOptions options(kernelOptions);
-        options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
 
         std::size_t numberOfDimensions = input.dimension();
         std::size_t locationOfChannel = 0;
@@ -113,6 +112,18 @@ namespace xvigra {
         }
         
         std::size_t channels = inputShape[locationOfChannel];
+        typename xt::xtensor<KernelType, 3>::shape_type kernelShape{channels, channels, kernelWidth};
+        xt::xtensor<KernelType, 3> kernel(kernelShape);
+
+        for (std::size_t outIndex = 0; outIndex < channels; ++outIndex) {
+            for (std::size_t inIndex = 0; inIndex < channels; ++inIndex) {
+                for (std::size_t w = 0; w < kernelWidth; ++w) {
+                    kernel(outIndex, inIndex, w) = outIndex == inIndex ? rawKernel(w) : static_cast<KernelType>(0);
+                }
+            }
+        }
+
+        // std::cout << kernel << std::endl;
 
         std::array<std::size_t, 2> resultShape;
         if constexpr (channelPosition == xvigra::ChannelPosition::LAST) {
@@ -126,18 +137,11 @@ namespace xvigra {
         }
         xt::xtensor<ResultType, 2> result(resultShape);
 
-        for (std::size_t channel = 0; channel < channels; ++channel) {
-            xt::xstrided_slice_vector sliceVector(2, xt::all());
-            if constexpr (channelPosition == xvigra::ChannelPosition::LAST) {
-                sliceVector[1] = channel;
-            } else {
-                sliceVector[0] = channel;
-            }
-
-            xt::xtensor<InputType, 1> row(xt::strided_view(input, sliceVector));
-            auto convolvedRow = xvigra::convolve1DImplicit(row, kernel, options);
-            xt::strided_view(result, sliceVector) = convolvedRow;
-        }
+        xt::xstrided_slice_vector sliceVector(2, xt::all());
+        xt::xtensor<InputType, 2> rowWithChannels = xt::strided_view(input, sliceVector);
+        auto convolvedRow = xvigra::convolve1D(rowWithChannels, kernel, options);
+        xt::strided_view(result, sliceVector) = convolvedRow;
+        
 
         return result;
     }   
@@ -349,6 +353,7 @@ namespace xvigra {
         
         std::size_t channels = input.shape()[locationOfChannel];
 
+
         std::size_t startAxis = 0;
         std::size_t endAxis = numberOfDimensions - 1;
 
@@ -363,10 +368,11 @@ namespace xvigra {
         xt::xtensor<ResultType, N + 1> result(input);
         std::array<std::size_t, N + 1> resultShape = result.shape();
 
+        
         for (std::size_t currentAxis = startAxis; currentAxis < endAxis; ++currentAxis) {
             std::size_t index = currentAxis - startAxis;
             xvigra::KernelOptions options(kernelOptions[index]);
-            options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
+            // options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
             updateConstantValueIfNecessary<KernelType, ResultType, N>(
                 options, 
                 currentAxis - startAxis, 
@@ -375,8 +381,17 @@ namespace xvigra {
 
             xt::xtensor<KernelType, 1> rawKernel = rawKernels[index];
             std::size_t kernelSize = rawKernel.shape()[0];
-            std::vector<int> kernelShape{1, 1, static_cast<int>(kernelSize)};
-            xt::xtensor<KernelType, 3> kernel(xt::reshape_view(rawKernel, kernelShape));
+            typename xt::xtensor<KernelType, 3>::shape_type kernelShape{channels, channels, kernelSize};
+            xt::xtensor<KernelType, 3> kernel(kernelShape);
+
+            for (std::size_t outIndex = 0; outIndex < channels; ++outIndex) {
+                for (std::size_t inIndex = 0; inIndex < channels; ++inIndex) {
+                    for (std::size_t w = 0; w < kernelSize; ++w) {
+                        kernel(outIndex, inIndex, w) = outIndex == inIndex ? rawKernel(w) : static_cast<KernelType>(0);
+                    }
+                }
+            }
+
 
             int size = xvigra::calculateOutputSize(resultShape[currentAxis], kernelSize, options);
             resultShape[currentAxis] = static_cast<std::size_t>(size);
@@ -384,16 +399,14 @@ namespace xvigra {
             xt::xtensor<ResultType, N + 1> tmp(resultShape);
             std::size_t maxIndex = xvigra::calculateMaxIndex<N + 1>(resultShape, currentAxis, startAxis, endAxis);
 
-            for (std::size_t channel = 0; channel < channels; ++channel) {
                 for (std::size_t compoundIndex = 0; compoundIndex < maxIndex; ++compoundIndex) {
                     xt::xstrided_slice_vector sliceVector = xvigra::decomposeIndex<N + 1>(compoundIndex, resultShape, currentAxis, startAxis, endAxis);
-                    sliceVector[locationOfChannel] = channel;
 
-                    xt::xtensor<ResultType, 1> row(xt::strided_view(result, sliceVector));
-                    xt::xtensor<ResultType, 1> convolvedRow = xvigra::convolve1DImplicit(row, kernel, options);
+                    xt::xtensor<ResultType, 2> row(xt::strided_view(result, sliceVector));
+                    xt::xtensor<ResultType, 2> convolvedRow = xvigra::convolve1D(row, kernel, options);
                     xt::strided_view(tmp, sliceVector) = convolvedRow;
                 }
-            }
+            
 
             result = tmp;
         }

@@ -30,7 +30,7 @@ void benchmark_separableConvolve1D_inputSize_channelFirst(benchmark::State& stat
 	int dilation = 2;
 
 	xvigra::KernelOptions options(padding, stride, dilation);
-	options.channelPosition = xvigra::ChannelPosition::IMPLICIT;   
+	options.channelPosition = xvigra::ChannelPosition::FIRST;   
 
 	xt::xtensor<ElementType, 2> input;
 	xt::xtensor<ElementType, 1> kernel;
@@ -102,7 +102,7 @@ void benchmark_separableConvolve_1D_inputSize_channelFirst(benchmark::State& sta
 	int dilation = 2;
 
 	xvigra::KernelOptions options(padding, stride, dilation);
-	options.channelPosition = xvigra::ChannelPosition::IMPLICIT;   
+	options.channelPosition = xvigra::ChannelPosition::FIRST;   
 
 	xt::xtensor<ElementType, 2> input;
 	xt::xtensor<ElementType, 1> kernel;
@@ -136,7 +136,7 @@ void benchmark_separableConvolve_1D_inputSize_channelLast(benchmark::State& stat
 	int dilation = 2;
 
 	xvigra::KernelOptions options(padding, stride, dilation);
-	options.channelPosition = xvigra::ChannelPosition::IMPLICIT;   
+	options.channelPosition = xvigra::ChannelPosition::LAST;   
 
 	xt::xtensor<ElementType, 2> input;
 	xt::xtensor<ElementType, 1> kernel;
