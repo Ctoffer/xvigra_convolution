@@ -12,10 +12,10 @@
 
 #define INPUT_SIZE_MIN 50
 #define INPUT_SIZE_MAX 2000
-#define INPUT_SIZE_STEP 50
-using InputType = float;
+#define INPUT_SIZE_STEP 650
 
 // =======================================================================================
+
 
 template <typename ElementType>
 void benchmark_separableConvolve2D_inputSize_channelFirst(benchmark::State& state) {
@@ -300,7 +300,7 @@ void benchmark_convolve2D_inputSize_channelLast(benchmark::State& state) {
 
 // =======================================================================================
 
-BENCHMARK_TEMPLATE(benchmark_separableConvolve2D_inputSize_channelFirst, InputType)
+BENCHMARK_TEMPLATE(benchmark_separableConvolve2D_inputSize_channelFirst, float)
     ->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})
@@ -309,7 +309,7 @@ BENCHMARK_TEMPLATE(benchmark_separableConvolve2D_inputSize_channelFirst, InputTy
   	})
 	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
 	->Unit(benchmark::kMillisecond);
-BENCHMARK_TEMPLATE(benchmark_separableConvolve2D_inputSize_channelLast, InputType)
+BENCHMARK_TEMPLATE(benchmark_separableConvolve2D_inputSize_channelLast, float)
 	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})
@@ -320,7 +320,7 @@ BENCHMARK_TEMPLATE(benchmark_separableConvolve2D_inputSize_channelLast, InputTyp
 	->Unit(benchmark::kMillisecond);
 
 
-BENCHMARK_TEMPLATE(benchmark_separableConvolve_2D_inputSize_channelFirst, InputType)
+BENCHMARK_TEMPLATE(benchmark_separableConvolve_2D_inputSize_channelFirst, float)
     ->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})
@@ -329,7 +329,7 @@ BENCHMARK_TEMPLATE(benchmark_separableConvolve_2D_inputSize_channelFirst, InputT
   	})
 	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
 	->Unit(benchmark::kMillisecond);
-BENCHMARK_TEMPLATE(benchmark_separableConvolve_2D_inputSize_channelLast, InputType)
+BENCHMARK_TEMPLATE(benchmark_separableConvolve_2D_inputSize_channelLast, float)
 	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})
@@ -339,7 +339,8 @@ BENCHMARK_TEMPLATE(benchmark_separableConvolve_2D_inputSize_channelLast, InputTy
 	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
 	->Unit(benchmark::kMillisecond);
 
-BENCHMARK_TEMPLATE(benchmark_convolve2D_inputSize_channelFirst, InputType)
+
+BENCHMARK_TEMPLATE(benchmark_convolve2D_inputSize_channelFirst, float)
     ->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})
@@ -348,7 +349,7 @@ BENCHMARK_TEMPLATE(benchmark_convolve2D_inputSize_channelFirst, InputType)
   	})
 	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
 	->Unit(benchmark::kMillisecond);
-BENCHMARK_TEMPLATE(benchmark_convolve2D_inputSize_channelLast, InputType)
+BENCHMARK_TEMPLATE(benchmark_convolve2D_inputSize_channelLast, float)
 	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})

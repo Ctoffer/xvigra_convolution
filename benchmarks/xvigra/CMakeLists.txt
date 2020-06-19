@@ -5,6 +5,6 @@ set (TARGETS
 )
 
 FOREACH(TARGET ${TARGETS})
-    add_executable(xvigra_${TARGET} ${TARGET}.cpp)
-    target_link_libraries(xvigra_${TARGET} benchmark::benchmark ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} xtensor Threads::Threads)
+    add_executable(${TARGET} ${TARGET}.cpp)
+    target_link_libraries(${TARGET} benchmark::benchmark ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} xtensor Threads::Threads)
 ENDFOREACH(TARGET)

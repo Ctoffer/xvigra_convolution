@@ -1,4 +1,4 @@
-clear;
+#clear;
 cd build-windows; 
 
 $start_time = [Math]::Round((Get-Date).ToFileTime()/10000);
@@ -16,9 +16,9 @@ $runtime = $end_time - $start_time;
 cd ..;
 
 $start_time = [Math]::Round((Get-Date).ToFileTime()/10000);
-#.\build-windows\tests\Release\test_image_io.exe;
-#.\build-windows\tests\Release\test_explicit_convolution.exe;
-#.\build-windows\tests\Release\test_convolution_util.exe;
+.\build-windows\tests\Release\test_image_io.exe;
+.\build-windows\tests\Release\test_explicit_convolution.exe;
+.\build-windows\tests\Release\test_convolution_util.exe;
 .\build-windows\tests\Release\test_separable_convolution.exe;
 $end_time = [Math]::Round((Get-Date).ToFileTime()/10000);
 $runtime = $end_time - $start_time;

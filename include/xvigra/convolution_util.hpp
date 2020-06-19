@@ -24,7 +24,7 @@ namespace xvigra {
 
     class KernelOptions;
 
-    class KernelOptions2D;
+    struct KernelOptions2D;
 
     int truePadding(int, const BorderTreatment&);
 

@@ -6,15 +6,16 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xrandom.hpp"
 
+#include "xvigra/explicit_convolution.hpp"
 #include "xvigra/separable_convolution.hpp"
 #include "xvigra/io_util.hpp"
 
 #define INPUT_SIZE_MIN 50
-#define INPUT_SIZE_MAX 200
-#define INPUT_SIZE_STEP 150
-using InputType = float;
+#define INPUT_SIZE_MAX 2000
+#define INPUT_SIZE_STEP 650
 
 // =======================================================================================
+
 
 template <typename ElementType>
 void benchmark_separableConvolve1D_inputSize_channelFirst(benchmark::State& state) {
@@ -88,6 +89,7 @@ void benchmark_separableConvolve1D_inputSize_channelLast(benchmark::State& state
 // =======================================================================================
 // =======================================================================================
 
+
 template <typename ElementType>
 void benchmark_separableConvolve_1D_inputSize_channelFirst(benchmark::State& state) {
 	int inputWidth = static_cast<int>(state.range(0));
@@ -160,7 +162,79 @@ void benchmark_separableConvolve_1D_inputSize_channelLast(benchmark::State& stat
 // =======================================================================================
 // =======================================================================================
 
-BENCHMARK_TEMPLATE(benchmark_separableConvolve1D_inputSize_channelFirst, InputType)
+
+template <typename ElementType>
+void benchmark_convolve1D_inputSize_channelFirst(benchmark::State& state) {
+	int inputWidth = static_cast<int>(state.range(0));
+	int inputChannels = 3;
+	int kernelWidth = 7;
+	
+	std::array<int, 2> inputShape{inputChannels, inputWidth};
+	std::array<int, 3> kernelShape{inputChannels, inputChannels, kernelWidth};
+
+	int padding = 3;
+	int stride = 4;
+	int dilation = 2;
+
+	xvigra::KernelOptions options(padding, stride, dilation);
+	options.channelPosition = xvigra::ChannelPosition::FIRST;   
+
+	xt::xtensor<ElementType, 2> input;
+	xt::xtensor<ElementType, 3> kernel;
+	
+	if constexpr (std::is_floating_point<ElementType>::value) {
+		input = xt::random::rand<ElementType>(inputShape);
+		kernel = xt::random::rand<ElementType>(kernelShape);
+	} else {
+		input = xt::random::randint<ElementType>(inputShape);
+		kernel = xt::random::randint<ElementType>(kernelShape);
+	}
+	
+	for (auto _ : state) {
+		 auto result = xvigra::convolve1D(input, kernel, options);
+		 benchmark::DoNotOptimize(result.data());
+	}
+}
+
+
+template <typename ElementType>
+void benchmark_convolve1D_inputSize_channelLast(benchmark::State& state) {
+	int inputWidth = static_cast<int>(state.range(0));
+	int inputChannels = 3;
+	int kernelWidth = 7;
+	
+	std::array<int, 2> inputShape{inputWidth, inputChannels};
+	std::array<int, 3> kernelShape{inputChannels, inputChannels, kernelWidth};
+
+	int padding = 3;
+	int stride = 4;
+	int dilation = 2;
+
+	xvigra::KernelOptions options(padding, stride, dilation);
+	options.channelPosition = xvigra::ChannelPosition::LAST;   
+
+	xt::xtensor<ElementType, 2> input;
+	xt::xtensor<ElementType, 3> kernel;
+	
+	if constexpr (std::is_floating_point<ElementType>::value) {
+		input = xt::random::rand<ElementType>(inputShape);
+		kernel = xt::random::rand<ElementType>(kernelShape);
+	} else {
+		input = xt::random::randint<ElementType>(inputShape);
+		kernel = xt::random::randint<ElementType>(kernelShape);
+	}
+	
+	for (auto _ : state) {
+		 auto result = xvigra::convolve1D(input, kernel, options);
+		 benchmark::DoNotOptimize(result.data());
+	}
+}
+
+
+// =======================================================================================
+
+
+BENCHMARK_TEMPLATE(benchmark_separableConvolve1D_inputSize_channelFirst, float)
     ->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})
@@ -168,7 +242,8 @@ BENCHMARK_TEMPLATE(benchmark_separableConvolve1D_inputSize_channelFirst, InputTy
     	return *(std::max_element(std::begin(v), std::end(v)));
   	})
 	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP);
-BENCHMARK_TEMPLATE(benchmark_separableConvolve1D_inputSize_channelLast, InputType)
+
+BENCHMARK_TEMPLATE(benchmark_separableConvolve1D_inputSize_channelLast, float)
 	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})
@@ -178,7 +253,10 @@ BENCHMARK_TEMPLATE(benchmark_separableConvolve1D_inputSize_channelLast, InputTyp
 	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP);
 
 
-BENCHMARK_TEMPLATE(benchmark_separableConvolve_1D_inputSize_channelFirst, InputType)
+// =======================================================================================
+
+
+BENCHMARK_TEMPLATE(benchmark_separableConvolve_1D_inputSize_channelFirst, float)
     ->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})
@@ -186,7 +264,8 @@ BENCHMARK_TEMPLATE(benchmark_separableConvolve_1D_inputSize_channelFirst, InputT
     	return *(std::max_element(std::begin(v), std::end(v)));
   	})
 	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP);
-BENCHMARK_TEMPLATE(benchmark_separableConvolve_1D_inputSize_channelLast, InputType)
+
+BENCHMARK_TEMPLATE(benchmark_separableConvolve_1D_inputSize_channelLast, float)
 	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})
@@ -194,6 +273,32 @@ BENCHMARK_TEMPLATE(benchmark_separableConvolve_1D_inputSize_channelLast, InputTy
     	return *(std::max_element(std::begin(v), std::end(v)));
   	})
 	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP);
+
+
+// =======================================================================================
+
+
+
+BENCHMARK_TEMPLATE(benchmark_convolve1D_inputSize_channelFirst, float)
+    ->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
+    	return *(std::min_element(std::begin(v), std::end(v)));
+  	})
+	->ComputeStatistics("max", [](const std::vector<double>& v) -> double {
+    	return *(std::max_element(std::begin(v), std::end(v)));
+  	})
+	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP);
+
+BENCHMARK_TEMPLATE(benchmark_convolve1D_inputSize_channelLast, float)
+	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
+    	return *(std::min_element(std::begin(v), std::end(v)));
+  	})
+	->ComputeStatistics("max", [](const std::vector<double>& v) -> double {
+    	return *(std::max_element(std::begin(v), std::end(v)));
+  	})
+	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP);
+
+
+// =======================================================================================
 
 
 BENCHMARK_MAIN();
