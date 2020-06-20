@@ -12,7 +12,7 @@
 
 #define INPUT_SIZE_MIN 50
 #define INPUT_SIZE_MAX 2000
-#define INPUT_SIZE_STEP 650
+#define INPUT_SIZE_STEP 50
 
 // =======================================================================================
 

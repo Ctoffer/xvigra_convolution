@@ -6,9 +6,9 @@ data:
     - group_3
 
   group_names:
-    group_1: benchmark_separableConvolve2D_inputSize
-    group_2: benchmark_separableConvolve_2D_inputSize
-    group_3: benchmark_convolve2D_inputSize
+    group_1: benchmark_separableConvolve1D_inputSize
+    group_2: benchmark_separableConvolve_1D_inputSize
+    group_3: benchmark_convolve1D_inputSize
 
 
   variants: ['channelFirst', 'channelLast']
@@ -36,12 +36,12 @@ graph:
   legend:
     key: '{group_id}_{variant}'
     entries:
-      group_1_channelFirst: separableConvolve2D (Channel First)
-      group_1_channelLast: separableConvolve2D (Channel Last)
-      group_2_channelFirst: separableConvolve [N=2] (Channel First)
-      group_2_channelLast: separableConvolve [N=2] (Channel Last)
-      group_3_channelFirst: convolve2D (Channel First)
-      group_3_channelLast: convolve2D (Channel Last)
+      group_1_channelFirst: separableConvolve1D (Channel First)
+      group_1_channelLast: separableConvolve1D (Channel Last)
+      group_2_channelFirst: separableConvolve [N=1] (Channel First)
+      group_2_channelLast: separableConvolve [N=1] (Channel Last)
+      group_3_channelFirst: convolve1D (Channel First)
+      group_3_channelLast: convolve1D (Channel Last)
 
   line_style:
     key: '{variant}'

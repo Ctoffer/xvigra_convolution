@@ -49,13 +49,13 @@ def call_benchmark(file_name, benchmark_parameters, folder="xvigra"):
 def main():
     benchmark_parameters = {
         "format": "console",
-        "min_time": 1.0,
-        "repetitions": 3,
+        "min_time": 2.5,
+        "repetitions": 10,
         "report_aggregates_only": True
     }
 
     benchmark_files = (
-        # "benchmark_convolve1D_inputSize",
+        "benchmark_convolve1D_inputSize",
         "benchmark_separableConvolve1D_inputSize",
         "benchmark_separableConvolve2D_inputSize"
     )

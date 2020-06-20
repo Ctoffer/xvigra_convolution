@@ -10,7 +10,7 @@
 
 #define INPUT_SIZE_MIN 50
 #define INPUT_SIZE_MAX 2000
-#define INPUT_SIZE_STEP 650
+#define INPUT_SIZE_STEP 50
 
 // =======================================================================================
 
@@ -403,7 +403,7 @@ BENCHMARK_TEMPLATE(benchmark_convolve1D_v1_inputSize_channelFirst, float)
   	})
 	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP);
 
-BENCHMARK_TEMPLATE(benchmark_convolve1D_v1_inputSize_channelFirst, float)
+BENCHMARK_TEMPLATE(benchmark_convolve1D_v1_inputSize_channelLast, float)
 	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
     	return *(std::min_element(std::begin(v), std::end(v)));
   	})
