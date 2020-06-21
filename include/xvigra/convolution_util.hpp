@@ -35,7 +35,7 @@ namespace xvigra {
     xt::xtensor<T, Dim> roundTensor(const xt::xtensor<T, Dim>&, int);
 
     template <typename T = int> 
-    std::vector<T> range(const T&, const T&, const T&);
+    std::vector<T> range(const T&, const T&, const T& step=1);
 
     template <typename T>
     xt::xtensor<T, 3> normalizeAfterConvolution(const xt::xtensor<T, 3>&);

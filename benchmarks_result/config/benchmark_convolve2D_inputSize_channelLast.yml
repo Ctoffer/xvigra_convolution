@@ -1,0 +1,61 @@
+data:
+  key: '{group_name}_{variant}<{specialization}>/{x}_{aggregate}'
+  group_ids:
+    - group_1
+    - group_2
+    - group_3
+    - group_4
+
+  group_names:
+    group_1: benchmark_convolve2D_v1_inputSize
+    group_2: benchmark_convolve2D_v2_inputSize
+    group_3: benchmark_convolve2D_v3_inputSize
+    group_4: benchmark_convolve2D_v4_inputSize
+
+  variants:
+    - channelLast
+
+  aggregates: ['min']
+  specializations: ['float']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 2050
+      step: 650
+    values: []
+
+graph:
+  title: Different Implementations of convolve1D
+
+  x_axis:
+    label: Size S
+    mode: normal
+
+  y_axis:
+    label: Minimum Time (ms)
+    mode: normal
+
+  legend:
+    key: '{group_id}_{variant}'
+    entries:
+      group_1_channelLast: convolve2D V.1
+      group_2_channelLast: convolve2D V.2
+      group_3_channelLast: convolve2D V.3
+      group_4_channelLast: convolve2D V.4
+      group_5_channelLast: convolve2D V.5
+
+  line_style:
+    key: '{variant}'
+    entries:
+      channelLast: "-"
+
+  line_color:
+    key: '{group_id}'
+    entries:
+      group_1: "#55868C"
+      group_2: "#EEC584"
+      group_3: "#CE4257"
+      group_4: "#FF0000"
+      group_5: "#9900FF"
+

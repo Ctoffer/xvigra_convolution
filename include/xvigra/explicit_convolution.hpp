@@ -9,11 +9,13 @@
 #undef VOID
 #endif
 
+#include "xtensor/xbuilder.hpp"
 #include "xtensor/xtensor.hpp"
 
 #include "xtensor-blas/xlinalg.hpp"
 
 #include "xvigra/convolution_util.hpp"
+#include "xvigra/iter_util.hpp"
 
 namespace xvigra {
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -618,6 +620,730 @@ auto convolve2DImplicit(
         result.shape()[1]
     }));
 }
+
+
+// -------------------------------------------------------------------------------------------------------------------
+
+template <typename T, typename O>
+auto convolve2D_v2(
+    const xt::xexpression<T>& inputExpression,
+    const xt::xexpression<O>& kernelExpression,
+    const xvigra::KernelOptions& optionsY,
+    const xvigra::KernelOptions& optionsX
+) {
+    using InputContainerType = typename xt::xexpression<T>::derived_type;
+    using InputType = typename InputContainerType::value_type;
+    using KernelContainerType = typename xt::xexpression<O>::derived_type;
+    using KernelType = typename KernelContainerType::value_type;
+    using ResultType = typename std::common_type_t<InputType, KernelType>;
+
+    InputContainerType input = inputExpression.derived_cast();
+    KernelContainerType kernel = kernelExpression.derived_cast();
+
+    if (optionsY.channelPosition != optionsX.channelPosition) {
+        throw std::invalid_argument(
+            "convolve2D(): Channel can't be on different positions for optionsY and optionsX!"
+        );
+    }
+
+    if (optionsY.channelPosition == xvigra::ChannelPosition::IMPLICIT) {
+        throw std::invalid_argument(
+            "convolve2D(): Implicit channel option is not supported for explicit channels in input!"
+        );
+    }
+
+    if (input.dimension() != 3) {
+        throw std::invalid_argument("convolve2D(): Need 3 dimensional (H x W x C or C x H x W) input!");
+    }
+
+    if (kernel.dimension() != 4) {
+        throw std::invalid_argument("convolve2D(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!");
+    }
+
+    int inputChannels;
+    int inputHeight;
+    int inputWidth;
+    
+    if (optionsY.channelPosition == xvigra::ChannelPosition::FIRST) {
+        inputChannels = input.shape()[0];
+        inputHeight = input.shape()[1];
+        inputWidth = input.shape()[2];
+    } else {
+        inputHeight = input.shape()[0];
+        inputWidth = input.shape()[1];
+        inputChannels = input.shape()[2];
+    }
+    
+    int outputChannels = kernel.shape()[0];
+    int kernelHeight = kernel.shape()[2];
+    int kernelWidth = kernel.shape()[3];
+    
+    if(inputChannels != static_cast<int>(kernel.shape()[1])) {// dimension mismatch
+        throw std::invalid_argument("convolve2D(): Input channels of input and kernel do not align!");
+    }
+    
+    // size mismatch
+    if (inputHeight + optionsY.paddingTotal() < (kernelHeight - 1) * optionsY.dilation + 1) {
+        throw std::invalid_argument("convolve2D(): Kernel height is greater than padded input height!");
+    }
+    
+    if (inputWidth + optionsX.paddingTotal() < (kernelWidth - 1) * optionsX.dilation + 1) {
+        throw std::invalid_argument("convolve2D(): Kernel width is greater than padded input width!");
+    }
+    
+    
+    int kernelHeightRadius = kernelHeight / 2;
+    int kernelHeightMinimum = kernelHeight % 2 == 0 ? 0 : -kernelHeightRadius;
+    int kernelHeightMaximum = kernelHeight % 2 == 0 ? kernelHeight : kernelHeightRadius + 1;
+    
+    
+    int kernelWidthRadius = kernelWidth / 2;
+    int kernelWidthMinimum = kernelWidth % 2 == 0 ? 0 : -kernelWidthRadius;
+    int kernelWidthMaximum = kernelWidth % 2 == 0 ? kernelWidth : kernelWidthRadius + 1;
+
+    int outputHeight = xvigra::calculateOutputSize(inputHeight, kernelHeight, optionsY);
+    int outputWidth = xvigra::calculateOutputSize(inputWidth, kernelWidth, optionsX);
+        
+    int heightMinimum = -optionsY.paddingBegin() + optionsY.dilation * std::abs(kernelHeight % 2 == 0 ? 0 : kernelHeightMinimum);
+    int heightMaximum = inputHeight + optionsY.paddingEnd() - optionsY.dilation * (kernelHeight % 2 == 0 ? kernelHeight - 1 : kernelHeightRadius);
+  
+    int widthMinimum = -optionsX.paddingBegin() + optionsX.dilation * std::abs(kernelWidth % 2 == 0 ? 0 : kernelWidthMinimum);
+    int widthMaximum = inputWidth + optionsX.paddingEnd() - optionsX.dilation * (kernelWidth % 2 == 0 ? kernelWidth - 1 : kernelWidthRadius);
+
+    std::vector<int> inputHeightIndices = xvigra::range(heightMinimum, heightMaximum, optionsY.stride);
+    std::vector<int> inputWidthIndices = xvigra::range(widthMinimum, widthMaximum, optionsX.stride);
+    
+    xt::xtensor<ResultType, 3> result;
+    if (optionsY.channelPosition == xvigra::ChannelPosition::FIRST) {
+       Tensor5D<ResultType> patch = xt::zeros<ResultType>({inputChannels, kernelHeight, kernelWidth, outputHeight, outputWidth});
+        
+        for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
+            for (auto kernelY = kernelHeightMinimum; kernelY < kernelHeightMaximum; ++kernelY) {
+                auto outKernelY = kernelY + std::abs(kernelHeightMinimum);
+                auto inputOffsetY = kernelY * optionsY.dilation;
+
+                for (auto kernelX = kernelWidthMinimum; kernelX < kernelWidthMaximum; ++kernelX) {
+                    auto outKernelX = kernelX + std::abs(kernelWidthMinimum);
+                    auto inputOffsetX = kernelX * optionsX.dilation;
+
+                    for (std::size_t outIndexY = 0; outIndexY < inputHeightIndices.size(); ++outIndexY) {
+                        auto inputY = inputHeightIndices.at(outIndexY) + inputOffsetY;
+                        
+                        for (std::size_t outIndexX = 0; outIndexX < inputWidthIndices.size(); ++outIndexX) {
+                            auto inputX = inputWidthIndices.at(outIndexX) + inputOffsetX;
+                            
+                            if((0 <= inputY && inputY < inputHeight) && (0 <= inputX && inputX < inputWidth)) {
+                                patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = static_cast<ResultType>(input(inputChannel, inputY, inputX));
+                            } else {
+                                xvigra::BorderTreatment treatmentY = xvigra::BorderTreatment::avoid();
+                                int indexY = inputY;
+
+                                if (indexY < 0) {
+                                    treatmentY = optionsY.borderTreatmentBegin;
+                                    indexY = getBorderIndex<true>(treatmentY, indexY, inputHeight);
+                                } else if(inputHeight <= indexY) {
+                                    treatmentY = optionsY.borderTreatmentEnd;
+                                    indexY = getBorderIndex<false>(treatmentY, indexY, inputHeight);
+                                }
+
+                                xvigra::BorderTreatment treatmentX = xvigra::BorderTreatment::avoid();
+                                int indexX = inputX;
+
+                                if (indexX < 0) {
+                                    treatmentX = optionsX.borderTreatmentBegin;
+                                    indexX = getBorderIndex<true>(treatmentX, indexX, inputWidth);
+                                } else if(inputWidth <= indexX) {
+                                    treatmentX = optionsX.borderTreatmentEnd;
+                                    indexX = getBorderIndex<false>(treatmentX, indexX, inputWidth);
+                                }
+
+                                InputType value;
+                                if (indexY == -1 || indexX == -1) {
+                                    if (indexY == -1 && indexX != -1) {
+                                        value = treatmentY.getValue<InputType>();
+                                    } else if (indexX == -1 && indexY != -1) {
+                                        value = treatmentX.getValue<InputType>();
+                                    } else {
+                                        value = treatmentX.getValue<InputType>();
+                                    }
+                                } else {
+                                    value = input(inputChannel, indexY, indexX);
+                                }
+
+                                patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = static_cast<ResultType>(value);  
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        auto reshapedKernel = xt::reshape_view(kernel, {outputChannels, inputChannels * kernelHeight * kernelWidth});
+        auto reshapedPatch = xt::reshape_view(patch, {inputChannels * kernelHeight * kernelWidth, outputHeight * outputWidth});
+        result = xt::reshape_view(xt::linalg::dot(reshapedKernel, reshapedPatch), {outputChannels, outputHeight, outputWidth});
+        
+    } else {
+        Tensor5D<ResultType> patch= xt::zeros<ResultType>({outputHeight, outputWidth, inputChannels, kernelHeight, kernelWidth});
+        
+        for (std::size_t outIndexY = 0; outIndexY < inputHeightIndices.size(); ++outIndexY) {
+            auto inputIndexY = inputHeightIndices.at(outIndexY);
+
+            for (std::size_t outIndexX = 0; outIndexX < inputWidthIndices.size(); ++outIndexX) {
+                auto inputIndexX = inputWidthIndices.at(outIndexX);
+
+                for (auto kernelY = kernelHeightMinimum; kernelY < kernelHeightMaximum; ++kernelY) {
+                    auto inputY = inputIndexY + kernelY * optionsY.dilation;
+                    auto outKernelY = kernelY + std::abs(kernelHeightMinimum);
+                    
+                    for (auto kernelX = kernelWidthMinimum; kernelX < kernelWidthMaximum; ++kernelX) {
+                        auto inputX = inputIndexX + kernelX * optionsX.dilation;
+                        auto outKernelX = kernelX + std::abs(kernelWidthMinimum);
+                        
+                        if((0 <= inputY && inputY < inputHeight) && (0 <= inputX && inputX < inputWidth)){
+                            for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
+                                patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = static_cast<ResultType>(input(inputY, inputX, inputChannel));
+                            }
+                        } else {
+                            for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
+                                xvigra::BorderTreatment treatmentY = xvigra::BorderTreatment::avoid();
+                                int indexY = inputY;
+
+                                if (indexY < 0) {
+                                    treatmentY = optionsY.borderTreatmentBegin;
+                                    indexY = getBorderIndex<true>(treatmentY, indexY, inputHeight);
+                                } else if(inputHeight <= indexY) {
+                                    treatmentY = optionsY.borderTreatmentEnd;
+                                    indexY = getBorderIndex<false>(treatmentY, indexY, inputHeight);
+                                }
+
+                                xvigra::BorderTreatment treatmentX = xvigra::BorderTreatment::avoid();
+                                int indexX = inputX;
+
+                                if (inputX < 0) {
+                                    treatmentX = optionsX.borderTreatmentBegin;
+                                    indexX = getBorderIndex<true>(treatmentX, indexX, inputWidth);
+                                } else if(inputWidth <= indexX) {
+                                    treatmentX = optionsX.borderTreatmentEnd;
+                                    indexX = getBorderIndex<false>(treatmentX, indexX, inputWidth);
+                                }
+
+                                InputType value;
+                                if (indexY == -1 || indexX == -1) {
+                                    if (indexY == -1 && indexX != -1) {
+                                        value = treatmentY.getValue<InputType>();
+                                    } else if (indexX == -1 && indexY != -1) {
+                                        value = treatmentX.getValue<InputType>();
+                                    } else {
+                                        value = treatmentX.getValue<InputType>();
+                                    }
+                                } else {
+                                    value = input(indexY, indexX, inputChannel);
+                                }
+
+                                patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = static_cast<ResultType>(value); 
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        auto reshapedKernel = xt::transpose(xt::reshape_view(kernel, {outputChannels, inputChannels * kernelHeight * kernelWidth}));
+        auto reshapedPatch = xt::reshape_view(patch, {outputHeight*outputWidth, inputChannels*kernelHeight*kernelWidth});
+        result = xt::reshape_view(xt::linalg::dot(reshapedPatch, reshapedKernel), {outputHeight, outputWidth, outputChannels});
+    }
+    
+    return result;
+}
+
+template <typename T, typename O>
+inline auto convolve2D_v2(
+    const xt::xexpression<T>& inputExpression,
+    const xt::xexpression<O>& kernelExpression,
+    const xvigra::KernelOptions2D& options2D
+) {
+    return convolve2D_v2(
+        inputExpression.derived_cast(), 
+        kernelExpression.derived_cast(), 
+        options2D.optionsY, 
+        options2D.optionsX
+    );
+}
+
+// -------------------------------------------------------------------------------------------------------------------
+
+template <typename T, typename O>
+auto convolve2D_v3(
+    const xt::xexpression<T>& inputExpression,
+    const xt::xexpression<O>& kernelExpression,
+    const xvigra::KernelOptions& optionsY,
+    const xvigra::KernelOptions& optionsX
+) {
+    using InputContainerType = typename xt::xexpression<T>::derived_type;
+    using InputType = typename InputContainerType::value_type;
+    using KernelContainerType = typename xt::xexpression<O>::derived_type;
+    using KernelType = typename KernelContainerType::value_type;
+    using ResultType = typename std::common_type_t<InputType, KernelType>;
+
+    InputContainerType input = inputExpression.derived_cast();
+    KernelContainerType kernel = kernelExpression.derived_cast();
+
+    if (optionsY.channelPosition != optionsX.channelPosition) {
+        throw std::invalid_argument(
+            "convolve2D(): Channel can't be on different positions for optionsY and optionsX!"
+        );
+    }
+
+    if (optionsY.channelPosition == xvigra::ChannelPosition::IMPLICIT) {
+        throw std::invalid_argument(
+            "convolve2D(): Implicit channel option is not supported for explicit channels in input!"
+        );
+    }
+
+    if (input.dimension() != 3) {
+        throw std::invalid_argument("convolve2D(): Need 3 dimensional (H x W x C or C x H x W) input!");
+    }
+
+    if (kernel.dimension() != 4) {
+        throw std::invalid_argument("convolve2D(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!");
+    }
+
+    int inputChannels;
+    int inputHeight;
+    int inputWidth;
+    
+    if (optionsY.channelPosition == xvigra::ChannelPosition::FIRST) {
+        inputChannels = input.shape()[0];
+        inputHeight = input.shape()[1];
+        inputWidth = input.shape()[2];
+    } else {
+        inputHeight = input.shape()[0];
+        inputWidth = input.shape()[1];
+        inputChannels = input.shape()[2];
+    }
+    
+    int outputChannels = kernel.shape()[0];
+    int kernelHeight = kernel.shape()[2];
+    int kernelWidth = kernel.shape()[3];
+    
+    if(inputChannels != static_cast<int>(kernel.shape()[1])) {// dimension mismatch
+        throw std::invalid_argument("convolve2D(): Input channels of input and kernel do not align!");
+    }
+    
+    // size mismatch
+    if (inputHeight + optionsY.paddingTotal() < (kernelHeight - 1) * optionsY.dilation + 1) {
+        throw std::invalid_argument("convolve2D(): Kernel height is greater than padded input height!");
+    }
+    
+    if (inputWidth + optionsX.paddingTotal() < (kernelWidth - 1) * optionsX.dilation + 1) {
+        throw std::invalid_argument("convolve2D(): Kernel width is greater than padded input width!");
+    }
+    
+    
+    int kernelHeightRadius = kernelHeight / 2;
+    int kernelHeightMinimum = kernelHeight % 2 == 0 ? 0 : -kernelHeightRadius;
+    int kernelHeightMaximum = kernelHeight % 2 == 0 ? kernelHeight : kernelHeightRadius + 1;
+    
+    
+    int kernelWidthRadius = kernelWidth / 2;
+    int kernelWidthMinimum = kernelWidth % 2 == 0 ? 0 : -kernelWidthRadius;
+    int kernelWidthMaximum = kernelWidth % 2 == 0 ? kernelWidth : kernelWidthRadius + 1;
+
+    int outputHeight = xvigra::calculateOutputSize(inputHeight, kernelHeight, optionsY);
+    int outputWidth = xvigra::calculateOutputSize(inputWidth, kernelWidth, optionsX);
+        
+    int heightMinimum = -optionsY.paddingBegin() + optionsY.dilation * std::abs(kernelHeight % 2 == 0 ? 0 : kernelHeightMinimum);
+    int heightMaximum = inputHeight + optionsY.paddingEnd() - optionsY.dilation * (kernelHeight % 2 == 0 ? kernelHeight - 1 : kernelHeightRadius);
+  
+    int widthMinimum = -optionsX.paddingBegin() + optionsX.dilation * std::abs(kernelWidth % 2 == 0 ? 0 : kernelWidthMinimum);
+    int widthMaximum = inputWidth + optionsX.paddingEnd() - optionsX.dilation * (kernelWidth % 2 == 0 ? kernelWidth - 1 : kernelWidthRadius);
+
+    auto inputHeightIndices = xvigra::range(heightMinimum, heightMaximum, optionsY.stride);
+    auto inputWidthIndices = xvigra::range(widthMinimum, widthMaximum, optionsX.stride);
+    
+    xt::xtensor<ResultType, 3> result;
+    if (optionsY.channelPosition == xvigra::ChannelPosition::FIRST) {
+       Tensor5D<ResultType> patch = xt::zeros<ResultType>({inputChannels, kernelHeight, kernelWidth, outputHeight, outputWidth});
+        
+        for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
+            for (auto kernelY = kernelHeightMinimum; kernelY < kernelHeightMaximum; ++kernelY) {
+                auto outKernelY = kernelY + std::abs(kernelHeightMinimum);
+                auto inputOffsetY = kernelY * optionsY.dilation;
+
+                for (auto kernelX = kernelWidthMinimum; kernelX < kernelWidthMaximum; ++kernelX) {
+                    auto outKernelX = kernelX + std::abs(kernelWidthMinimum);
+                    auto inputOffsetX = kernelX * optionsX.dilation;
+
+                    for (auto [outIndexY, inputIndexY] : xvigra::enumerate(inputHeightIndices)) {
+                        auto inputY = inputIndexY + inputOffsetY;
+                        
+                        for (auto [outIndexX, inputIndexX] : xvigra::enumerate(inputWidthIndices)) {
+                            auto inputX = inputIndexX + inputOffsetX;
+                            
+                            if((0 <= inputY && inputY < inputHeight) && (0 <= inputX && inputX < inputWidth)) {
+                                patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = static_cast<ResultType>(input(inputChannel, inputY, inputX));
+                            } else {
+                                xvigra::BorderTreatment treatmentY = xvigra::BorderTreatment::avoid();
+                                int indexY = inputY;
+
+                                if (indexY < 0) {
+                                    treatmentY = optionsY.borderTreatmentBegin;
+                                    indexY = getBorderIndex<true>(treatmentY, indexY, inputHeight);
+                                } else if(inputHeight <= indexY) {
+                                    treatmentY = optionsY.borderTreatmentEnd;
+                                    indexY = getBorderIndex<false>(treatmentY, indexY, inputHeight);
+                                }
+
+                                xvigra::BorderTreatment treatmentX = xvigra::BorderTreatment::avoid();
+                                int indexX = inputX;
+
+                                if (indexX < 0) {
+                                    treatmentX = optionsX.borderTreatmentBegin;
+                                    indexX = getBorderIndex<true>(treatmentX, indexX, inputWidth);
+                                } else if(inputWidth <= indexX) {
+                                    treatmentX = optionsX.borderTreatmentEnd;
+                                    indexX = getBorderIndex<false>(treatmentX, indexX, inputWidth);
+                                }
+
+                                InputType value;
+                                if (indexY == -1 || indexX == -1) {
+                                    if (indexY == -1 && indexX != -1) {
+                                        value = treatmentY.getValue<InputType>();
+                                    } else if (indexX == -1 && indexY != -1) {
+                                        value = treatmentX.getValue<InputType>();
+                                    } else {
+                                        value = treatmentX.getValue<InputType>();
+                                    }
+                                } else {
+                                    value = input(inputChannel, indexY, indexX);
+                                }
+
+                                patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = static_cast<ResultType>(value);  
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        auto reshapedKernel = xt::reshape_view(kernel, {outputChannels, inputChannels * kernelHeight * kernelWidth});
+        auto reshapedPatch = xt::reshape_view(patch, {inputChannels * kernelHeight * kernelWidth, outputHeight * outputWidth});
+        result = xt::reshape_view(xt::linalg::dot(reshapedKernel, reshapedPatch), {outputChannels, outputHeight, outputWidth});
+        
+    } else {
+        Tensor5D<ResultType> patch= xt::zeros<ResultType>({outputHeight, outputWidth, inputChannels, kernelHeight, kernelWidth});
+        
+        for (auto [outIndexY, inputIndexY] : xvigra::enumerate(inputHeightIndices)) {
+            for (auto [outIndexX, inputIndexX] : xvigra::enumerate(inputWidthIndices)) {
+                for (auto kernelY = kernelHeightMinimum; kernelY < kernelHeightMaximum; ++kernelY) {
+                    auto inputY = inputIndexY + kernelY * optionsY.dilation;
+                    auto outKernelY = kernelY + std::abs(kernelHeightMinimum);
+                    
+                    for (auto kernelX = kernelWidthMinimum; kernelX < kernelWidthMaximum; ++kernelX) {
+                        auto inputX = inputIndexX + kernelX * optionsX.dilation;
+                        auto outKernelX = kernelX + std::abs(kernelWidthMinimum);
+                        
+                        if((0 <= inputY && inputY < inputHeight) && (0 <= inputX && inputX < inputWidth)){
+                            for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
+                                patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = static_cast<ResultType>(input(inputY, inputX, inputChannel));
+                            }
+                        } else {
+                            for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
+                                xvigra::BorderTreatment treatmentY = xvigra::BorderTreatment::avoid();
+                                int indexY = inputY;
+
+                                if (indexY < 0) {
+                                    treatmentY = optionsY.borderTreatmentBegin;
+                                    indexY = getBorderIndex<true>(treatmentY, indexY, inputHeight);
+                                } else if(inputHeight <= indexY) {
+                                    treatmentY = optionsY.borderTreatmentEnd;
+                                    indexY = getBorderIndex<false>(treatmentY, indexY, inputHeight);
+                                }
+
+                                xvigra::BorderTreatment treatmentX = xvigra::BorderTreatment::avoid();
+                                int indexX = inputX;
+
+                                if (inputX < 0) {
+                                    treatmentX = optionsX.borderTreatmentBegin;
+                                    indexX = getBorderIndex<true>(treatmentX, indexX, inputWidth);
+                                } else if(inputWidth <= indexX) {
+                                    treatmentX = optionsX.borderTreatmentEnd;
+                                    indexX = getBorderIndex<false>(treatmentX, indexX, inputWidth);
+                                }
+
+                                InputType value;
+                                if (indexY == -1 || indexX == -1) {
+                                    if (indexY == -1 && indexX != -1) {
+                                        value = treatmentY.getValue<InputType>();
+                                    } else if (indexX == -1 && indexY != -1) {
+                                        value = treatmentX.getValue<InputType>();
+                                    } else {
+                                        value = treatmentX.getValue<InputType>();
+                                    }
+                                } else {
+                                    value = input(indexY, indexX, inputChannel);
+                                }
+
+                                patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = static_cast<ResultType>(value); 
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        auto reshapedKernel = xt::transpose(xt::reshape_view(kernel, {outputChannels, inputChannels * kernelHeight * kernelWidth}));
+        auto reshapedPatch = xt::reshape_view(patch, {outputHeight*outputWidth, inputChannels*kernelHeight*kernelWidth});
+        result = xt::reshape_view(xt::linalg::dot(reshapedPatch, reshapedKernel), {outputHeight, outputWidth, outputChannels});
+    }
+    
+    return result;
+}
+
+template <typename T, typename O>
+inline auto convolve2D_v3(
+    const xt::xexpression<T>& inputExpression,
+    const xt::xexpression<O>& kernelExpression,
+    const xvigra::KernelOptions2D& options2D
+) {
+    return convolve2D_v3(
+        inputExpression.derived_cast(), 
+        kernelExpression.derived_cast(), 
+        options2D.optionsY, 
+        options2D.optionsX
+    );
+}
+
+// -------------------------------------------------------------------------------------------------------------------
+
+
+template <typename T, typename O>
+auto convolve2D_v4(
+    const xt::xexpression<T>& inputExpression,
+    const xt::xexpression<O>& kernelExpression,
+    const xvigra::KernelOptions& optionsY,
+    const xvigra::KernelOptions& optionsX
+) {
+    using InputContainerType = typename xt::xexpression<T>::derived_type;
+    using InputType = typename InputContainerType::value_type;
+    using KernelContainerType = typename xt::xexpression<O>::derived_type;
+    using KernelType = typename KernelContainerType::value_type;
+    using ResultType = typename std::common_type_t<InputType, KernelType>;
+
+    InputContainerType input = inputExpression.derived_cast();
+    KernelContainerType kernel = kernelExpression.derived_cast();
+
+    if (optionsY.channelPosition != optionsX.channelPosition) {
+        throw std::invalid_argument(
+            "convolve2D(): Channel can't be on different positions for optionsY and optionsX!"
+        );
+    }
+
+    if (optionsY.channelPosition == xvigra::ChannelPosition::IMPLICIT) {
+        throw std::invalid_argument(
+            "convolve2D(): Implicit channel option is not supported for explicit channels in input!"
+        );
+    }
+
+    if (input.dimension() != 3) {
+        throw std::invalid_argument("convolve2D(): Need 3 dimensional (H x W x C or C x H x W) input!");
+    }
+
+    if (kernel.dimension() != 4) {
+        throw std::invalid_argument("convolve2D(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!");
+    }
+
+    int inputChannels;
+    int inputHeight;
+    int inputWidth;
+    
+    if (optionsY.channelPosition == xvigra::ChannelPosition::FIRST) {
+        inputChannels = input.shape()[0];
+        inputHeight = input.shape()[1];
+        inputWidth = input.shape()[2];
+    } else {
+        inputHeight = input.shape()[0];
+        inputWidth = input.shape()[1];
+        inputChannels = input.shape()[2];
+    }
+    
+    int outputChannels = kernel.shape()[0];
+    int kernelHeight = kernel.shape()[2];
+    int kernelWidth = kernel.shape()[3];
+    
+    if(inputChannels != static_cast<int>(kernel.shape()[1])) {// dimension mismatch
+        throw std::invalid_argument("convolve2D(): Input channels of input and kernel do not align!");
+    }
+    
+    // size mismatch
+    if (inputHeight + optionsY.paddingTotal() < (kernelHeight - 1) * optionsY.dilation + 1) {
+        throw std::invalid_argument("convolve2D(): Kernel height is greater than padded input height!");
+    }
+    
+    if (inputWidth + optionsX.paddingTotal() < (kernelWidth - 1) * optionsX.dilation + 1) {
+        throw std::invalid_argument("convolve2D(): Kernel width is greater than padded input width!");
+    }
+    
+    
+    int kernelHeightRadius = kernelHeight / 2;
+    int kernelHeightMinimum = kernelHeight % 2 == 0 ? 0 : -kernelHeightRadius;
+    int kernelHeightMaximum = kernelHeight % 2 == 0 ? kernelHeight : kernelHeightRadius + 1;
+    
+    
+    int kernelWidthRadius = kernelWidth / 2;
+    int kernelWidthMinimum = kernelWidth % 2 == 0 ? 0 : -kernelWidthRadius;
+    int kernelWidthMaximum = kernelWidth % 2 == 0 ? kernelWidth : kernelWidthRadius + 1;
+
+    int outputHeight = xvigra::calculateOutputSize(inputHeight, kernelHeight, optionsY);
+    int outputWidth = xvigra::calculateOutputSize(inputWidth, kernelWidth, optionsX);
+        
+    int heightMinimum = -optionsY.paddingBegin() + optionsY.dilation * std::abs(kernelHeight % 2 == 0 ? 0 : kernelHeightMinimum);
+    int heightMaximum = inputHeight + optionsY.paddingEnd() - optionsY.dilation * (kernelHeight % 2 == 0 ? kernelHeight - 1 : kernelHeightRadius);
+  
+    int widthMinimum = -optionsX.paddingBegin() + optionsX.dilation * std::abs(kernelWidth % 2 == 0 ? 0 : kernelWidthMinimum);
+    int widthMaximum = inputWidth + optionsX.paddingEnd() - optionsX.dilation * (kernelWidth % 2 == 0 ? kernelWidth - 1 : kernelWidthRadius);
+
+    auto inputHeightIndices = xvigra::range(heightMinimum, heightMaximum, optionsY.stride);
+    auto inputWidthIndices = xvigra::range(widthMinimum, widthMaximum, optionsX.stride);
+    
+    xt::xtensor<ResultType, 3> result;
+    if (optionsY.channelPosition == xvigra::ChannelPosition::FIRST) {
+       Tensor5D<ResultType> patch = xt::zeros<ResultType>({inputChannels, kernelHeight, kernelWidth, outputHeight, outputWidth});
+        
+        for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
+            for (auto kernelY = kernelHeightMinimum; kernelY < kernelHeightMaximum; ++kernelY) {
+                auto outKernelY = kernelY + std::abs(kernelHeightMinimum);
+                auto inputOffsetY = kernelY * optionsY.dilation;
+
+                for (auto kernelX = kernelWidthMinimum; kernelX < kernelWidthMaximum; ++kernelX) {
+                    auto outKernelX = kernelX + std::abs(kernelWidthMinimum);
+                    auto inputOffsetX = kernelX * optionsX.dilation;
+
+                    for (auto [outIndexY, inputIndexY] : xvigra::enumerate(inputHeightIndices)) {
+                        auto inputY = inputIndexY + inputOffsetY;
+
+                        xvigra::BorderTreatment treatmentY = xvigra::BorderTreatment::avoid();
+                        int indexY = inputY;
+
+                        if (indexY < 0) {
+                            treatmentY = optionsY.borderTreatmentBegin;
+                            indexY = getBorderIndex<true>(treatmentY, indexY, inputHeight);
+                        } else if(inputHeight <= indexY) {
+                            treatmentY = optionsY.borderTreatmentEnd;
+                            indexY = getBorderIndex<false>(treatmentY, indexY, inputHeight);
+                        }
+                        
+                        for (auto [outIndexX, inputIndexX] : xvigra::enumerate(inputWidthIndices)) {
+                            auto inputX = inputIndexX + inputOffsetX;
+
+                            if (indexY == -1) {
+                                patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = static_cast<ResultType>(treatmentY.getValue<InputType>());  
+                            } else {
+                                xvigra::BorderTreatment treatmentX = xvigra::BorderTreatment::avoid();
+                                int indexX = inputX;
+
+                                if (indexX < 0) {
+                                    treatmentX = optionsX.borderTreatmentBegin;
+                                    indexX = getBorderIndex<true>(treatmentX, indexX, inputWidth);
+                                } else if(inputWidth <= indexX) {
+                                    treatmentX = optionsX.borderTreatmentEnd;
+                                    indexX = getBorderIndex<false>(treatmentX, indexX, inputWidth);
+                                }
+
+                                if (indexX == -1) {
+                                    patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = static_cast<ResultType>(treatmentX.getValue<InputType>()); 
+                                } else {
+                                    patch(inputChannel, outKernelY, outKernelX, outIndexY, outIndexX) = input(inputChannel, indexY, indexX);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        auto reshapedKernel = xt::reshape_view(kernel, {outputChannels, inputChannels * kernelHeight * kernelWidth});
+        auto reshapedPatch = xt::reshape_view(patch, {inputChannels * kernelHeight * kernelWidth, outputHeight * outputWidth});
+        result = xt::reshape_view(xt::linalg::dot(reshapedKernel, reshapedPatch), {outputChannels, outputHeight, outputWidth});
+        
+    } else {
+        Tensor5D<ResultType> patch= xt::zeros<ResultType>({outputHeight, outputWidth, inputChannels, kernelHeight, kernelWidth});
+        
+        for (auto [outIndexY, inputIndexY] : xvigra::enumerate(inputHeightIndices)) {
+            for (auto [outIndexX, inputIndexX] : xvigra::enumerate(inputWidthIndices)) {
+                for (auto kernelY = kernelHeightMinimum; kernelY < kernelHeightMaximum; ++kernelY) {
+                    auto inputY = inputIndexY + kernelY * optionsY.dilation;
+                    auto outKernelY = kernelY + std::abs(kernelHeightMinimum);
+
+                    xvigra::BorderTreatment treatmentY = xvigra::BorderTreatment::avoid();
+                    int indexY = inputY;
+
+                    if (indexY < 0) {
+                        treatmentY = optionsY.borderTreatmentBegin;
+                        indexY = getBorderIndex<true>(treatmentY, indexY, inputHeight);
+                    } else if(inputHeight <= indexY) {
+                        treatmentY = optionsY.borderTreatmentEnd;
+                        indexY = getBorderIndex<false>(treatmentY, indexY, inputHeight);
+                    }
+                    
+                    for (auto kernelX = kernelWidthMinimum; kernelX < kernelWidthMaximum; ++kernelX) {
+                        auto inputX = inputIndexX + kernelX * optionsX.dilation;
+                        auto outKernelX = kernelX + std::abs(kernelWidthMinimum);
+
+                        if (indexY == -1) {
+                            for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
+                                patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = static_cast<ResultType>(treatmentY.getValue<InputType>());
+                            }
+                        } else {
+                            xvigra::BorderTreatment treatmentX = xvigra::BorderTreatment::avoid();
+                            int indexX = inputX;
+
+                            if (indexX < 0) {
+                                treatmentX = optionsX.borderTreatmentBegin;
+                                indexX = getBorderIndex<true>(treatmentX, indexX, inputWidth);
+                            } else if(inputWidth <= indexX) {
+                                treatmentX = optionsX.borderTreatmentEnd;
+                                indexX = getBorderIndex<false>(treatmentX, indexX, inputWidth);
+                            }
+
+                            if (indexX == -1) {
+                                for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
+                                    patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = static_cast<ResultType>(treatmentX.getValue<InputType>());
+                                }  
+                            } else {
+                                for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
+                                    patch(outIndexY, outIndexX, inputChannel, outKernelY, outKernelX) = static_cast<ResultType>(input(indexY, indexX, inputChannel)); 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        auto reshapedKernel = xt::transpose(xt::reshape_view(kernel, {outputChannels, inputChannels * kernelHeight * kernelWidth}));
+        auto reshapedPatch = xt::reshape_view(patch, {outputHeight*outputWidth, inputChannels*kernelHeight*kernelWidth});
+        result = xt::reshape_view(xt::linalg::dot(reshapedPatch, reshapedKernel), {outputHeight, outputWidth, outputChannels});
+    }
+    
+    return result;
+}
+
+template <typename T, typename O>
+inline auto convolve2D_v4(
+    const xt::xexpression<T>& inputExpression,
+    const xt::xexpression<O>& kernelExpression,
+    const xvigra::KernelOptions2D& options2D
+) {
+    return convolve2D_v4(
+        inputExpression.derived_cast(), 
+        kernelExpression.derived_cast(), 
+        options2D.optionsY, 
+        options2D.optionsX
+    );
+}
+
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ convolve2D - end                                                                                                 ║

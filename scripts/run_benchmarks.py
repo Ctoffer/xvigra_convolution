@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 from util import TimeMeasure, string_framed_line
+from plot_benchmark import main as plot
 
 
 def build_all():
@@ -19,7 +20,8 @@ def build_all():
         print(line)
     print()
 
-    execute_command = ["PowerShell", "-ExecutionPolicy", "Unrestricted", "-File", ".\\build_all.ps1"] if is_windows else ["bash",  "build_all.sh"]
+    execute_command = ["PowerShell", "-ExecutionPolicy", "Unrestricted", "-File",
+                       ".\\build_all.ps1"] if is_windows else ["bash", "build_all.sh"]
     subprocess.call(execute_command, cwd=os.getcwd(), shell=is_windows)
 
 
@@ -49,15 +51,17 @@ def call_benchmark(file_name, benchmark_parameters, folder="xvigra"):
 def main():
     benchmark_parameters = {
         "format": "console",
-        "min_time": 2.5,
+        "min_time": 1,
         "repetitions": 10,
         "report_aggregates_only": True
     }
 
     benchmark_files = (
-        "benchmark_convolve1D_inputSize",
-        "benchmark_separableConvolve1D_inputSize",
-        "benchmark_separableConvolve2D_inputSize"
+        # "benchmark_convolve1D_inputSize",
+        "benchmark_convolve2D_inputSize_channelFirst",
+        "benchmark_convolve2D_inputSize_channelLast",
+        # "benchmark_separableConvolve1D_inputSize",
+        # "benchmark_separableConvolve2D_inputSize"
     )
 
     build_all()
@@ -65,7 +69,9 @@ def main():
     for file_name in benchmark_files:
         with TimeMeasure(f"{'─' * 100}\nRunning {file_name}:", f"Total time: {{}}\n{'─' * 100}\n"):
             call_benchmark(file_name, benchmark_parameters)
-        print("\n")
+        print("\nPlotting...")
+        plot(file_name, os_name=platform.system())
+        print("Finished plot\n")
 
 
 if __name__ == "__main__":

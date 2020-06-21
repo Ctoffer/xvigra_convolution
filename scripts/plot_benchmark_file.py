@@ -210,13 +210,16 @@ def plot_all(file_context, yml_config):
     plt.close()
 
 
-def main():
-    parser = setup_argument_parser()
-    file_context = FileContext.from_args(parser.parse_args())
+def main(file_context):
     yml_config = load_yml_config(file_context.config_file)
 
     plot_all(file_context, yml_config)
 
 
+def parse_arguments():
+    parser = setup_argument_parser()
+    return FileContext.from_args(parser.parse_args())
+
+
 if __name__ == "__main__":
-    main()
+    main(parse_arguments())
