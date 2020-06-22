@@ -177,7 +177,6 @@ int getBorderIndex(const xvigra::BorderTreatment& treatment, int index, int size
         int inputWidthMinimum;
         int inputWidthMaximum;
 
-        // TODO avoid 
         if(size % 2 == 0) {
             inputWidthMinimum = -options.paddingBegin();
             inputWidthMaximum = inputWidth 
@@ -471,7 +470,6 @@ int getBorderIndex(const xvigra::BorderTreatment& treatment, int index, int size
         int inputWidthMinimum;
         int inputWidthMaximum;
 
-        // TODO avoid 
         if(size % 2 == 0) {
             inputWidthMinimum = -paddingBegin;
             inputWidthMaximum = inputWidth 
@@ -764,7 +762,6 @@ int getBorderIndex(const xvigra::BorderTreatment& treatment, int index, int size
         int inputWidthMinimum;
         int inputWidthMaximum;
 
-        // TODO avoid 
         if(size % 2 == 0) {
             inputWidthMinimum = -paddingBegin;
             inputWidthMaximum = inputWidth 
