@@ -79,7 +79,7 @@ void benchmark_separableConvolve2D_inputSize_channelFirst(benchmark::State& stat
 		 auto result = xvigra::separableConvolve2D<ElementType, ElementType, xvigra::ChannelPosition::FIRST>(
 		 	input, 
 		 	{kernelY, kernelX}, 
-		 	{options2D.optionsY, options2D.optionsX}
+		 	options2D
 		 );
 		 benchmark::DoNotOptimize(result.data());
 	}
@@ -126,7 +126,7 @@ void benchmark_separableConvolve2D_inputSize_channelLast(benchmark::State& state
 		 auto result = xvigra::separableConvolve2D<ElementType, ElementType, xvigra::ChannelPosition::LAST>(
 		 	input, 
 		 	{kernelY, kernelX}, 
-		 	{options2D.optionsY, options2D.optionsX}
+		 	options2D
 		 );
 		 benchmark::DoNotOptimize(result.data());
 	}

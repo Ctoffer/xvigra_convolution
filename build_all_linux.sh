@@ -1,5 +1,9 @@
-#clear
-cd build-linux;
+if [ $# -eq 0 ]
+  then
+    clear
+fi
+
+cd build-linux
 
 start_time=$(date +%s%3N)
 cmake .. "-DCMAKE_TOOLCHAIN_FILE=/mnt/d/Subsystem_Ubuntu_20/vcpkg/scripts/buildsystems/vcpkg.cmake" -DLAPACK_lapack_WORKS=ON

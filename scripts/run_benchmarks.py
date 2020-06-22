@@ -21,7 +21,7 @@ def build_all():
     print()
 
     execute_command = ["PowerShell", "-ExecutionPolicy", "Unrestricted", "-File",
-                       ".\\build_all.ps1"] if is_windows else ["bash", "build_all.sh"]
+                       ".\\build_all_windows.ps1"] if is_windows else ["bash", "build_all_linux.sh"]
     subprocess.call(execute_command, cwd=os.getcwd(), shell=is_windows)
 
 
@@ -57,10 +57,10 @@ def main():
     }
 
     benchmark_files = (
-        "benchmark_convolve1D_inputSize_channelFirst",
-        "benchmark_convolve1D_inputSize_channelLast",
-        "benchmark_convolve2D_inputSize_channelFirst",
-        "benchmark_convolve2D_inputSize_channelLast",
+        #"benchmark_convolve1D_inputSize_channelFirst",
+        #"benchmark_convolve1D_inputSize_channelLast",
+        #"benchmark_convolve2D_inputSize_channelFirst",
+        #"benchmark_convolve2D_inputSize_channelLast",
         "benchmark_separableConvolve1D_inputSize",
         "benchmark_separableConvolve2D_inputSize"
     )

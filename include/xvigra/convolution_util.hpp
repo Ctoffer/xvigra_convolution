@@ -313,7 +313,7 @@ namespace xvigra {
         : optionsY(), optionsX()
         {}
 
-        KernelOptions2D(const KernelOptions& optionsY, const KernelOptions& optionsX)
+        explicit KernelOptions2D(const KernelOptions& optionsY, const KernelOptions& optionsX)
         : optionsY(optionsY), optionsX(optionsX)
         {}
 

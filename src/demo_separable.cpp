@@ -112,8 +112,8 @@ void runFirstWithSeparableConvolve2D() {
 
     auto result = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
         arr, 
-        {rawKernelY, rawKernelX}, 
-        {optionsY, optionsX}
+        std::array{rawKernelY, rawKernelX}, 
+        std::array{optionsY, optionsX}
     );
 
 
@@ -153,8 +153,8 @@ void runLastWithSeparableConvolve2D() {
 
     auto result = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::LAST>(
         arr, 
-        {rawKernelY, rawKernelX}, 
-        {optionsY, optionsX}
+        std::array{rawKernelY, rawKernelX}, 
+        std::array{optionsY, optionsX}
     );
 
 
