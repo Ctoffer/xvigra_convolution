@@ -1,5 +1,6 @@
 set (TARGETS 
-    benchmark_convolve1D_inputSize
+    benchmark_convolve1D_inputSize_channelFirst
+    benchmark_convolve1D_inputSize_channelLast
     benchmark_convolve2D_inputSize_channelFirst
     benchmark_convolve2D_inputSize_channelLast
     benchmark_separableConvolve1D_inputSize

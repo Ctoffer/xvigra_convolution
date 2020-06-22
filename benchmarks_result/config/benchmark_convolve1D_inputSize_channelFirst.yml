@@ -5,12 +5,14 @@ data:
     - group_2
     - group_3
     - group_4
+    - group_5
 
   group_names:
-    group_1: benchmark_convolve2D_v1_inputSize
-    group_2: benchmark_convolve2D_v2_inputSize
-    group_3: benchmark_convolve2D_v3_inputSize
-    group_4: benchmark_convolve2D_v4_inputSize
+    group_1: benchmark_convolve1D_v1_inputSize
+    group_2: benchmark_convolve1D_v2_inputSize
+    group_3: benchmark_convolve1D_v3_inputSize
+    group_4: benchmark_convolve1D_v4_inputSize
+    group_5: benchmark_convolve1D_v5_inputSize
 
   variants:
     - channelFirst
@@ -22,28 +24,28 @@ data:
     attrs:
       start: 50
       stop: 2050
-      step: 50
+      step: 150
     values: []
 
 graph:
-  title: Different Implementations of convolve2D (channelFirst)
+  title: Different Implementations of convolve1D (channelFirst)
 
   x_axis:
     label: Size S
     mode: normal
 
   y_axis:
-    label: Minimum Time (ms)
+    label: Minimum Time (ns)
     mode: normal
 
   legend:
     key: '{group_id}_{variant}'
     entries:
-      group_1_channelFirst: convolve2D V.1
-      group_2_channelFirst: convolve2D V.2
-      group_3_channelFirst: convolve2D V.3
-      group_4_channelFirst: convolve2D V.4
-      group_5_channelFirst: convolve2D V.5
+      group_1_channelFirst: convolve1D V.1
+      group_2_channelFirst: convolve1D V.2
+      group_3_channelFirst: convolve1D V.3
+      group_4_channelFirst: convolve1D V.4
+      group_5_channelFirst: convolve1D V.5
 
   line_style:
     key: '{variant}'

@@ -35,8 +35,6 @@ add_definitions(-DHAVE_CBLAS=1)
 find_package(OpenBLAS CONFIG REQUIRED)
 find_package(clapack CONFIG REQUIRED)
 set(BLAS_LIBRARIES ${CMAKE_INSTALL_PREFIX}${OpenBLAS_LIBRARIES})
-message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
-message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
 
 find_package(OpenImageIO CONFIG REQUIRED)
 find_package(xsimd CONFIG REQUIRED)
@@ -45,11 +43,36 @@ find_package(xtensor CONFIG REQUIRED)
 find_package(xtensor-io CONFIG REQUIRED)
 find_package(xtensor-blas CONFIG REQUIRED)
 
-message(STATUS "xtensor_VERSION: " ${xtensor_VERSION})
+message(STATUS "")
 
-add_subdirectory(src)
+message(STATUS "                             Test libs")
+message(STATUS "──────────────────────────────────────────────────────────────────────")
+message(STATUS "doctest_VERSION: ${doctest_VERSION}")
+message(STATUS "")
 
-add_subdirectory(benchmarks)
+message(STATUS "                           Benchmark libs")
+message(STATUS "──────────────────────────────────────────────────────────────────────")
+message(STATUS "benchmark_VERSION: ${benchmark_VERSION}")
+message(STATUS "")
+
+message(STATUS "                            Xtensor libs")
+message(STATUS "──────────────────────────────────────────────────────────────────────")
+message(STATUS "xtl_VERSION         : " ${xtl_VERSION})
+message(STATUS "xtensor_VERSION     : " ${xtensor_VERSION})
+message(STATUS "xtensor-io_VERSION  : " ${xtensor-io_VERSION})
+message(STATUS "xtensor-blas_VERSION: " ${xtensor-blas_VERSION})
+message(STATUS "")
+
+message(STATUS "                        Xtensor dependencies")
+message(STATUS "──────────────────────────────────────────────────────────────────────")
+message(STATUS "clapack_VERSION    : " ${clapack_VERSION})
+message(STATUS "OpenBLAS_VERSION   : " ${OpenBLAS_VERSION})
+message(STATUS "OpenImageIO_VERSION: " ${OpenImageIO_VERSION})
+message(STATUS "")
 
 enable_testing()
 add_subdirectory(tests)
+
+add_subdirectory(benchmarks)
+
+add_subdirectory(src)

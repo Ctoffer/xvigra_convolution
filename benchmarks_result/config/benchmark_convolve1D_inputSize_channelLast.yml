@@ -15,8 +15,7 @@ data:
     group_5: benchmark_convolve1D_v5_inputSize
 
   variants:
-    - channelFirst
-  #  - channelLast
+    - channelLast
 
   aggregates: ['min']
   specializations: ['float']
@@ -29,7 +28,7 @@ data:
     values: []
 
 graph:
-  title: Different Implementations of convolve1D
+  title: Different Implementations of convolve1D (channelLast)
 
   x_axis:
     label: Size S
@@ -42,22 +41,16 @@ graph:
   legend:
     key: '{group_id}_{variant}'
     entries:
-      group_1_channelFirst: convolve1D V.1 (Channel First)
-      group_1_channelLast: convolve1D V.1 (Channel Last)
-      group_2_channelFirst: convolve1D V.2 (Channel First)
-      group_2_channelLast: convolve1D V.2 (Channel Last)
-      group_3_channelFirst: convolve1D V.3 (Channel First)
-      group_3_channelLast: convolve1D V.3 (Channel Last)
-      group_4_channelFirst: convolve1D V.4 (Channel First)
-      group_4_channelLast: convolve1D V.4 (Channel Last)
-      group_5_channelFirst: convolve1D V.5 (Channel First)
-      group_5_channelLast: convolve1D V.5 (Channel Last)
+      group_1_channelLast: convolve1D V.1
+      group_2_channelLast: convolve1D V.2
+      group_3_channelLast: convolve1D V.3
+      group_4_channelLast: convolve1D V.4
+      group_5_channelLast: convolve1D V.5
 
   line_style:
     key: '{variant}'
     entries:
-      channelFirst: "-"
-      channelLast: ":"
+      channelLast: "-"
 
   line_color:
     key: '{group_id}'

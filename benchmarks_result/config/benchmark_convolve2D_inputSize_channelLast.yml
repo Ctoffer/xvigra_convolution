@@ -22,11 +22,11 @@ data:
     attrs:
       start: 50
       stop: 2050
-      step: 650
+      step: 50
     values: []
 
 graph:
-  title: Different Implementations of convolve1D
+  title: Different Implementations of convolve1D (channelLast)
 
   x_axis:
     label: Size S

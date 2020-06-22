@@ -6,14 +6,37 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xrandom.hpp"
 
-#include "xvigra/explicit_convolution.hpp"
+#include "xvigra_legacy/explicit_convolution.hpp"
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ define - begin                                                                                                   ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 #define INPUT_SIZE_MIN 50
 #define INPUT_SIZE_MAX 2000
-#define INPUT_SIZE_STEP 650
+#define INPUT_SIZE_STEP 50
 
-// =======================================================================================
 
+#define BENCHMARK_SINGLE_VERSION(name)\
+	BENCHMARK_TEMPLATE(name, float)\
+	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {\
+    	return *(std::min_element(std::begin(v), std::end(v)));\
+  	})\
+	->ComputeStatistics("max", [](const std::vector<double>& v) -> double {\
+    	return *(std::max_element(std::begin(v), std::end(v)));\
+  	})\
+	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)\
+	->Unit(benchmark::kMillisecond)
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ define - end                                                                                                     ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ benchmark version 1 to 4 - begin                                                                                 ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 template <typename ElementType>
 void benchmark_convolve2D_v1_inputSize_channelLast(benchmark::State& state) {
@@ -48,7 +71,7 @@ void benchmark_convolve2D_v1_inputSize_channelLast(benchmark::State& state) {
 	}
 	
 	for (auto _ : state) {
-		 auto result = xvigra::convolve2D(
+		 auto result = xvigra_legacy::convolve2D_v1(
 		 	input, 
 		 	kernel, 
 		 	options2D
@@ -56,9 +79,6 @@ void benchmark_convolve2D_v1_inputSize_channelLast(benchmark::State& state) {
 		 benchmark::DoNotOptimize(result.data());
 	}
 }
-
-
-// =======================================================================================
 
 
 template <typename ElementType>
@@ -94,7 +114,7 @@ void benchmark_convolve2D_v2_inputSize_channelLast(benchmark::State& state) {
 	}
 	
 	for (auto _ : state) {
-		 auto result = xvigra::convolve2D_v2(
+		 auto result = xvigra_legacy::convolve2D_v2(
 		 	input, 
 		 	kernel, 
 		 	options2D
@@ -102,9 +122,6 @@ void benchmark_convolve2D_v2_inputSize_channelLast(benchmark::State& state) {
 		 benchmark::DoNotOptimize(result.data());
 	}
 }
-
-
-// =======================================================================================
 
 
 template <typename ElementType>
@@ -140,7 +157,7 @@ void benchmark_convolve2D_v3_inputSize_channelLast(benchmark::State& state) {
 	}
 	
 	for (auto _ : state) {
-		 auto result = xvigra::convolve2D_v3(
+		 auto result = xvigra_legacy::convolve2D_v3(
 		 	input, 
 		 	kernel, 
 		 	options2D
@@ -148,9 +165,6 @@ void benchmark_convolve2D_v3_inputSize_channelLast(benchmark::State& state) {
 		 benchmark::DoNotOptimize(result.data());
 	}
 }
-
-
-// =======================================================================================
 
 
 template <typename ElementType>
@@ -186,7 +200,7 @@ void benchmark_convolve2D_v4_inputSize_channelLast(benchmark::State& state) {
 	}
 	
 	for (auto _ : state) {
-		 auto result = xvigra::convolve2D_v4(
+		 auto result = xvigra_legacy::convolve2D_v4(
 		 	input, 
 		 	kernel, 
 		 	options2D
@@ -195,64 +209,23 @@ void benchmark_convolve2D_v4_inputSize_channelLast(benchmark::State& state) {
 	}
 }
 
-
-// =======================================================================================
-
-
-BENCHMARK_TEMPLATE(benchmark_convolve2D_v1_inputSize_channelLast, float)
-	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
-    	return *(std::min_element(std::begin(v), std::end(v)));
-  	})
-	->ComputeStatistics("max", [](const std::vector<double>& v) -> double {
-    	return *(std::max_element(std::begin(v), std::end(v)));
-  	})
-	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
-	->Unit(benchmark::kMillisecond);
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ benchmark version 1 to 4 - end                                                                                   ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 
-// =======================================================================================
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ run benchmarks - begin                                                                                           ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-
-BENCHMARK_TEMPLATE(benchmark_convolve2D_v2_inputSize_channelLast, float)
-	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
-    	return *(std::min_element(std::begin(v), std::end(v)));
-  	})
-	->ComputeStatistics("max", [](const std::vector<double>& v) -> double {
-    	return *(std::max_element(std::begin(v), std::end(v)));
-  	})
-	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
-	->Unit(benchmark::kMillisecond);
-
-
-// =======================================================================================
-
-
-BENCHMARK_TEMPLATE(benchmark_convolve2D_v3_inputSize_channelLast, float)
-	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
-    	return *(std::min_element(std::begin(v), std::end(v)));
-  	})
-	->ComputeStatistics("max", [](const std::vector<double>& v) -> double {
-    	return *(std::max_element(std::begin(v), std::end(v)));
-  	})
-	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
-	->Unit(benchmark::kMillisecond);
-
-
-// =======================================================================================
-
-
-BENCHMARK_TEMPLATE(benchmark_convolve2D_v4_inputSize_channelLast, float)
-	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {
-    	return *(std::min_element(std::begin(v), std::end(v)));
-  	})
-	->ComputeStatistics("max", [](const std::vector<double>& v) -> double {
-    	return *(std::max_element(std::begin(v), std::end(v)));
-  	})
-	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
-	->Unit(benchmark::kMillisecond);
-
-
-// =======================================================================================
+BENCHMARK_SINGLE_VERSION(benchmark_convolve2D_v1_inputSize_channelLast);
+BENCHMARK_SINGLE_VERSION(benchmark_convolve2D_v2_inputSize_channelLast);
+BENCHMARK_SINGLE_VERSION(benchmark_convolve2D_v3_inputSize_channelLast);
+BENCHMARK_SINGLE_VERSION(benchmark_convolve2D_v4_inputSize_channelLast);
 
 
 BENCHMARK_MAIN();
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ run benchmarks - end                                                                                             ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
