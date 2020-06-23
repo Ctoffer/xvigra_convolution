@@ -21,7 +21,7 @@ def build_all():
     print()
 
     execute_command = ["PowerShell", "-ExecutionPolicy", "Unrestricted", "-File",
-                       ".\\build_all_windows.ps1"] if is_windows else ["bash", "build_all_linux.sh"]
+                       ".\\build_all_windows.ps1"] if is_windows else ["bash", "build_all_linux.sh", "--no-clear"]
     subprocess.call(execute_command, cwd=os.getcwd(), shell=is_windows)
 
 
@@ -51,7 +51,7 @@ def call_benchmark(file_name, benchmark_parameters, folder="xvigra"):
 def main():
     benchmark_parameters = {
         "format": "console",
-        "min_time": 1,
+        "min_time": 2,
         "repetitions": 10,
         "report_aggregates_only": True
     }

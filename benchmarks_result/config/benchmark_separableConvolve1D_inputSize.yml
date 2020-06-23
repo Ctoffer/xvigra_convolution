@@ -30,8 +30,8 @@ graph:
     mode: normal
 
   y_axis:
-    label: Minimum Time (ms)
-    mode: log
+    label: Minimum Time (ns)
+    mode: normal
 
   legend:
     key: '{group_id}_{variant}'

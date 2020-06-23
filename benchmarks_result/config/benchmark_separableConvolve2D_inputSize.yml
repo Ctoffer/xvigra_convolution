@@ -31,7 +31,7 @@ graph:
 
   y_axis:
     label: Minimum Time (ms)
-    mode: log
+    mode: normal
 
   legend:
     key: '{group_id}_{variant}'
