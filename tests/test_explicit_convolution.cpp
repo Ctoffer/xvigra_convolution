@@ -532,31 +532,6 @@ TEST_CASE_TEMPLATE("Convolve1D: Test Invalid Configurations", T, TYPE_PAIRS) {
         );
     }
 
-    SUBCASE("Kernel wrong dimension") {
-        xt::xarray<float> input(std::vector<std::size_t>{7, 3});
-        xt::xarray<float> kernelTooSmall(std::vector<std::size_t>{1, 1});
-        xt::xarray<float> kernelTooBig(std::vector<std::size_t>{1, 1, 3, 1});
-
-        xvigra::KernelOptions options;
-        options.channelPosition = xvigra::ChannelPosition::LAST;
-
-        CHECK(input.dimension() == 2);
-        CHECK(kernelTooSmall.dimension() == 2);
-        CHECK(kernelTooBig.dimension() == 4);
-
-        CHECK_THROWS_WITH_AS(
-            xvigra::convolve1D(input, kernelTooSmall, options),
-            "convolve1D(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!",
-            std::invalid_argument
-        );
-
-        CHECK_THROWS_WITH_AS(
-            xvigra::convolve1D(input, kernelTooBig, options),
-            "convolve1D(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!",
-            std::invalid_argument
-        );
-    }
-
     SUBCASE("Implicit: Input wrong dimension") {
         xt::xarray<float> inputTooSmall(std::vector<std::size_t>{});
         xt::xarray<float> inputTooBig(std::vector<std::size_t>{7, 3});
@@ -579,31 +554,6 @@ TEST_CASE_TEMPLATE("Convolve1D: Test Invalid Configurations", T, TYPE_PAIRS) {
         CHECK_THROWS_WITH_AS(
             xvigra::convolve1DImplicit(inputTooBig, kernel, options),
             "convolve1DImplicit(): Need 1 dimensional (W) input!",
-            std::invalid_argument
-        );
-    }
-
-    SUBCASE("Implicit: Kernel wrong dimension") {
-        xt::xarray<float> input(std::vector<std::size_t>{7});
-        xt::xarray<float> kernelTooSmall(std::vector<std::size_t>{1, 1});
-        xt::xarray<float> kernelTooBig(std::vector<std::size_t>{1, 1, 3, 1});
-
-        xvigra::KernelOptions options;
-        options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
-
-        CHECK(input.dimension() == 1);
-        CHECK(kernelTooSmall.dimension() == 2);
-        CHECK(kernelTooBig.dimension() == 4);
-
-        CHECK_THROWS_WITH_AS(
-            xvigra::convolve1DImplicit(input, kernelTooSmall, options),
-            "convolve1DImplicit(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!",
-            std::invalid_argument
-        );
-
-        CHECK_THROWS_WITH_AS(
-            xvigra::convolve1DImplicit(input, kernelTooBig, options),
-            "convolve1DImplicit(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!",
             std::invalid_argument
         );
     }
@@ -2053,31 +2003,6 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Invalid Configurations", T, TYPE_PAIRS) {
         );
     }
 
-    SUBCASE("Kernel wrong dimension") {
-        xt::xarray<float> input(std::vector<std::size_t>{7, 3, 3});
-        xt::xarray<float> kernelTooSmall(std::vector<std::size_t>{1, 1});
-        xt::xarray<float> kernelTooBig(std::vector<std::size_t>{1, 1, 3, 1, 3});
-
-        xvigra::KernelOptions2D options;
-        options.setChannelPosition(xvigra::ChannelPosition::LAST);
-
-        CHECK(input.dimension() == 3);
-        CHECK(kernelTooSmall.dimension() == 2);
-        CHECK(kernelTooBig.dimension() == 5);
-
-        CHECK_THROWS_WITH_AS(
-            xvigra::convolve2D(input, kernelTooSmall, options),
-            "convolve2D(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!",
-            std::invalid_argument
-        );
-
-        CHECK_THROWS_WITH_AS(
-            xvigra::convolve2D(input, kernelTooBig, options),
-            "convolve2D(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!",
-            std::invalid_argument
-        );
-    }
-
     SUBCASE("Implicit: Input wrong dimension") {
         xt::xarray<float> inputTooSmall(std::vector<std::size_t>{});
         xt::xarray<float> inputTooBig(std::vector<std::size_t>{7, 3, 3});
@@ -2100,31 +2025,6 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Invalid Configurations", T, TYPE_PAIRS) {
         CHECK_THROWS_WITH_AS(
             xvigra::convolve2DImplicit(inputTooBig, kernel, options),
             "convolve2DImplicit(): Need 2 dimensional (H x W) input!",
-            std::invalid_argument
-        );
-    }
-
-    SUBCASE("Implicit: Kernel wrong dimension") {
-        xt::xarray<float> input(std::vector<std::size_t>{7, 5});
-        xt::xarray<float> kernelTooSmall(std::vector<std::size_t>{1, 1});
-        xt::xarray<float> kernelTooBig(std::vector<std::size_t>{1, 1, 3, 1, 3});
-
-        xvigra::KernelOptions2D options;
-        options.setChannelPosition(xvigra::ChannelPosition::IMPLICIT);
-
-        CHECK(input.dimension() == 2);
-        CHECK(kernelTooSmall.dimension() == 2);
-        CHECK(kernelTooBig.dimension() == 5);
-
-        CHECK_THROWS_WITH_AS(
-            xvigra::convolve2DImplicit(input, kernelTooSmall, options),
-            "convolve2DImplicit(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!",
-            std::invalid_argument
-        );
-
-        CHECK_THROWS_WITH_AS(
-            xvigra::convolve2DImplicit(input, kernelTooBig, options),
-            "convolve2DImplicit(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!",
             std::invalid_argument
         );
     }

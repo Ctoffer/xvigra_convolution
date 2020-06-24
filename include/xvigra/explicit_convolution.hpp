@@ -16,6 +16,7 @@
 
 #include "xvigra/convolution_util.hpp"
 #include "xvigra/iter_util.hpp"
+#include "xvigra/kernel_util.hpp"
 
 namespace xvigra {
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -123,7 +124,6 @@ auto convolve1D(
     using ResultType = typename std::common_type_t<InputType, KernelType>;
 
     InputContainerType input = inputExpression.derived_cast();
-    KernelContainerType kernel = kernelExpression.derived_cast();
 
     if (options.channelPosition == xvigra::ChannelPosition::IMPLICIT) {
         throw std::invalid_argument(
@@ -133,10 +133,6 @@ auto convolve1D(
 
     if (input.dimension() != 2) {
         throw std::invalid_argument("convolve1D(): Need 2 dimensional (W x C or C x W) input!");
-    }
-
-    if (kernel.dimension() != 3) {
-        throw std::invalid_argument("convolve1D(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!");
     }
 
     // Input Parameters
@@ -149,6 +145,9 @@ auto convolve1D(
         inputChannels = static_cast<int>(input.shape()[0]);
         inputWidth = static_cast<int>(input.shape()[1]);
     }
+
+    // Kernel
+    xt::xtensor<KernelType, 3> kernel = xvigra::promoteKernelToFull1D(kernelExpression.derived_cast(), inputChannels);
 
     // Filter Specifications
     int kernelSize = kernel.shape()[2];
@@ -318,16 +317,12 @@ auto convolve1DImplicit(
         throw std::invalid_argument("convolve1DImplicit(): Need 1 dimensional (W) input!");
     }
 
-    if (kernel.dimension() != 3) {
-        throw std::invalid_argument("convolve1DImplicit(): Need a full 3 dimensional (C_{out} x C_{in} x K_{W}) kernel to operate!");
-    }
-
     xvigra::KernelOptions tempOptions(options);
     tempOptions.channelPosition = xvigra::ChannelPosition::LAST;
-    auto normalizedInput = xt::reshape_view(input, {static_cast<int>(input.shape()[0]), 1});
+    auto normalizedInput = xt::expand_dims(input, input.dimension());
     auto result = convolve1D(normalizedInput, kernel, tempOptions);
 
-    return Tensor1D<ResultType>(xt::reshape_view(result, {result.shape()[0]}));
+    return Tensor1D<ResultType>(xt::squeeze(result));
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -353,7 +348,6 @@ auto convolve2D(
     using ResultType = typename std::common_type_t<InputType, KernelType>;
 
     InputContainerType input = inputExpression.derived_cast();
-    KernelContainerType kernel = kernelExpression.derived_cast();
 
     if (optionsY.channelPosition != optionsX.channelPosition) {
         throw std::invalid_argument(
@@ -371,10 +365,6 @@ auto convolve2D(
         throw std::invalid_argument("convolve2D(): Need 3 dimensional (H x W x C or C x H x W) input!");
     }
 
-    if (kernel.dimension() != 4) {
-        throw std::invalid_argument("convolve2D(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!");
-    }
-
     int inputChannels;
     int inputHeight;
     int inputWidth;
@@ -388,6 +378,9 @@ auto convolve2D(
         inputWidth = input.shape()[1];
         inputChannels = input.shape()[2];
     }
+
+    // Kernel
+    xt::xtensor<KernelType, 4> kernel = xvigra::promoteKernelToFull2D(kernelExpression.derived_cast(), inputChannels);
     
     int outputChannels = kernel.shape()[0];
     int kernelHeight = kernel.shape()[2];
@@ -591,23 +584,12 @@ auto convolve2DImplicit(
         throw std::invalid_argument("convolve2DImplicit(): Need 2 dimensional (H x W) input!");
     }
 
-    if (kernel.dimension() != 4) {
-        throw std::invalid_argument("convolve2DImplicit(): Need a full 4 dimensional (C_{out} x C_{in} x K_{H} x K_{W}) kernel to operate!");
-    }
-
     xvigra::KernelOptions2D tempOptions(options2D);
     tempOptions.setChannelPosition(xvigra::ChannelPosition::LAST);
-    auto normalizedInput = xt::reshape_view(input, {
-        static_cast<int>(input.shape()[0]), 
-        static_cast<int>(input.shape()[1]),
-        1
-    });
+    auto normalizedInput = xt::expand_dims(input, input.dimension());
     auto result = convolve2D(normalizedInput, kernel, tempOptions);
 
-    return Tensor2D<ResultType>(xt::reshape_view(result, {
-        result.shape()[0],
-        result.shape()[1]
-    }));
+    return Tensor2D<ResultType>(xt::squeeze(result));
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗

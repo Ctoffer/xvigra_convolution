@@ -76,9 +76,9 @@ void benchmark_separableConvolve2D_inputSize_channelFirst(benchmark::State& stat
 	}
 	
 	for (auto _ : state) {
-		 auto result = xvigra::separableConvolve2D<ElementType, ElementType, xvigra::ChannelPosition::FIRST>(
+		 auto result = xvigra::separableConvolve2D(
 		 	input, 
-		 	{kernelY, kernelX}, 
+		 	std::array{kernelY, kernelX}, 
 		 	options2D
 		 );
 		 benchmark::DoNotOptimize(result.data());
@@ -123,9 +123,9 @@ void benchmark_separableConvolve2D_inputSize_channelLast(benchmark::State& state
 	}
 	
 	for (auto _ : state) {
-		 auto result = xvigra::separableConvolve2D<ElementType, ElementType, xvigra::ChannelPosition::LAST>(
+		 auto result = xvigra::separableConvolve2D(
 		 	input, 
-		 	{kernelY, kernelX}, 
+		 	std::array{kernelY, kernelX}, 
 		 	options2D
 		 );
 		 benchmark::DoNotOptimize(result.data());
@@ -178,10 +178,10 @@ void benchmark_separableConvolve_2D_inputSize_channelFirst(benchmark::State& sta
 	}
 	
 	for (auto _ : state) {
-		 auto result = xvigra::separableConvolve<ElementType, ElementType, xvigra::ChannelPosition::FIRST, 2>(
+		 auto result = xvigra::separableConvolve<2>(
 		 	input, 
-		 	{kernelY, kernelX}, 
-		 	{options2D.optionsY, options2D.optionsX}
+		 	std::array{kernelY, kernelX}, 
+		 	std::array{options2D.optionsY, options2D.optionsX}
 		 );
 		 benchmark::DoNotOptimize(result.data());
 	}
@@ -225,10 +225,10 @@ void benchmark_separableConvolve_2D_inputSize_channelLast(benchmark::State& stat
 	}
 	
 	for (auto _ : state) {
-		 auto result = xvigra::separableConvolve<ElementType, ElementType, xvigra::ChannelPosition::LAST, 2>(
+		 auto result = xvigra::separableConvolve<2>(
 		 	input, 
-		 	{kernelY, kernelX}, 
-		 	{options2D.optionsY, options2D.optionsX}
+		 	std::array{kernelY, kernelX}, 
+		 	std::array{options2D.optionsY, options2D.optionsX}
 		 );
 		 benchmark::DoNotOptimize(result.data());
 	}

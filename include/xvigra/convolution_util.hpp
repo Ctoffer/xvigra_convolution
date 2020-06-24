@@ -9,7 +9,11 @@
 #undef VOID
 #endif
 
+#include <xtensor/xexpression.hpp>
+#include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
+
+#include <xvigra/math.hpp>
 
 namespace xvigra {
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -27,12 +31,6 @@ namespace xvigra {
     struct KernelOptions2D;
 
     int truePadding(int, const BorderTreatment&);
-
-    template <typename T>
-    T roundValue(const T, int);
-
-    template <typename T, int Dim>
-    xt::xtensor<T, Dim> roundTensor(const xt::xtensor<T, Dim>&, int);
 
     template <typename T = int> 
     std::vector<T> range(const T&, const T&, const T& step=1);
@@ -415,41 +413,6 @@ namespace xvigra {
     }
 
     template <typename T>
-    T roundValue(
-        const T value, 
-        int decimals
-    ) {
-        if constexpr (std::is_floating_point_v<T>) {
-            int d = 0;
-            int factor = std::pow(10, decimals);
-            if ((value * factor * 10 - value * factor) > 4) {
-                d = 1;
-            }
-
-            return (std::floor(value * factor) + d) / static_cast<T>(factor);
-        } else {
-            return value;
-        }
-    }
-
-    template <typename T, int Dim>
-    xt::xtensor<T, Dim> roundTensor(
-        const xt::xtensor<T, Dim>& tensor, 
-        int decimals
-    ) {
-        xt::xtensor<T, Dim> copiedTensor(tensor);
-        auto sourceIter = tensor.begin();
-        auto sourceEnd = tensor.end();
-        auto targetIter = copiedTensor.begin();
-
-        for (; sourceIter < sourceEnd; ++sourceIter, ++targetIter) {
-            *targetIter = xvigra::roundValue<T>(*sourceIter, decimals);
-        }
-
-        return copiedTensor;
-    }
-
-    template <typename T>
     xt::xtensor<T, 3> normalizeAfterConvolution(
         const xt::xtensor<T, 3>& originalTensor
     ) {
@@ -458,7 +421,7 @@ namespace xvigra {
         arr /= xt::amax(arr)[0];
 
         if constexpr (std::is_floating_point_v<T>) {
-            return xvigra::roundTensor<T, 3>(arr, 11);
+            return xvigra::roundExpression(arr, 11);
         } else {
            return arr * 255;
         }

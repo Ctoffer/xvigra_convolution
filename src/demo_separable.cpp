@@ -26,16 +26,16 @@ void runFirstWithSeparableConvolve1D() {
     xt::xtensor<KernelType, 1> rawKernel{1.0, 1.3, 1.7};
     xvigra::KernelOptions options;
 
-    auto result = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(arr, rawKernel, options);
+    auto result = xvigra::separableConvolve1D(arr, rawKernel, options);
 
     std::cout << std::endl;
     std::cout << result.shape() << std::endl;
     std::cout << result << std::endl;
 
-    auto result2 = xvigra::separableConvolve<InputType, KernelType, xvigra::ChannelPosition::FIRST, 1>(
+    auto result2 = xvigra::separableConvolve<1>(
         arr, 
-        {rawKernel}, 
-        {options}
+        std::array{rawKernel}, 
+        std::array{options}
     );
     std::cout << result2.shape() << std::endl;
     std::cout << result2 << std::endl;
@@ -53,16 +53,16 @@ void runLastWithSeparableConvolve1D() {
     xt::xtensor<KernelType, 1> rawKernel{1.0, 1.3, 1.7};
     xvigra::KernelOptions options;
 
-    auto result = xvigra::separableConvolve1D<InputType, KernelType, xvigra::ChannelPosition::LAST>(arr, rawKernel, options);
+    auto result = xvigra::separableConvolve1D(arr, rawKernel, options);
 
     std::cout << std::endl;
     std::cout << result.shape() << std::endl;
     std::cout << result << std::endl;
 
-    auto result2 = xvigra::separableConvolve<InputType, KernelType, xvigra::ChannelPosition::LAST, 1>(
+    auto result2 = xvigra::separableConvolve<1>(
         arr, 
-        {rawKernel}, 
-        {options}
+        std::array{rawKernel}, 
+        std::array{options}
     );
     std::cout << result2.shape() << std::endl;
     std::cout << result2 << std::endl;
@@ -110,7 +110,7 @@ void runFirstWithSeparableConvolve2D() {
     xvigra::KernelOptions optionsY;
     xvigra::KernelOptions optionsX;
 
-    auto result = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::FIRST>(
+    auto result = xvigra::separableConvolve2D(
         arr, 
         std::array{rawKernelY, rawKernelX}, 
         std::array{optionsY, optionsX}
@@ -120,10 +120,10 @@ void runFirstWithSeparableConvolve2D() {
     std::cout << std::endl;
     printTensor<ResultType>(result);
 
-    auto result2 = xvigra::separableConvolve<InputType, KernelType, xvigra::ChannelPosition::FIRST, 2>(
+    auto result2 = xvigra::separableConvolve<2>(
         arr, 
-        {rawKernelY, rawKernelX}, 
-        {optionsY, optionsX}
+        std::array{rawKernelY, rawKernelX}, 
+        std::array{optionsY, optionsX}
     );
     printTensor<ResultType>(result2);
 }
@@ -151,7 +151,7 @@ void runLastWithSeparableConvolve2D() {
     xvigra::KernelOptions optionsY;
     xvigra::KernelOptions optionsX;
 
-    auto result = xvigra::separableConvolve2D<InputType, KernelType, xvigra::ChannelPosition::LAST>(
+    auto result = xvigra::separableConvolve2D(
         arr, 
         std::array{rawKernelY, rawKernelX}, 
         std::array{optionsY, optionsX}
@@ -161,10 +161,10 @@ void runLastWithSeparableConvolve2D() {
     std::cout << std::endl;
     printTensor<ResultType>(result);
 
-    auto result2 = xvigra::separableConvolve<InputType, KernelType, xvigra::ChannelPosition::LAST, 2>(
+    auto result2 = xvigra::separableConvolve<2>(
         arr, 
-        {rawKernelY, rawKernelX}, 
-        {optionsY, optionsX}
+        std::array{rawKernelY, rawKernelX}, 
+        std::array{optionsY, optionsX}
     );
     printTensor<ResultType>(result2);
 }

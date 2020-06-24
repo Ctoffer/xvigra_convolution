@@ -1,7 +1,9 @@
 set(TARGETS
+    test_math
+    test_kernel_util
     test_convolution_util
-    test_explicit_convolution
     test_image_io
+    test_explicit_convolution
     test_separable_convolution
 )
 

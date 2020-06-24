@@ -2,6 +2,7 @@
 #define XVIGRA_IO_UTIL_HPP
 
 #include <array>
+#include <iomanip>
 #include <iostream>
 #include <ostream>
 #include <vector>
