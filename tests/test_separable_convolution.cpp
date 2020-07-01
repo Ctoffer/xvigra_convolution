@@ -32,6 +32,11 @@
     std::pair<int, float>, \
     std::pair<int, double>
     
+TYPE_TO_STRING(std::pair<short, float>);
+TYPE_TO_STRING(std::pair<short, double>);
+TYPE_TO_STRING(std::pair<int, float>);
+TYPE_TO_STRING(std::pair<int, double>);
+    
 #define ZERO_2D {\
     {0.00f, 0.00f, 0.00f},\
     {0.00f, 0.00f, 0.00f},\

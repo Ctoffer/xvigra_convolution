@@ -41,65 +41,222 @@ namespace xvigra {
     // ║ utility - begin                                                                                                  ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-    template <bool isBegin>
-    int getBorderIndex(const BorderTreatment& treatment, int index, int size) {
-        if (0 <= index && index < size) {
-            return index;
-        }
+    #define XVIGRA_SET_BEGIN_BORDER_VALUE_CHANNEL_FIRST {                                 \
+        InputType value;                                                                  \
+        auto treatment = options.borderTreatmentBegin;                                    \
+                                                                                          \
+        switch(treatment.getType()) {                                                     \
+            case xvigra::BorderTreatmentType::ASYMMETRIC_REFLECT: {                       \
+                value = input(inputChannel, std::abs(inputX));                            \
+                break;                                                                    \
+            }                                                                             \
+            case xvigra::BorderTreatmentType::AVOID: {                                    \
+                throw std::domain_error(                                                  \
+                    "convolve1D(): Border treatment AVOID should not be used here!"       \
+                );                                                                        \
+            }                                                                             \
+            case xvigra::BorderTreatmentType::CONSTANT: {                                 \
+                value = treatment.getValue<InputType>();                                  \
+                break;                                                                    \
+            }                                                                             \
+            case xvigra::BorderTreatmentType::REPEAT: {                                   \
+                value = input(inputChannel, 0);                                           \
+                break;                                                                    \
+            }                                                                             \
+            case xvigra::BorderTreatmentType::SYMMETRIC_REFLECT: {                        \
+                value = input(inputChannel, std::abs(inputX + 1));                        \
+                break;                                                                    \
+            }                                                                             \
+            case xvigra::BorderTreatmentType::WRAP: {                                     \
+                value = input(inputChannel, inputX + inputWidth);                         \
+                break;                                                                    \
+            }                                                                             \
+            default: {                                                                    \
+                throw std::domain_error("convolve1D(): Unknown begin border treatment!"); \
+            }                                                                             \
+        }                                                                                 \
+                                                                                          \
+        patch(inputChannel, patchKernelX, outIndex) = static_cast<ResultType>(value);     \
+    }
 
-        if constexpr (isBegin) {
-            switch(treatment.getType()) {
-                case BorderTreatmentType::ASYMMETRIC_REFLECT: {
-                    return std::abs(index); 
-                }
-                case BorderTreatmentType::AVOID: {
-                    throw std::domain_error(
-                        "getBorderIndex(): Border treatment AVOID should not be used here!"
-                    );
-                }
-                case BorderTreatmentType::CONSTANT: {
-                    return -1;
-                }
-                case BorderTreatmentType::REPEAT: {
-                    return 0; 
-                }
-                case BorderTreatmentType::SYMMETRIC_REFLECT: {
-                    return std::abs(index + 1); 
-                }
-                case BorderTreatmentType::WRAP: {
-                    return index + size; 
-                }
-                default: {
-                    throw std::domain_error("getBorderIndex(): Unknown begin border treatment!");
-                }
-            }
-        } else {
-            switch(treatment.getType()) {
-                case BorderTreatmentType::ASYMMETRIC_REFLECT: {
-                    return 2 * size - index - 2; 
-                }
-                case BorderTreatmentType::AVOID: {
-                    throw std::domain_error(
-                        "getBorderIndex(): Border treatment AVOID should not be used here!"
-                    );
-                }
-                case BorderTreatmentType::CONSTANT: {
-                    return -1;
-                }
-                case BorderTreatmentType::REPEAT: {
-                    return size - 1; 
-                }
-                case BorderTreatmentType::SYMMETRIC_REFLECT: {
-                    return 2 * size - index - 1; 
-                }
-                case BorderTreatmentType::WRAP: {
-                    return index - size; 
-                }
-                default: {
-                    throw std::domain_error("getBorderIndex(): Unknown end border treatment!");
-                }
-            }
-        }   
+    #define XVIGRA_SET_END_BORDER_VALUE_CHANNEL_FIRST {\
+        InputType value;\
+        auto treatment = options.borderTreatmentEnd;\
+        \
+        switch(treatment.getType()) {\
+            case xvigra::BorderTreatmentType::ASYMMETRIC_REFLECT: {\
+                value = input(inputChannel, 2 * inputWidth - inputX - 2); \
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::AVOID: {\
+                throw std::domain_error(\
+                    "convolve1D(): Border treatment AVOID should not be used here!"\
+                );\
+            }\
+            case xvigra::BorderTreatmentType::CONSTANT: {\
+                value = treatment.getValue<InputType>();\
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::REPEAT: {\
+                value = input(inputChannel, inputWidth - 1);\
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::SYMMETRIC_REFLECT: {\
+                value = input(inputChannel, 2 * inputWidth - inputX - 1); \
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::WRAP: {\
+                value = input(inputChannel, inputX - inputWidth); \
+                break;\
+            }\
+            default: {\
+                throw std::domain_error("convolve1D(): Unknown end border treatment!");\
+            }\
+        }\
+        \
+        patch(inputChannel, patchKernelX, outIndex) = static_cast<ResultType>(value);\
+    }
+
+    #define XVIGRA_SET_BEGIN_BORDER_VALUE_CHANNEL_LAST {                                     \
+        InputType value;                                                                  \
+        auto treatment = options.borderTreatmentBegin;                                            \
+                                                                                          \
+        switch(treatment.getType()) {                                                     \
+            case xvigra::BorderTreatmentType::ASYMMETRIC_REFLECT: {                       \
+                value = input(std::abs(inputX + 1), inputChannel);                        \
+                break;                                                                    \
+            }                                                                             \
+            case xvigra::BorderTreatmentType::AVOID: {                                    \
+                throw std::domain_error(                                                  \
+                    "convolve1D(): Border treatment AVOID should not be used here!"       \
+                );                                                                        \
+            }                                                                             \
+            case xvigra::BorderTreatmentType::CONSTANT: {                                 \
+                value = treatment.getValue<InputType>();                                  \
+                break;                                                                    \
+            }                                                                             \
+            case xvigra::BorderTreatmentType::REPEAT: {                                   \
+                value = input(0, inputChannel);                                           \
+                break;                                                                    \
+            }                                                                             \
+            case xvigra::BorderTreatmentType::SYMMETRIC_REFLECT: {                        \
+                value = input(std::abs(inputX), inputChannel);                            \
+                break;                                                                    \
+            }                                                                             \
+            case xvigra::BorderTreatmentType::WRAP: {                                     \
+                value = input(inputX + inputWidth, inputChannel);                         \
+                break;                                                                    \
+            }                                                                             \
+            default: {                                                                    \
+                throw std::domain_error("convolve1D(): Unknown begin border treatment!"); \
+            }                                                                             \
+        }                                                                                 \
+                                                                                          \
+        patch(outIndex, inputChannel, patchKernelX) = static_cast<ResultType>(value);\
+    }
+
+    #define XVIGRA_SET_END_BORDER_VALUE_CHANNEL_LAST {\
+        InputType value;\
+        auto treatment = options.borderTreatmentEnd;\
+        \
+        switch(treatment.getType()) {\
+            case xvigra::BorderTreatmentType::ASYMMETRIC_REFLECT: {\
+                value = input(2 * inputWidth - inputX - 2, inputChannel); \
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::AVOID: {\
+                throw std::domain_error(\
+                    "convolve1D(): Border treatment AVOID should not be used here!"\
+                );\
+            }\
+            case xvigra::BorderTreatmentType::CONSTANT: {\
+                value = treatment.getValue<InputType>();\
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::REPEAT: {\
+                value = input(inputWidth - 1, inputChannel);\
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::SYMMETRIC_REFLECT: {\
+                value = input(2 * inputWidth - inputX - 1, inputChannel); \
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::WRAP: {\
+                value = input(inputX - inputWidth, inputChannel); \
+                break;\
+            }\
+            default: {\
+                throw std::domain_error("convolve1D(): Unknown end border treatment!");\
+            }\
+        }\
+        \
+        patch(outIndex, inputChannel, patchKernelX) = static_cast<ResultType>(value);\
+    }
+
+    #define XVIGRA_GET_BEGIN_BORDER_INDEX(value, treatment, index, size) {\
+        switch((treatment).getType()) {\
+            case xvigra::BorderTreatmentType::ASYMMETRIC_REFLECT: {\
+                (value) = std::abs((index)); \
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::AVOID: {\
+                throw std::domain_error(\
+                    "getBorderIndex(): Border treatment AVOID should not be used here!"\
+                );\
+            }\
+            case xvigra::BorderTreatmentType::CONSTANT: {\
+                (value) = -1;\
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::REPEAT: {\
+                (value) = 0; \
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::SYMMETRIC_REFLECT: {\
+                (value) = std::abs((index) + 1); \
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::WRAP: {\
+                (value) = (index) + (size); \
+                break;\
+            }\
+            default: {\
+                throw std::domain_error("getBorderIndex(): Unknown begin border treatment!");\
+            }\
+        }\
+    }
+
+    #define XVIGRA_GET_END_BORDER_INDEX(value, treatment, index, size) {\
+        switch((treatment).getType()) {\
+            case xvigra::BorderTreatmentType::ASYMMETRIC_REFLECT: {\
+                (value) = 2 * (size) - (index) - 2; \
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::AVOID: {\
+                throw std::domain_error(\
+                    "getBorderIndex(): Border treatment AVOID should not be used here!"\
+                );\
+            }\
+            case xvigra::BorderTreatmentType::CONSTANT: {\
+                (value) = -1;\
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::REPEAT: {\
+                (value) = (size) - 1; \
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::SYMMETRIC_REFLECT: {\
+                (value) = 2 * (size) - (index) - 1; \
+                break;\
+            }\
+            case xvigra::BorderTreatmentType::WRAP: {\
+                (value) = (index) - (size); \
+                break;\
+            }\
+            default: {\
+                throw std::domain_error("getBorderIndex(): Unknown end border treatment!");\
+            }\
+        }\
     }
 
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -213,26 +370,10 @@ namespace xvigra {
                         
                         if(0 <= inputX && inputX < inputWidth) {
                             patch(inputChannel, patchKernelX, outIndex) = static_cast<ResultType>(input(inputChannel, inputX));  
-                        } else {
-                            xvigra::BorderTreatment treatment = xvigra::BorderTreatment::avoid();
-                            int index = -1;
-
-                            if (inputX < 0) {
-                                treatment = options.borderTreatmentBegin;
-                                index = getBorderIndex<true>(treatment, inputX, inputWidth);
-                            } else if(inputWidth <= inputX) {
-                                treatment = options.borderTreatmentEnd;
-                                index = getBorderIndex<false>(treatment, inputX, inputWidth);
-                            }
-
-                            InputType value;
-                            if (index == -1) {
-                                value = treatment.getValue<InputType>();
-                            } else {
-                                value = input(inputChannel, index);
-                            }
-
-                            patch(inputChannel, patchKernelX, outIndex) = static_cast<ResultType>(value);
+                        } else if (inputX < 0) {  
+                            XVIGRA_SET_BEGIN_BORDER_VALUE_CHANNEL_FIRST   
+                        } else if(inputWidth <= inputX) {   
+                            XVIGRA_SET_END_BORDER_VALUE_CHANNEL_FIRST
                         }
                     }
                 }
@@ -259,27 +400,13 @@ namespace xvigra {
                         for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
                             patch(outIndex, inputChannel, patchKernelX) = static_cast<ResultType>(input(inputX, inputChannel)); 
                         }
-                    } else {
-                         for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {
-                            xvigra::BorderTreatment treatment = xvigra::BorderTreatment::avoid();
-                            int index = -1;
-
-                            if (inputX < 0) {
-                                treatment = options.borderTreatmentBegin;
-                                index = getBorderIndex<true>(treatment, inputX, inputWidth);
-                            } else if(inputWidth <= inputX) {
-                                treatment = options.borderTreatmentEnd;
-                                index = getBorderIndex<false>(treatment, inputX, inputWidth);
-                            }
-
-                            InputType value;
-                            if (index == -1) {
-                                value = treatment.getValue<InputType>();
-                            } else {
-                                value = input(index, inputChannel);
-                            }
-
-                            patch(outIndex, inputChannel, patchKernelX) = static_cast<ResultType>(value);
+                    } else if (inputX < 0) {  
+                        for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) {     
+                            XVIGRA_SET_BEGIN_BORDER_VALUE_CHANNEL_LAST
+                        }   
+                    } else if(inputWidth <= inputX) {   
+                        for (auto inputChannel = 0; inputChannel < inputChannels; ++inputChannel) { 
+                            XVIGRA_SET_END_BORDER_VALUE_CHANNEL_LAST
                         }
                     }
                 }
@@ -442,10 +569,10 @@ namespace xvigra {
 
                             if (indexY < 0) {
                                 treatmentY = optionsY.borderTreatmentBegin;
-                                indexY = getBorderIndex<true>(treatmentY, indexY, inputHeight);
+                                XVIGRA_GET_BEGIN_BORDER_INDEX(indexY, treatmentY, indexY, inputHeight)
                             } else if(inputHeight <= indexY) {
                                 treatmentY = optionsY.borderTreatmentEnd;
-                                indexY = getBorderIndex<false>(treatmentY, indexY, inputHeight);
+                                XVIGRA_GET_END_BORDER_INDEX(indexY, treatmentY, indexY, inputHeight)
                             }
                             
                             for (auto [outIndexX, inputIndexX] : xvigra::enumerate(inputWidthIndices)) {
@@ -459,10 +586,10 @@ namespace xvigra {
 
                                     if (indexX < 0) {
                                         treatmentX = optionsX.borderTreatmentBegin;
-                                        indexX = getBorderIndex<true>(treatmentX, indexX, inputWidth);
+                                        XVIGRA_GET_BEGIN_BORDER_INDEX(indexX, treatmentX, indexX, inputWidth)
                                     } else if(inputWidth <= indexX) {
                                         treatmentX = optionsX.borderTreatmentEnd;
-                                        indexX = getBorderIndex<false>(treatmentX, indexX, inputWidth);
+                                        XVIGRA_GET_END_BORDER_INDEX(indexX, treatmentX, indexX, inputWidth)
                                     }
 
                                     if (indexX == -1) {
@@ -496,10 +623,10 @@ namespace xvigra {
 
                         if (indexY < 0) {
                             treatmentY = optionsY.borderTreatmentBegin;
-                            indexY = getBorderIndex<true>(treatmentY, indexY, inputHeight);
+                            XVIGRA_GET_BEGIN_BORDER_INDEX(indexY, treatmentY, indexY, inputHeight)
                         } else if(inputHeight <= indexY) {
                             treatmentY = optionsY.borderTreatmentEnd;
-                            indexY = getBorderIndex<false>(treatmentY, indexY, inputHeight);
+                            XVIGRA_GET_END_BORDER_INDEX(indexY, treatmentY, indexY, inputHeight)
                         }
                         
                         for (auto kernelX = kernelWidthMinimum; kernelX < kernelWidthMaximum; ++kernelX) {
@@ -516,10 +643,10 @@ namespace xvigra {
 
                                 if (indexX < 0) {
                                     treatmentX = optionsX.borderTreatmentBegin;
-                                    indexX = getBorderIndex<true>(treatmentX, indexX, inputWidth);
+                                    XVIGRA_GET_BEGIN_BORDER_INDEX(indexX, treatmentX, indexX, inputWidth)
                                 } else if(inputWidth <= indexX) {
                                     treatmentX = optionsX.borderTreatmentEnd;
-                                    indexX = getBorderIndex<false>(treatmentX, indexX, inputWidth);
+                                    XVIGRA_GET_END_BORDER_INDEX(indexX, treatmentX, indexX, inputWidth)
                                 }
 
                                 if (indexX == -1) {
