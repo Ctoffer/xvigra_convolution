@@ -25,22 +25,22 @@ TEST_CASE("Test calculateOutputSize") {
 
         SUBCASE("(Constant, Constant)") {
             options.setBorderTreatment(xvigra::BorderTreatment::constant(0));
-            CHECK(calculateOutputSize(inputSize, kernelSize, options) == 7);
+            CHECK_EQ(calculateOutputSize(inputSize, kernelSize, options), 7);
         }
         
         SUBCASE("(Constant, Avoid)") {
             options.setBorderTreatment(xvigra::BorderTreatment::constant(0), xvigra::BorderTreatment::avoid());
-            CHECK(calculateOutputSize(inputSize, kernelSize, options) == 5);
+            CHECK_EQ(calculateOutputSize(inputSize, kernelSize, options), 5);
         }
 
         SUBCASE("(Avoid, Constant)") {
             options.setBorderTreatment(xvigra::BorderTreatment::avoid(), xvigra::BorderTreatment::constant(0));
-            CHECK(calculateOutputSize(inputSize, kernelSize, options) == 5);
+            CHECK_EQ(calculateOutputSize(inputSize, kernelSize, options), 5);
         }
 
         SUBCASE("(Avoid, Avoid)") {
             options.setBorderTreatment(xvigra::BorderTreatment::avoid(), xvigra::BorderTreatment::avoid());
-            CHECK(calculateOutputSize(inputSize, kernelSize, options) == 3);
+            CHECK_EQ(calculateOutputSize(inputSize, kernelSize, options), 3);
         }
     }
 }

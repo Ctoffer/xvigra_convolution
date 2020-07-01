@@ -14,23 +14,45 @@
 TEST_CASE("Test roundValue") {
     SUBCASE("Positive numbers") {
         SUBCASE("Round 5.291 to 0 decimals") {
-            CHECK(xvigra::roundValue(5.291, 0) == 5.0);
+            CHECK_EQ(xvigra::roundValue(5.291, 0), 5.0);
         }
 
         SUBCASE("Round 5.91 to 0 decimals") {
-            CHECK(xvigra::roundValue(5.91, 0) == 6.0);
+            CHECK_EQ(xvigra::roundValue(5.91, 0), 6.0);
         }
 
         SUBCASE("Round 5.291 to 1 decimals") {
-            CHECK(xvigra::roundValue(5.291, 1) == 5.3);
+            CHECK_EQ(xvigra::roundValue(5.291, 1), 5.3);
         }
 
         SUBCASE("Round 5.291 to 2 decimals") {
-            CHECK(xvigra::roundValue(5.291, 2) == 5.29);
+            CHECK_EQ(xvigra::roundValue(5.291, 2), 5.29);
         }
 
         SUBCASE("Round π to 11 decimals") {
-            CHECK(xvigra::roundValue(3.14159265358979323846, 11) == 3.14159265359);
+            CHECK_EQ(xvigra::roundValue(3.14159265358979323846, 11), 3.14159265359);
+        }
+    }
+
+    SUBCASE("Negative numbers") {
+        SUBCASE("Round -5.291 to 0 decimals") {
+            CHECK_EQ(xvigra::roundValue(-5.291, 0), -5.0);
+        }
+
+        SUBCASE("Round -5.91 to 0 decimals") {
+            CHECK_EQ(xvigra::roundValue(-5.91, 0), -6.0);
+        }
+
+        SUBCASE("Round -5.291 to 1 decimals") {
+            CHECK_EQ(xvigra::roundValue(-5.291, 1), -5.3);
+        }
+
+        SUBCASE("Round -5.291 to 2 decimals") {
+            CHECK_EQ(xvigra::roundValue(-5.291, 2), -5.29);
+        }
+
+        SUBCASE("Round -π to 11 decimals") {
+            CHECK_EQ(xvigra::roundValue(-3.14159265358979323846, 11), -3.14159265359);
         }
     }
 }

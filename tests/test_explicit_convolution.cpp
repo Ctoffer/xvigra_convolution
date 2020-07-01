@@ -73,7 +73,7 @@ void checkExpressions(
     auto actual = actualExpression.derived_cast();
     auto expected = expectedExpression.derived_cast();
 
-    CHECK(actual.dimension() == expected.dimension());
+    CHECK_EQ(actual.dimension(), expected.dimension());
     
     std::vector<std::size_t> actualShape;
     for (const auto& value : actual.shape()) {
@@ -84,14 +84,14 @@ void checkExpressions(
     for (const auto& value : expected.shape()) {
         expectedShape.push_back(value);
     }
-    CHECK(actualShape == expectedShape);
+    CHECK_EQ(actualShape, expectedShape);
     
     auto iterActual = actual.begin();
     auto iterExpected = expected.begin();
     auto endExpected = expected.end();
 
     for (; iterExpected != endExpected; ++iterActual, ++iterExpected) {
-        CHECK(*iterActual == doctest::Approx(*iterExpected).epsilon(epsilon));
+        CHECK_EQ(*iterActual, doctest::Approx(*iterExpected).epsilon(epsilon));
     }
 }
 
@@ -181,8 +181,8 @@ void checkConvolution2DWithImage(
     // simulate saving from and reading from image file
     actualImage = xt::cast<ResultType>(xt::cast<double>(xt::cast<uint8_t>(actualImage * 255)) / 255.0);
 
-    CHECK(actualImage.shape() == expectedImage.shape());
-    CHECK(actualImage == expectedImage);
+    CHECK_EQ(actualImage.shape(), expectedImage.shape());
+    CHECK_EQ(actualImage, expectedImage);
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -201,25 +201,25 @@ TEST_CASE("Test getBorderIndex") {
         constexpr bool isBegin = true;
 
         SUBCASE("BorderTreatment::constant(0)") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 0, size) == 0);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), -1, size) == -1);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), -2, size) == -1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 0, size), 0);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), -1, size), -1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), -2, size), -1);
         }
 
         SUBCASE("BorderTreatment::constant(2)") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 0, size) == 0);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), -1, size) == -1);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), -2, size) == -1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 0, size), 0);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), -1, size), -1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), -2, size), -1);
         }
 
         SUBCASE("BorderTreatment::asymmetricReflect()") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 0, size) == 0);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), -1, size) == 1);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), -2, size) == 2);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 0, size), 0);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), -1, size), 1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), -2, size), 2);
         }
 
         SUBCASE("BorderTreatment::avoid()") {
-           CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), 0, size) == 0);
+           CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), 0, size), 0);
            CHECK_THROWS_WITH_AS(
                xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), -1, size),
                "getBorderIndex(): Border treatment AVOID should not be used here!",
@@ -233,21 +233,21 @@ TEST_CASE("Test getBorderIndex") {
         }
 
         SUBCASE("BorderTreatment::repeat()") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 0, size) == 0);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), -1, size) == 0);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), -2, size) == 0);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 0, size), 0);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), -1, size), 0);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), -2, size), 0);
         }  
 
         SUBCASE("BorderTreatment::symmetricReflect()") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 0, size) == 0);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), -1, size) == 0);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), -2, size) == 1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 0, size), 0);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), -1, size), 0);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), -2, size), 1);
         }
 
         SUBCASE("BorderTreatment::wrap()") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 0, size) == 0);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), -1, size) == 4);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), -2, size) == 3);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 0, size), 0);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), -1, size), 4);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), -2, size), 3);
         }
     }
 
@@ -255,25 +255,25 @@ TEST_CASE("Test getBorderIndex") {
         constexpr bool isBegin = false;
 
         SUBCASE("BorderTreatment::constant(0)") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 4, size) == 4);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 5, size) == -1);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 6, size) == -1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 4, size), 4);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 5, size), -1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 6, size), -1);
         }
 
         SUBCASE("BorderTreatment::constant(2)") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 4, size) == 4);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 5, size) == -1);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 6, size) == -1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 4, size), 4);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 5, size), -1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 6, size), -1);
         }
 
         SUBCASE("BorderTreatment::asymmetricReflect()") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 4, size) == 4);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 5, size) == 3);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 6, size) == 2);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 4, size), 4);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 5, size), 3);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 6, size), 2);
         }
 
         SUBCASE("BorderTreatment::avoid()") {
-           CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), 4, size) == 4);
+           CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), 4, size), 4);
            CHECK_THROWS_WITH_AS(
                xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), 5, size),
                "getBorderIndex(): Border treatment AVOID should not be used here!",
@@ -287,21 +287,21 @@ TEST_CASE("Test getBorderIndex") {
         }
 
         SUBCASE("BorderTreatment::repeat()") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 4, size) == 4);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 5, size) == 4);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 6, size) == 4);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 4, size), 4);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 5, size), 4);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 6, size), 4);
         }  
 
         SUBCASE("BorderTreatment::symmetricReflect()") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 4, size) == 4);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 5, size) == 4);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 6, size) == 3);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 4, size), 4);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 5, size), 4);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 6, size), 3);
         }
 
         SUBCASE("BorderTreatment::wrap()") {
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 4, size) == 4);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 5, size) == 0);
-            CHECK(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 6, size) == 1);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 4, size), 4);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 5, size), 0);
+            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 6, size), 1);
         }
     }
 }
@@ -515,9 +515,9 @@ TEST_CASE_TEMPLATE("Convolve1D: Test Invalid Configurations", T, TYPE_PAIRS) {
         xvigra::KernelOptions options;
         options.channelPosition = xvigra::ChannelPosition::LAST;
 
-        CHECK(inputTooSmall.dimension() == 1);
-        CHECK(inputTooBig.dimension() == 3);
-        CHECK(kernel.dimension() == 3);
+        REQUIRE_EQ(inputTooSmall.dimension(), 1);
+        REQUIRE_EQ(inputTooBig.dimension(), 3);
+        REQUIRE_EQ(kernel.dimension(), 3);
 
         CHECK_THROWS_WITH_AS(
             xvigra::convolve1D(inputTooSmall, kernel, options),
@@ -541,9 +541,9 @@ TEST_CASE_TEMPLATE("Convolve1D: Test Invalid Configurations", T, TYPE_PAIRS) {
         xvigra::KernelOptions options;
         options.channelPosition = xvigra::ChannelPosition::IMPLICIT;
 
-        CHECK(inputTooSmall.dimension() == 0);
-        CHECK(inputTooBig.dimension() == 2);
-        CHECK(kernel.dimension() == 3);
+        REQUIRE_EQ(inputTooSmall.dimension(), 0);
+        REQUIRE_EQ(inputTooBig.dimension(), 2);
+        REQUIRE_EQ(kernel.dimension(), 3);
 
         CHECK_THROWS_WITH_AS(
             xvigra::convolve1DImplicit(inputTooSmall, kernel, options),
@@ -1986,9 +1986,9 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Invalid Configurations", T, TYPE_PAIRS) {
         xvigra::KernelOptions2D options;
         options.setChannelPosition(xvigra::ChannelPosition::LAST);
 
-        CHECK(inputTooSmall.dimension() == 2);
-        CHECK(inputTooBig.dimension() == 4);
-        CHECK(kernel.dimension() == 4);
+        REQUIRE_EQ(inputTooSmall.dimension(), 2);
+        REQUIRE_EQ(inputTooBig.dimension(), 4);
+        REQUIRE_EQ(kernel.dimension(), 4);
 
         CHECK_THROWS_WITH_AS(
             xvigra::convolve2D(inputTooSmall, kernel, options),
@@ -2012,9 +2012,9 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Invalid Configurations", T, TYPE_PAIRS) {
         xvigra::KernelOptions2D options;
         options.setChannelPosition(xvigra::ChannelPosition::IMPLICIT);
 
-        CHECK(inputTooSmall.dimension() == 0);
-        CHECK(inputTooBig.dimension() == 3);
-        CHECK(kernel.dimension() == 4);
+        REQUIRE_EQ(inputTooSmall.dimension(), 0);
+        REQUIRE_EQ(inputTooBig.dimension(), 3);
+        REQUIRE_EQ(kernel.dimension(), 4);
 
         CHECK_THROWS_WITH_AS(
             xvigra::convolve2DImplicit(inputTooSmall, kernel, options),
@@ -2049,8 +2049,8 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Invalid Configurations", T, TYPE_PAIRS) {
         xvigra::KernelOptions2D options;
         options.setChannelPosition(xvigra::ChannelPosition::FIRST);
 
-        CHECK(input.dimension() == 2);
-        CHECK(kernel.dimension() == 4);
+        REQUIRE_EQ(input.dimension(), 2);
+        REQUIRE_EQ(kernel.dimension(), 4);
 
         CHECK_THROWS_WITH_AS(
             xvigra::convolve2DImplicit(input, kernel, options),
@@ -2066,8 +2066,8 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Invalid Configurations", T, TYPE_PAIRS) {
         xvigra::KernelOptions2D options;
         options.setChannelPosition(xvigra::ChannelPosition::IMPLICIT);
 
-        CHECK(input.dimension() == 3);
-        CHECK(kernel.dimension() == 4);
+        REQUIRE_EQ(input.dimension(), 3);
+        REQUIRE_EQ(kernel.dimension(), 4);
 
         CHECK_THROWS_WITH_AS(
             xvigra::convolve2D(input, kernel, options),
@@ -2083,8 +2083,8 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Invalid Configurations", T, TYPE_PAIRS) {
         xvigra::KernelOptions2D options;
         options.setChannelPosition(xvigra::ChannelPosition::LAST);
 
-        CHECK(input.dimension() == 3);
-        CHECK(kernel.dimension() == 4);
+        REQUIRE_EQ(input.dimension(), 3);
+        REQUIRE_EQ(kernel.dimension(), 4);
 
         CHECK_THROWS_WITH_AS(
             xvigra::convolve2D(input, kernel, options),

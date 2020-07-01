@@ -114,10 +114,10 @@ TEST_CASE("Test loadImage") {
             };
             ImageTensor<int> actualImage = xvigra::loadImageAsXTensor(TEST_SMALL_IMAGE_PGM);
 
-            CHECK(xt::amin(expectedImage)[0] == xt::amin(actualImage)[0]);
-            CHECK(xt::amax(expectedImage)[0] == xt::amax(actualImage)[0]);
-            CHECK(expectedImage.shape() == actualImage.shape());
-            CHECK(expectedImage == actualImage);
+            CHECK_EQ(xt::amin(expectedImage)[0], xt::amin(actualImage)[0]);
+            CHECK_EQ(xt::amax(expectedImage)[0], xt::amax(actualImage)[0]);
+            CHECK_EQ(expectedImage.shape(), actualImage.shape());
+            CHECK_EQ(expectedImage, actualImage);
         }
 
         SUBCASE("As xArray") {
@@ -150,10 +150,10 @@ TEST_CASE("Test loadImage") {
             }));
             ImageArray<int> actualImage = xvigra::loadImageAsXArray(TEST_SMALL_IMAGE_PGM);
 
-            CHECK(xt::amin(expectedImage)[0] == xt::amin(actualImage)[0]);
-            CHECK(xt::amax(expectedImage)[0] == xt::amax(actualImage)[0]);
-            CHECK(expectedImage.shape() == actualImage.shape());
-            CHECK(expectedImage == actualImage);
+            CHECK_EQ(xt::amin(expectedImage)[0], xt::amin(actualImage)[0]);
+            CHECK_EQ(xt::amax(expectedImage)[0], xt::amax(actualImage)[0]);
+            CHECK_EQ(expectedImage.shape(), actualImage.shape());
+            CHECK_EQ(expectedImage, actualImage);
         }
     }
 
@@ -234,16 +234,16 @@ void checkIntegerVsFloatContainer(const IntegerContainer& integerImage, const Fl
     float minimalFloatValue = xt::amin(floatImage)[0];
     float maximalFloatValue = xt::amax(floatImage)[0];
 
-    CHECK(0 <= minimalIntegerValue);
-    CHECK(maximalIntegerValue <= 255);
-    CHECK(doctest::Approx(0.0f).epsilon(1e-7f) <= minimalFloatValue);
-    CHECK(maximalFloatValue <= doctest::Approx(1.0f).epsilon(1e-7f));
+    CHECK_LE(0, minimalIntegerValue);
+    CHECK_LE(maximalIntegerValue, 255);
+    CHECK_LE(doctest::Approx(0.0f).epsilon(1e-7f), minimalFloatValue);
+    CHECK_LE(maximalFloatValue, doctest::Approx(1.0f).epsilon(1e-7f));
 
-    CHECK(minimalIntegerValue == static_cast<int>(minimalFloatValue * 255));
-    CHECK(maximalIntegerValue == static_cast<int>(maximalFloatValue * 255));
+    CHECK_EQ(minimalIntegerValue, static_cast<int>(minimalFloatValue * 255));
+    CHECK_EQ(maximalIntegerValue, static_cast<int>(maximalFloatValue * 255));
 
-    CHECK(integerImage.shape() == floatImage.shape());
-    CHECK(integerImage == xt::cast<int>(255 * floatImage));
+    CHECK_EQ(integerImage.shape(), floatImage.shape());
+    CHECK_EQ(integerImage, xt::cast<int>(255 * floatImage));
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -346,15 +346,15 @@ void checkSaveImageFromTensor(const StdPath& orginalPath, const StdPath& copyPat
     if(fs::exists(copyPath)) {
        fs::remove(copyPath);
     }
-    CHECK(!fs::exists(copyPath));
+    REQUIRE_UNARY_FALSE(fs::exists(copyPath));
 
     ImageTensor<ElementType> originalImage = xvigra::loadImageAsXTensor<ElementType>(orginalPath);
     xvigra::saveImage(copyPath, originalImage);
-    CHECK(fs::exists(copyPath));
+    CHECK_UNARY(fs::exists(copyPath));
     ImageTensor<ElementType> copiedImage = xvigra::loadImageAsXTensor<ElementType>(copyPath);
 
-    CHECK(originalImage.shape() == copiedImage.shape());
-    CHECK(originalImage == copiedImage);
+    CHECK_EQ(originalImage.shape(), copiedImage.shape());
+    CHECK_EQ(originalImage, copiedImage);
 }
 
 
@@ -363,15 +363,15 @@ void checkSaveImageFromArray(const StdPath& orginalPath, const StdPath& copyPath
     if(fs::exists(copyPath)) {
        fs::remove(copyPath);
     }
-    CHECK(!fs::exists(copyPath));
+    REQUIRE_UNARY_FALSE(fs::exists(copyPath));
 
     ImageTensor<ElementType> originalImage = xvigra::loadImageAsXArray<ElementType>(orginalPath);
     xvigra::saveImage(copyPath, originalImage);
-    CHECK(fs::exists(copyPath));
+    CHECK_UNARY(fs::exists(copyPath));
     ImageTensor<ElementType> copiedImage = xvigra::loadImageAsXArray<ElementType>(copyPath);
 
-    CHECK(originalImage.shape() == copiedImage.shape());
-    CHECK(originalImage == copiedImage);
+    CHECK_EQ(originalImage.shape(), copiedImage.shape());
+    CHECK_EQ(originalImage, copiedImage);
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗

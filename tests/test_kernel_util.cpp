@@ -102,6 +102,37 @@
 
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ utility - begin                                                                                                  ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+template <typename T>
+void checkKernel(
+    const xt::xexpression<T>& actualExpression, 
+    const xt::xexpression<T>& expectedExpression
+) {
+    using KernelContainerType = typename xt::xexpression<T>::derived_type;
+    using KernelType = typename KernelContainerType::value_type;
+
+    KernelContainerType actual = actualExpression.derived_cast();
+    KernelContainerType expected = expectedExpression.derived_cast();
+
+    REQUIRE_EQ(actual.dimension(), expected.dimension());
+    REQUIRE_EQ(actual.shape(), expected.shape());
+
+    if constexpr (std::is_floating_point<KernelType>::value) {
+        int decimals = 2;
+        CHECK_EQ(xvigra::roundExpression(actual, decimals), xvigra::roundExpression(expected, decimals));
+    } else {
+        CHECK_EQ(actual, expected);
+    }
+}
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ utility - end                                                                                                    ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ Test promoteKernelToFull1D - begin                                                                               ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
@@ -129,9 +160,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull1D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull1D(kernel, 3);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-            CHECK(actual == expected);
+            checkKernel(expected, actual);
         }
         
         SUBCASE("Asymmetric Kernel") {
@@ -152,9 +181,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull1D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull1D(kernel, 3);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-            CHECK(actual == expected);
+            checkKernel(expected, actual);
         }
     }
 
@@ -182,9 +209,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull1D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull1D(kernel, outputChannels);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-            CHECK(actual == expected);
+            checkKernel(expected, actual);
         }
         
         SUBCASE("Asymmetric Kernel") {
@@ -212,9 +237,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull1D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull1D(kernel, outputChannels);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-            CHECK(actual == expected);
+            checkKernel(expected, actual);
         }
     }
 
@@ -251,9 +274,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull1D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull1D(kernel);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-            CHECK(actual == expected);
+            checkKernel(expected, actual);
         }
         
         SUBCASE("Asymmetric Kernel") {
@@ -286,9 +307,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull1D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull1D(kernel);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-            CHECK(actual == expected);
+            checkKernel(expected, actual);
         }
     }
 }   
@@ -327,14 +346,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull2D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull2D(kernel, 3);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-            
-            if constexpr (std::is_floating_point<KernelType>::value) {
-                CHECK(xvigra::roundExpression(actual, 2) == xvigra::roundExpression(expected, 2));
-            } else {
-                CHECK(actual == expected);
-            }
+            checkKernel(expected, actual);
             
         }
         
@@ -356,14 +368,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull2D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull2D(kernel, 3);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-
-            if constexpr (std::is_floating_point<KernelType>::value) {
-                CHECK(xvigra::roundExpression(actual, 2) == xvigra::roundExpression(expected, 2));
-            } else {
-                CHECK(actual == expected);
-            }
+            checkKernel(expected, actual);
         }
     }
 
@@ -388,14 +393,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull2D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull2D(kernel, 3);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-
-            if constexpr (std::is_floating_point<KernelType>::value) {
-                CHECK(xvigra::roundExpression(actual, 2) == xvigra::roundExpression(expected, 2));
-            } else {
-                CHECK(actual == expected);
-            }
+            checkKernel(expected, actual);
         }
         
         SUBCASE("Asymmetric Kernel") {
@@ -416,14 +414,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull2D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull2D(kernel, 3);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-
-            if constexpr (std::is_floating_point<KernelType>::value) {
-                CHECK(xvigra::roundExpression(actual, 2) == xvigra::roundExpression(expected, 2));
-            } else {
-                CHECK(actual == expected);
-            }
+            checkKernel(expected, actual);
         }
     }
 
@@ -451,14 +442,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull2D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull2D(kernel, outputChannels);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-
-            if constexpr (std::is_floating_point<KernelType>::value) {
-                CHECK(xvigra::roundExpression(actual, 2) == xvigra::roundExpression(expected, 2));
-            } else {
-                CHECK(actual == expected);
-            }
+            checkKernel(expected, actual);
         }
         
         SUBCASE("Asymmetric Kernel") {
@@ -486,14 +470,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull2D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull2D(kernel, outputChannels);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-
-            if constexpr (std::is_floating_point<KernelType>::value) {
-                CHECK(xvigra::roundExpression(actual, 2) == xvigra::roundExpression(expected, 2));
-            } else {
-                CHECK(actual == expected);
-            }
+            checkKernel(expected, actual);
         }
     }
 
@@ -530,14 +507,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull2D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull2D(kernel);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-
-            if constexpr (std::is_floating_point<KernelType>::value) {
-                CHECK(xvigra::roundExpression(actual, 2) == xvigra::roundExpression(expected, 2));
-            } else {
-                CHECK(actual == expected);
-            }
+            checkKernel(expected, actual);
         }
         
         SUBCASE("Asymmetric Kernel") {
@@ -570,14 +540,7 @@ TEST_CASE_TEMPLATE("Test promoteKernelToFull2D", KernelType, TYPES) {
             }
 
             auto actual = xvigra::promoteKernelToFull2D(kernel);
-            REQUIRE(actual.dimension() == expected.dimension());
-            REQUIRE(actual.shape() == expected.shape());
-
-            if constexpr (std::is_floating_point<KernelType>::value) {
-                CHECK(xvigra::roundExpression(actual, 2) == xvigra::roundExpression(expected, 2));
-            } else {
-                CHECK(actual == expected);
-            }
+            checkKernel(expected, actual);
         }
     }
 }   

@@ -75,7 +75,7 @@ void checkExpressions(
     auto actual = actualExpression.derived_cast();
     auto expected = expectedExpression.derived_cast();
 
-    CHECK(actual.dimension() == expected.dimension());
+    CHECK_EQ(actual.dimension(), expected.dimension());
     
     std::vector<std::size_t> actualShape;
     for (const auto& value : actual.shape()) {
@@ -86,7 +86,7 @@ void checkExpressions(
     for (const auto& value : expected.shape()) {
         expectedShape.push_back(value);
     }
-    CHECK(actualShape == expectedShape);
+    CHECK_EQ(actualShape, expectedShape);
     
     auto iterActual = actual.begin();
     auto iterExpected = expected.begin();
@@ -698,10 +698,10 @@ TEST_CASE_TEMPLATE("SeparableConvolve2D: Test Different Padding, Stride, Dilatio
     xvigra::KernelOptions2D options;
     options.setChannelPosition(xvigra::ChannelPosition::LAST);
 
-    CHECK(input.dimension() == 3);
-    CHECK(kernelY.dimension() == 1);
-    CHECK(kernelX.dimension() == 1);
-    CHECK(fullKernel.dimension() == 4);
+    REQUIRE_EQ(input.dimension(), 3);
+    REQUIRE_EQ(kernelY.dimension(), 1);
+    REQUIRE_EQ(kernelX.dimension(), 1);
+    REQUIRE_EQ(fullKernel.dimension(), 4);
 
     SUBCASE("Padding=(2, 3), Stride=(1, 1), Dilation=(1, 1)") {
         options.setPadding(2, 3);
@@ -1443,10 +1443,10 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Different Padding, Stride, Dilati
     xvigra::KernelOptions2D options;
     options.setChannelPosition(xvigra::ChannelPosition::LAST);
 
-    CHECK(input.dimension() == 3);
-    CHECK(kernelY.dimension() == 1);
-    CHECK(kernelX.dimension() == 1);
-    CHECK(fullKernel.dimension() == 4);
+    REQUIRE_EQ(input.dimension(), 3);
+    REQUIRE_EQ(kernelY.dimension(), 1);
+    REQUIRE_EQ(kernelX.dimension(), 1);
+    REQUIRE_EQ(fullKernel.dimension(), 4);
 
     SUBCASE("Padding=(2, 3), Stride=(1, 1), Dilation=(1, 1)") {
         options.setPadding(2, 3);
