@@ -35,10 +35,14 @@ namespace xvigra {
             std::size_t factor = std::pow(10, decimals);
 
             if ( (std::abs(value * factor * 10) - std::abs(static_cast<int>(value * factor) * 10) ) > 4) {
-                d = 1;
+                d = value < 0 ? -1 : 1 ;
             }
-
-            return static_cast<T>( (std::floor(value * factor) + d) / static_cast<double>(factor) );
+            
+            if (value < 0) {
+                return static_cast<T>( (std::ceil(value * factor) + d) / static_cast<double>(factor) );
+            } else {
+                return static_cast<T>( (std::floor(value * factor) + d) / static_cast<double>(factor) );
+            }
         } else {
             return value;
         }

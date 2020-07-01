@@ -32,9 +32,6 @@ namespace xvigra {
 
     int truePadding(int, const BorderTreatment&);
 
-    template <typename T = int> 
-    std::vector<T> range(const T&, const T&, const T& step=1);
-
     template <typename T>
     xt::xtensor<T, 3> normalizeAfterConvolution(const xt::xtensor<T, 3>&);
 
@@ -398,19 +395,6 @@ namespace xvigra {
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
     // ║ general utility - begin                                                                                      ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-
-    template <typename T>
-    std::vector<T> range(
-        const T& start, 
-        const T& stop, 
-        const T& step
-    ) {
-        std::vector<T> result;
-        for(T index = start; index < stop; index += step) {
-            result.push_back(index);
-        }
-        return result;
-    }
 
     template <typename T>
     xt::xtensor<T, 3> normalizeAfterConvolution(

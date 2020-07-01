@@ -5,6 +5,30 @@
 #include <utility>
 
 namespace xvigra {
+    // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    // ║ forward declaration - begin                                                                                  ║
+    // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+    template <typename T = int> 
+    std::vector<T> range(const T&, const T&, const T& step=1);
+
+    // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    // ║ forward declaration - end                                                                                    ║
+    // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+    
+    template <typename T>
+    std::vector<T> range(
+        const T& start, 
+        const T& stop, 
+        const T& step
+    ) {
+        std::vector<T> result;
+        for(T index = start; index < stop; index += step) {
+            result.push_back(index);
+        }
+        return result;
+    }
+    
     template <typename T>
     constexpr auto enumerate(T&& iterable){
         using TIterator = decltype(std::begin(std::declval<T>()));
