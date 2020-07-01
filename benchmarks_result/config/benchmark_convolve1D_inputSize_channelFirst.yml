@@ -6,6 +6,7 @@ data:
     - group_3
     - group_4
     - group_5
+    - group_6
 
   group_names:
     group_1: benchmark_convolve1D_v1_inputSize
@@ -13,6 +14,7 @@ data:
     group_3: benchmark_convolve1D_v3_inputSize
     group_4: benchmark_convolve1D_v4_inputSize
     group_5: benchmark_convolve1D_v5_inputSize
+    group_6: benchmark_convolve1D_v6_inputSize
 
   variants:
     - channelFirst
@@ -46,6 +48,7 @@ graph:
       group_3_channelFirst: convolve1D V.3
       group_4_channelFirst: convolve1D V.4
       group_5_channelFirst: convolve1D V.5
+      group_6_channelFirst: convolve1D V.6
 
   line_style:
     key: '{variant}'
@@ -60,4 +63,5 @@ graph:
       group_3: "#CE4257"
       group_4: "#FF0000"
       group_5: "#9900FF"
+      group_6: "#000000"
 

@@ -15,7 +15,7 @@ if(MSVC)
 else()
 	message(STATUS "G++ build")
     set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)

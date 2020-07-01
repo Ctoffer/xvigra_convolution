@@ -5,12 +5,14 @@ data:
     - group_2
     - group_3
     - group_4
+    - group_5
 
   group_names:
     group_1: benchmark_convolve2D_v1_inputSize
     group_2: benchmark_convolve2D_v2_inputSize
     group_3: benchmark_convolve2D_v3_inputSize
     group_4: benchmark_convolve2D_v4_inputSize
+    group_5: benchmark_convolve2D_v5_inputSize
 
   variants:
     - channelLast
