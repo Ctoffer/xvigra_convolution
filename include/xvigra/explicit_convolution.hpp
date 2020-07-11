@@ -526,11 +526,9 @@ namespace xvigra {
             throw std::invalid_argument("convolve2D(): Kernel width is greater than padded input width!");
         }
 
-
         int kernelHeightRadius = kernelHeight / 2;
         int kernelHeightMinimum = kernelHeight % 2 == 0 ? 0 : -kernelHeightRadius;
         int kernelHeightMaximum = kernelHeight % 2 == 0 ? kernelHeight : kernelHeightRadius + 1;
-
 
         int kernelWidthRadius = kernelWidth / 2;
         int kernelWidthMinimum = kernelWidth % 2 == 0 ? 0 : -kernelWidthRadius;
