@@ -34,7 +34,7 @@ def call_benchmark(file_name, benchmark_parameters, folder="xvigra"):
     else:
         executable_file = os.path.join("build-linux", "benchmarks", folder, file_name)
 
-    json_path = f"./benchmarks_result/{os_name}/data/{file_name}.json"
+    json_path = f"./benchmarks_result/{os_name}/data/{folder}/{file_name}.json"
 
     execute_command = f".\\{executable_file}" if is_windows else f"./{executable_file}"
 
@@ -51,30 +51,36 @@ def call_benchmark(file_name, benchmark_parameters, folder="xvigra"):
 def main():
     benchmark_parameters = {
         "format": "console",
-        "min_time": 1,
-        "repetitions": 10,
+        "min_time": 0.5,
+        "repetitions": 2,
         "report_aggregates_only": True
     }
 
-    benchmark_files = (
-        #"benchmark_convolve1D_inputSize_channelFirst",
-        #"benchmark_convolve1D_inputSize_channelLast",
-        #"benchmark_convolve2D_inputSize_channelFirst",
-        #"benchmark_convolve2D_inputSize_channelLast",
-        "benchmark_separableConvolve1D_inputSize",
-        "benchmark_separableConvolve2D_inputSize",
-        "benchmark_separableConvolve1D_kernelSize",
-        "benchmark_separableConvolve2D_kernelSize"
-    )
+    benchmark_folders = {
+        "xtensor": (
+            "benchmark_xstrided-view_copy_complete_X",
+        ),
+#        "xvigra": (
+            # "benchmark_convolve1D_inputSize_channelFirst",
+            # "benchmark_convolve1D_inputSize_channelLast",
+            # "benchmark_convolve2D_inputSize_channelFirst",
+            # "benchmark_convolve2D_inputSize_channelLast",
+     #       "benchmark_separableConvolve1D_inputSize",
+    #        "benchmark_separableConvolve2D_inputSize",
+   #         "benchmark_separableConvolve1D_kernelSize",
+  #          "benchmark_separableConvolve2D_kernelSize"
+ #       )
+    }
 
     build_all()
 
-    for file_name in benchmark_files:
-        with TimeMeasure(f"{'─' * 100}\nRunning {file_name}:", f"Total time: {{}}\n{'─' * 100}\n"):
-            call_benchmark(file_name, benchmark_parameters)
-        print("\nPlotting...")
-        plot(file_name, os_name=platform.system())
-        print("Finished plot\n")
+    for folder_name, benchmark_files in benchmark_folders.items():
+        for file_name in benchmark_files:
+            with TimeMeasure(f"{'─' * 100}\nRunning {file_name}:", f"Total time: {{}}\n{'─' * 100}\n"):
+                call_benchmark(file_name, benchmark_parameters, folder=folder_name)
+            print("\nPlotting...")
+            plot(file_name, os_name=platform.system(), folder=folder_name)
+            print("Finished plot\n")
 
 
 if __name__ == "__main__":
