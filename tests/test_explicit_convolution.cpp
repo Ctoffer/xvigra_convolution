@@ -753,7 +753,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Channel Position", T, TYPE_PAIRS) {
 }
 
 
-TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment - ChannelFirst", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
     using ResultType = typename std::common_type_t<InputType, KernelType>;
@@ -886,6 +886,145 @@ TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment", T, TYPE_PAIRS) {
             {208.80f, 224.80f, 240.80f, 243.20f},
             {288.80f, 304.80f, 320.80f, 323.20f}
         }};
+
+        checkConvolution2D(input, kernel, options, expected);
+    }
+}
+
+
+TEST_CASE_TEMPLATE("Convolve2D: Test Border Treatment - ChannelLast", T, TYPE_PAIRS) {
+    using InputType = typename T::first_type;
+    using KernelType = typename T::second_type;
+    using ResultType = typename std::common_type_t<InputType, KernelType>;
+
+    xt::xtensor<InputType, 3> input{
+        {{ 1}, { 2}, { 3}, { 4}, { 5}}, 
+        {{ 6}, { 7}, { 8}, { 9}, {10}}, 
+        {{11}, {12}, {13}, {14}, {15}}, 
+        {{16}, {17}, {18}, {19}, {20}}, 
+        {{21}, {22}, {23}, {24}, {25}}
+    };
+    xt::xtensor<KernelType, 4> kernel{{{
+        {1.00f, 1.30f, 1.70f},
+        {1.30f, 1.69f, 2.21f},
+        {1.70f, 2.21f, 2.89f}
+    }}};
+
+    xvigra::KernelOptions2D options;
+    options.setChannelPosition(xvigra::ChannelPosition::LAST);
+    options.setPadding(1);
+
+    SUBCASE("BorderTreatment::constant(0)") {
+        options.setBorderTreatment(xvigra::BorderTreatment::constant(0));
+        xt::xtensor<ResultType, 3> expected{
+            {{ 39.60f}, { 60.10f}, { 72.10f}, { 84.10f}, { 51.05f}},
+            {{ 89.30f}, {128.80f}, {144.80f}, {160.80f}, { 96.05f}},
+            {{149.30f}, {208.80f}, {224.80f}, {240.80f}, {142.05f}},
+            {{209.30f}, {288.80f}, {304.80f}, {320.80f}, {188.05f}},
+            {{133.81f}, {184.01f}, {193.21f}, {202.41f}, {118.45f}}
+        };
+
+        checkConvolution2D(input, kernel, options, expected, 1e-5);
+    }
+
+    SUBCASE("BorderTreatment::constant(2)") {
+        options.setBorderTreatment(xvigra::BorderTreatment::constant(2));
+        xt::xtensor<ResultType, 3> expected{
+            {{ 53.60f}, { 68.10f}, { 80.10f}, { 92.10f}, { 69.25f}},
+            {{ 97.30f}, {128.80f}, {144.80f}, {160.80f}, {109.65f}},
+            {{157.30f}, {208.80f}, {224.80f}, {240.80f}, {155.65f}},
+            {{217.30f}, {288.80f}, {304.80f}, {320.80f}, {201.65f}},
+            {{152.01f}, {197.61f}, {206.81f}, {216.01f}, {139.87f}}
+        };
+
+        checkConvolution2D(input, kernel, options, expected, 1e-5);
+    }
+
+    SUBCASE("BorderTreatment::asymmetricReflect()") {
+        options.setBorderTreatment(xvigra::BorderTreatment::asymmetricReflect());
+        xt::xtensor<ResultType, 3> expected{
+            {{ 80.80f}, { 88.80f}, {104.80f}, {120.80f}, {123.20f}},
+            {{120.80f}, {128.80f}, {144.80f}, {160.80f}, {163.20f}},
+            {{200.80f}, {208.80f}, {224.80f}, {240.80f}, {243.20f}},
+            {{280.80f}, {288.80f}, {304.80f}, {320.80f}, {323.20f}},
+            {{292.80f}, {300.80f}, {316.80f}, {332.80f}, {335.20f}}
+        };
+
+        checkConvolution2D(input, kernel, options, expected);
+    }
+
+    SUBCASE("BorderTreatment::avoid()") {
+        options.setBorderTreatment(xvigra::BorderTreatment::avoid());
+        xt::xtensor<ResultType, 3> expected{
+            {{128.8f}, {144.8f}, {160.8f}},
+            {{208.8f}, {224.8f}, {240.8f}},
+            {{288.8f}, {304.8f}, {320.8f}},
+        };
+
+        checkConvolution2D(input, kernel, options, expected);
+    }
+
+    SUBCASE("BorderTreatment::repeat()") {
+        options.setBorderTreatment(xvigra::BorderTreatment::repeat());
+        xt::xtensor<ResultType, 3> expected{
+            {{ 56.80f}, { 68.80f}, { 84.80f}, {100.80f}, {110.00f}},
+            {{116.80f}, {128.80f}, {144.80f}, {160.80f}, {170.00f}},
+            {{196.80f}, {208.80f}, {224.80f}, {240.80f}, {250.00f}},
+            {{276.80f}, {288.80f}, {304.80f}, {320.80f}, {330.00f}},
+            {{322.80f}, {334.80f}, {350.80f}, {366.80f}, {376.00f}}
+        };
+
+        checkConvolution2D(input, kernel, options, expected);
+    }
+
+    SUBCASE("BorderTreatment::symmetricReflect()") {
+        options.setBorderTreatment(xvigra::BorderTreatment::symmetricReflect());
+        xt::xtensor<ResultType, 3> expected{
+               {{ 56.80f}, { 68.80f}, { 84.80f}, {100.80f}, {110.00f}},
+               {{116.80f}, {128.80f}, {144.80f}, {160.80f}, {170.00f}},
+               {{196.80f}, {208.80f}, {224.80f}, {240.80f}, {250.00f}},
+               {{276.80f}, {288.80f}, {304.80f}, {320.80f}, {330.00f}},
+               {{322.80f}, {334.80f}, {350.80f}, {366.80f}, {376.00f}}
+        };
+
+        checkConvolution2D(input, kernel, options, expected);
+    }
+
+    SUBCASE("BorderTreatment::wrap()") {
+        options.setBorderTreatment(xvigra::BorderTreatment::wrap());
+        xt::xtensor<ResultType, 3> expected{
+            {{152.80f}, {148.80f}, {164.80f}, {180.80f}, {162.80f}},
+            {{132.80f}, {128.80f}, {144.80f}, {160.80f}, {142.80f}},
+            {{212.80f}, {208.80f}, {224.80f}, {240.80f}, {222.80f}},
+            {{292.80f}, {288.80f}, {304.80f}, {320.80f}, {302.80f}},
+            {{202.80f}, {198.80f}, {214.80f}, {230.80f}, {212.80f}}
+        };
+
+        checkConvolution2D(input, kernel, options, expected);
+    }
+
+    SUBCASE("(asymmetricReflect, avoid) (avoid, avoid)") {
+        options.setBorderTreatmentBegin(xvigra::BorderTreatment::asymmetricReflect(), xvigra::BorderTreatment::avoid());
+        options.setBorderTreatmentEnd(xvigra::BorderTreatment::avoid());
+        xt::xtensor<ResultType, 3> expected{
+            {{ 88.80f}, {104.80f}, {120.80f}},
+            {{128.80f}, {144.80f}, {160.80f}},
+            {{208.80f}, {224.80f}, {240.80f}},
+            {{288.80f}, {304.80f}, {320.80f}}
+        };
+
+        checkConvolution2D(input, kernel, options, expected);
+    }
+
+    SUBCASE("(asymmetricReflect, avoid) (avoid, asymmetricReflect)") {
+        options.setBorderTreatmentBegin(xvigra::BorderTreatment::asymmetricReflect(), xvigra::BorderTreatment::avoid());
+        options.setBorderTreatmentEnd(xvigra::BorderTreatment::avoid(), xvigra::BorderTreatment::asymmetricReflect());
+        xt::xtensor<ResultType, 3> expected{
+            {{ 88.80f}, {104.80f}, {120.80f}, {123.20f}},
+            {{128.80f}, {144.80f}, {160.80f}, {163.20f}},
+            {{208.80f}, {224.80f}, {240.80f}, {243.20f}},
+            {{288.80f}, {304.80f}, {320.80f}, {323.20f}}
+        };
 
         checkConvolution2D(input, kernel, options, expected);
     }
