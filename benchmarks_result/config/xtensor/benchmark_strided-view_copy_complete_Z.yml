@@ -1,0 +1,59 @@
+data:
+  key: '{group_name}_{variant}<{specialization}>/{x}_{aggregate}'
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_xstrided_view_copy_complete_Z
+
+  variants:
+    - assign
+    - iterator
+    - rawAgainstCache
+    - rawCacheAligned
+
+  aggregates: ['min']
+  specializations: ['float']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 1250
+      step: 50
+    values: []
+
+graph:
+  title: ""
+
+  x_axis:
+    label: Size S
+    mode: normal
+
+  y_axis:
+    label: Minimum Time (ms)
+    mode: normal
+
+  legend:
+    key: '{group_id}_{variant}'
+    entries:
+      group_1_assign: assign operator
+      group_1_iterator: std::copy with iterators
+      group_1_rawAgainstCache: raw data copy against cache
+      group_1_rawCacheAligned: raw data copy cache aligned
+
+  line_style:
+    key: '{variant}'
+    entries:
+      assign: "-"
+      iterator: "-"
+      rawAgainstCache: "-"
+      rawCacheAligned: "-"
+
+  line_color:
+    key: '{group_id}_{variant}'
+    entries:
+      group_1_assign: "#55868C"
+      group_1_iterator: "#EEC584"
+      group_1_rawAgainstCache: "#CE4257"
+      group_1_rawCacheAligned: "#9900FF"
+

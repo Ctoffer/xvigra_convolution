@@ -1,4 +1,5 @@
 set(TARGETS
+    test_array_view_3d
     test_math
     test_kernel_util
     test_convolution_util

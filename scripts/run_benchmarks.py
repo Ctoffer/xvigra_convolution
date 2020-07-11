@@ -58,8 +58,18 @@ def main():
 
     benchmark_folders = {
         "xtensor": (
-            "benchmark_xstrided-view_copy_complete_X",
-            "benchmark_xtstrided-view_copy_paddingStride_X",
+            "benchmark_strided-view_copy_complete_X",
+            "benchmark_strided-view_copy_complete_Y",
+            "benchmark_strided-view_copy_complete_Z",
+            "benchmark_strided-view_copy_paddingStride_X",
+            "benchmark_strided-view_copy_paddingStride_Y",
+            "benchmark_strided-view_copy_paddingStride_Z",
+            "benchmark_view_copy_complete_X",
+            "benchmark_view_copy_complete_Y",
+            "benchmark_view_copy_complete_Z",
+            "benchmark_view_copy_paddingStride_X",
+            "benchmark_view_copy_paddingStride_Y",
+            "benchmark_view_copy_paddingStride_Z",
         ),
         # "xvigra": (
         #   "benchmark_convolve1D_inputSize_channelFirst",

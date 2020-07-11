@@ -19,12 +19,9 @@
     int paddingEndZ = 1;                                                                                                  \
     int paddingStartY = 3;                                                                                                \
     int paddingEndY = 2;                                                                                                  \
-    int paddingStartX = 0;                                                                                                \
-    int paddingEndX = 0;                                                                                                  \
                                                                                                                           \
     int strideZ = 2;                                                                                                      \
     int strideY = 3;                                                                                                      \
-    int strideX = 1;                                                                                                      \
                                                                                                                           \
     int outputY = static_cast<int>(std::ceil(static_cast<double>((inputZ - paddingStartZ - paddingEndZ)) / (strideZ)));   \
     int outputX = static_cast<int>(std::ceil(static_cast<double>((inputY - paddingStartY - paddingEndY)) / (strideY)));
@@ -94,8 +91,8 @@ void benchmark_xstrided_view_copy_paddingStride_X_rawAgainstCache(benchmark::Sta
     int x = inputX / 2;
     raw::ArrayView3D rawView{
         {inputZ, inputY, inputX}
-        , {paddingStartZ, paddingStartY, paddingStartX}
-        , {strideZ, strideY, strideX}
+        , {paddingStartZ, paddingStartY, 0}
+        , {strideZ, strideY, 1}
     };
     auto rawData = data.data();
     auto resData = res.data();
@@ -124,8 +121,8 @@ void benchmark_xstrided_view_copy_paddingStride_X_rawCacheAligned(benchmark::Sta
     int x = inputX / 2;
     raw::ArrayView3D rawView{
         {inputZ, inputY, inputX}
-        , {paddingStartZ, paddingStartY, paddingStartX}
-        , {strideZ, strideY, strideX}
+        , {paddingStartZ, paddingStartY, 0}
+        , {strideZ, strideY, 1}
     };
     auto rawData = data.data();
     auto resData = res.data();

@@ -83,7 +83,7 @@ def sanitize_file(file_name):
 
 def main():
     print("Start macro block formatting...")
-    directories = ("./benchmarks", "./include")
+    directories = ("./benchmarks", "./include", "./src", "./tests")
 
     scanned, sanitized = 0, 0
 

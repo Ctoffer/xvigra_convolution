@@ -522,8 +522,8 @@ namespace xvigra {
     // ║ separableConvolveND - end                                                                                    ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-    // ║ separableConvolveND - begin                                                                                  ║
+    // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    // ║ separableConvolve - begin                                                                                    ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
     template <std::size_t N, typename T, typename KernelContainerType>
@@ -533,9 +533,6 @@ namespace xvigra {
         const std::array<xvigra::KernelOptions, N>& kernelOptions
     ) {
         using InputContainerType = typename xt::xexpression<T>::derived_type;
-        using InputType = typename InputContainerType::value_type;
-        using KernelType = typename KernelContainerType::value_type;
-        using ResultType = typename std::common_type_t<InputType, KernelType>;
 
         InputContainerType input = inputExpression.derived_cast();
 
@@ -580,7 +577,7 @@ namespace xvigra {
     }
 
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-    // ║ separableConvolveND - end                                                                                    ║
+    // ║ separableConvolve - end                                                                                      ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 }

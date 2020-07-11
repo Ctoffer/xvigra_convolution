@@ -2,6 +2,9 @@
 #define RAW_ARRAY_VIEW_3D_HPP
 
 #include <array>
+#include <iostream>
+
+#include "xvigra/io_util.hpp"
 
 namespace raw {
 	inline int dotprod(int x1, int y1, int x2, int y2) {
@@ -24,12 +27,15 @@ namespace raw {
 		int strideZ;
 		
 		void calculateConstants() {
-			baseOffset = offset.at(0) * dimensions.at(2) * dimensions.at(1)
-						 + offset.at(1) * dimensions.at(2) 
+		    auto Y = dimensions.at(1);
+		    auto X = dimensions.at(2);
+
+			baseOffset = offset.at(0) * Y * X
+						 + offset.at(1) * X
 					     + offset.at(2);
 			
-			strideZ = stride.at(0) * dimensions.at(2) * dimensions.at(1);
-			strideY = stride.at(1) * dimensions.at(2);
+			strideZ = stride.at(0) * Y * X;
+			strideY = stride.at(1) * X;
 			strideX = stride.at(2);
 		}
 		
