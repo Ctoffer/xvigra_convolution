@@ -98,7 +98,7 @@ def main():
                         print(f"    Sanitized macro blocks in '{file_name}'")
 
     print("Finished")
-    print(f"Sanitized C++ files: {sanitized} / {scanned} ({100 * sanitized / scanned:>5.2f})")
+    print(f"Sanitized C++ files: {sanitized} / {scanned} ({100 * sanitized / scanned:>5.2f}%)")
 
 
 if __name__ == "__main__":

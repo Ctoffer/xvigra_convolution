@@ -19,7 +19,7 @@
 
 #define TYPES short, int, float, double
 #define SIZE 15
-#define CREATE_COPIED                                                  \
+#define CREATE_COPIED                                                   \
     OutputTensor stridedViewCopied = xt::ones<T>({outputY, outputX});   \
     OutputTensor rawViewCopied = xt::ones<T>({outputY, outputX});       \
     auto resData = rawViewCopied.data();
@@ -30,21 +30,21 @@
             int outputX = static_cast<int>(std::ceil(static_cast<double>((inputX - paddingStartX - paddingEndX)) / (strideX)));   \
                                                                                                                                   \
             CREATE_COPIED                                                                                                         \
-                  \
-            int z = inputZ / 2;                                                                                                                 \
+                                                                                                                                  \
+            int z = inputZ / 2;                                                                                                   \
             auto view = xt::strided_view(input, {                                                                                 \
                 z,                                                                                                                \
                 xt::range(paddingStartY, inputY - paddingEndY, strideY),                                                          \
                 xt::range(paddingStartX, inputX - paddingEndX, strideX)                                                           \
             });                                                                                                                   \
-            raw::ArrayView3D rawView{\
-                {static_cast<int>(inputZ), static_cast<int>(inputY), static_cast<int>(inputX)},\
-                {0, paddingStartY, paddingStartX},\
-                {1, strideY, strideX}\
-            };\
+            raw::ArrayView3D rawView{                                                                                             \
+                {static_cast<int>(inputZ), static_cast<int>(inputY), static_cast<int>(inputX)},                                   \
+                {0, paddingStartY, paddingStartX},                                                                                \
+                {1, strideY, strideX}                                                                                             \
+            };                                                                                                                    \
             std::copy(view.begin(), view.end(), stridedViewCopied.begin());                                                       \
                                                                                                                                   \
-                                                                                                              \
+                                                                                                                                  \
             for(int y = 0; y < outputY; ++y) {                                                                                    \
                 for(int x = 0; x < outputX; ++x) {                                                                                \
                     *raw::access_direct(resData, outputX, y, x) = *rawView.access(rawData, z, y, x);                              \
@@ -61,16 +61,16 @@
             CREATE_COPIED                                                                                                         \
                                                                                                                                   \
             int y = inputY / 2;                                                                                                   \
-            auto view = xt::strided_view(input, {                                                                                  \
+            auto view = xt::strided_view(input, {                                                                                 \
                 xt::range(paddingStartZ, inputZ - paddingEndZ, strideZ),                                                          \
                 y,                                                                                                                \
                 xt::range(paddingStartX, inputX - paddingEndX, strideX)                                                           \
             });                                                                                                                   \
-            raw::ArrayView3D rawView{\
-                {static_cast<int>(inputZ), static_cast<int>(inputY), static_cast<int>(inputX)},\
-                {paddingStartZ, 0, paddingStartX},\
-                {strideZ, 1, strideX}\
-            };\
+            raw::ArrayView3D rawView{                                                                                             \
+                {static_cast<int>(inputZ), static_cast<int>(inputY), static_cast<int>(inputX)},                                   \
+                {paddingStartZ, 0, paddingStartX},                                                                                \
+                {strideZ, 1, strideX}                                                                                             \
+            };                                                                                                                    \
             std::copy(view.begin(), view.end(), stridedViewCopied.begin());                                                       \
                                                                                                                                   \
             for(int z = 0; z < outputY; ++z) {                                                                                    \
@@ -89,16 +89,16 @@
             CREATE_COPIED                                                                                                         \
                                                                                                                                   \
             int x = inputX / 2;                                                                                                   \
-            auto view = xt::strided_view(input, {                                                                                  \
+            auto view = xt::strided_view(input, {                                                                                 \
                 xt::range(paddingStartZ, inputZ - paddingEndZ, strideZ),                                                          \
                 xt::range(paddingStartY, inputY - paddingEndY, strideY),                                                          \
                 x                                                                                                                 \
             });                                                                                                                   \
-            raw::ArrayView3D rawView{\
-                {static_cast<int>(inputZ), static_cast<int>(inputY), static_cast<int>(inputX)},\
-                {paddingStartZ, paddingStartY, 0},\
-                {strideZ, strideY, 1}\
-            };\
+            raw::ArrayView3D rawView{                                                                                             \
+                {static_cast<int>(inputZ), static_cast<int>(inputY), static_cast<int>(inputX)},                                   \
+                {paddingStartZ, paddingStartY, 0},                                                                                \
+                {strideZ, strideY, 1}                                                                                             \
+            };                                                                                                                    \
             std::copy(view.begin(), view.end(), stridedViewCopied.begin());                                                       \
                                                                                                                                   \
             for(int z = 0; z < outputY; ++z) {                                                                                    \
