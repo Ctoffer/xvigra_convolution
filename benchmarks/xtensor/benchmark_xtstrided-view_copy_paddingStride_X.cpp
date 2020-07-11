@@ -8,24 +8,24 @@
 #define INPUT_SIZE_MAX 1250
 #define INPUT_SIZE_STEP 50
 
-#define SETUP_VARIABLES \
+#define SETUP_VARIABLES\
     int size = state.range(0);\
-                           \
+    \
     int inputZ = size - 1;\
     int inputY = size;\
     int inputX = size + 1;\
-                             \
-    int paddingStartZ = 0;\
-    int paddingEndZ = 0;\
-    int paddingStartY = 0;\
-    int paddingEndY = 0;\
+    \
+    int paddingStartZ = 2;\
+    int paddingEndZ = 1;\
+    int paddingStartY = 3;\
+    int paddingEndY = 2;\
     int paddingStartX = 0;\
     int paddingEndX = 0;\
-                     \
-    int strideZ = 1;\
-    int strideY = 1;\
+    \
+    int strideZ = 2;\
+    int strideY = 3;\
     int strideX = 1;\
-        \
+    \
     int outputY = static_cast<int>(std::ceil(static_cast<double>((inputZ - paddingStartZ - paddingEndZ)) / (strideZ)));\
     int outputX = static_cast<int>(std::ceil(static_cast<double>((inputY - paddingStartY - paddingEndY)) / (strideY)));
 
@@ -41,7 +41,7 @@
     ->Unit(benchmark::kMillisecond)
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_complete_X_assign(benchmark::State& state) {
+void benchmark_xstrided_view_copy_paddingStride_X_assign(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
@@ -52,7 +52,7 @@ void benchmark_xstrided_view_copy_complete_X_assign(benchmark::State& state) {
     }
 
     int x = inputX / 2;
-    auto view = xt::strided_view(data, {xt::all(), xt::all(), x});
+    auto view = xt::strided_view(data, {xt::range(paddingStartZ, inputZ - paddingEndZ, strideZ), xt::range(paddingStartY, inputY - paddingEndY, strideY), x});
 
     for (auto _ : state) {
         res = view;
@@ -61,7 +61,7 @@ void benchmark_xstrided_view_copy_complete_X_assign(benchmark::State& state) {
 }
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_complete_X_iterator(benchmark::State& state) {
+void benchmark_xstrided_view_copy_paddingStride_X_iterator(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
@@ -72,7 +72,7 @@ void benchmark_xstrided_view_copy_complete_X_iterator(benchmark::State& state) {
     }
 
     int x = inputX / 2;
-    auto view = xt::strided_view(data, {xt::all(), xt::all(), x});
+    auto view = xt::strided_view(data, {xt::range(paddingStartZ, inputZ - paddingEndZ, strideZ), xt::range(paddingStartY, inputY - paddingEndY, strideY), x});
 
     for (auto _ : state) {
         std::copy(view.begin(), view.end(), res.begin());
@@ -81,7 +81,7 @@ void benchmark_xstrided_view_copy_complete_X_iterator(benchmark::State& state) {
 }
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_complete_X_rawAgainstCache(benchmark::State& state) {
+void benchmark_xstrided_view_copy_paddingStride_X_rawAgainstCache(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
@@ -111,7 +111,7 @@ void benchmark_xstrided_view_copy_complete_X_rawAgainstCache(benchmark::State& s
 }
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_complete_X_rawCacheAligned(benchmark::State& state) {
+void benchmark_xstrided_view_copy_paddingStride_X_rawCacheAligned(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
@@ -140,9 +140,9 @@ void benchmark_xstrided_view_copy_complete_X_rawCacheAligned(benchmark::State& s
     }
 }
 
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_complete_X_assign);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_complete_X_iterator);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_complete_X_rawAgainstCache);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_complete_X_rawCacheAligned);
+BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_paddingStride_X_assign);
+BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_paddingStride_X_iterator);
+BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_paddingStride_X_rawAgainstCache);
+BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_paddingStride_X_rawCacheAligned);
 
 BENCHMARK_MAIN();

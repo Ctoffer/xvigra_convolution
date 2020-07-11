@@ -147,7 +147,8 @@ def init_plot(graph_config):
 
     plt.figure(figsize=(24, 9))
 
-    plt.title(title, fontsize=20)
+    if len(title) > 0:
+        plt.title(title, fontsize=20)
     plt.xlabel(x_axis_name, fontsize=18)
     plt.ylabel(y_axis_name, fontsize=18)
 

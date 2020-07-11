@@ -51,25 +51,26 @@ def call_benchmark(file_name, benchmark_parameters, folder="xvigra"):
 def main():
     benchmark_parameters = {
         "format": "console",
-        "min_time": 0.5,
-        "repetitions": 2,
+        "min_time": 1,
+        "repetitions": 10,
         "report_aggregates_only": True
     }
 
     benchmark_folders = {
         "xtensor": (
             "benchmark_xstrided-view_copy_complete_X",
+            "benchmark_xtstrided-view_copy_paddingStride_X",
         ),
-#        "xvigra": (
-            # "benchmark_convolve1D_inputSize_channelFirst",
-            # "benchmark_convolve1D_inputSize_channelLast",
-            # "benchmark_convolve2D_inputSize_channelFirst",
-            # "benchmark_convolve2D_inputSize_channelLast",
-     #       "benchmark_separableConvolve1D_inputSize",
-    #        "benchmark_separableConvolve2D_inputSize",
-   #         "benchmark_separableConvolve1D_kernelSize",
-  #          "benchmark_separableConvolve2D_kernelSize"
- #       )
+        # "xvigra": (
+        #   "benchmark_convolve1D_inputSize_channelFirst",
+        #   "benchmark_convolve1D_inputSize_channelLast",
+        #   "benchmark_convolve2D_inputSize_channelFirst",
+        #   "benchmark_convolve2D_inputSize_channelLast",
+        #   "benchmark_separableConvolve1D_inputSize",
+        #   "benchmark_separableConvolve2D_inputSize",
+        #   "benchmark_separableConvolve1D_kernelSize",
+        #   "benchmark_separableConvolve2D_kernelSize"
+        # )
     }
 
     build_all()

@@ -1,5 +1,6 @@
 set (TARGETS 
     benchmark_xstrided-view_copy_complete_X
+    benchmark_xtstrided-view_copy_paddingStride_X
 )
 
 FOREACH(TARGET ${TARGETS})
