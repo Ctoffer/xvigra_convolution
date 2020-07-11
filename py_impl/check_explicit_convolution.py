@@ -107,7 +107,7 @@ def check_convolution1D():
         combinations = list(product(*parameters))
         print("[Ok]")
 
-        for params in tqdm(combinations):
+        for params in tqdm(combinations, ncols=100):
             input_channels, input_width = params[0:2]
             kernel_width = params[2]
             padding, dilation, stride = params[3:6]
@@ -183,7 +183,7 @@ def compare_convolve2D(data, silent=True):
                                        )
             expected_result = expected_result.squeeze(0)
         else:
-            tmp = input_tensor.transpose(0, 1).unsqueeze(0)
+            tmp = input_tensor.transpose(0, 2).transpose(1, 2).unsqueeze(0)
             expected_result = F.conv2d(input=tmp,
                                        weight=kernels,
                                        padding=(padding_y, padding_x),
@@ -191,7 +191,7 @@ def compare_convolve2D(data, silent=True):
                                        stride=(stride_y, stride_x)
                                        )
             expected_result = expected_result.squeeze(0).transpose(1, 2).transpose(0, 2)
-    except RuntimeError:
+    except RuntimeError as e:
         reference_failed = True
 
     actual_failed = False
@@ -207,7 +207,7 @@ def compare_convolve2D(data, silent=True):
                                   channel_position=channel_position
                                   )
         actual_result = convolve2D(input_tensor.numpy(), kernels.numpy(), options_y, options_x)
-    except ValueError:
+    except ValueError as e:
         actual_failed = True
 
     if reference_failed and actual_failed:
@@ -216,8 +216,9 @@ def compare_convolve2D(data, silent=True):
     if reference_failed != actual_failed:
         raise RuntimeError(f"discrepancy reference: {reference_failed}, custom: {actual_failed}")
 
-    assert actual_result.shape == expected_result.numpy().shape
-    assert np.all(actual_result == expected_result.numpy())
+    expected_result = expected_result.numpy()
+    assert actual_result.shape == expected_result.shape
+    assert np.all(actual_result == expected_result)
 
     if not silent:
         print("Ok")
@@ -228,12 +229,12 @@ def check_convolution2D():
     logfile = f"test_result/convolve2D.txt"
     makedirs("test_result", exist_ok=True)
 
-    input_channel_values = range(1, 3)
-    input_sizes = (7, 8, 13, 17, 21, 50)
-    kernel_sizes = (2, 3, 4, 5)
-    paddings = range(0, 2)
-    dilations = range(1, 3)
-    strides = range(1, 3)
+    input_channel_values = range(1, 4)
+    input_sizes = (7, 8, 13, 17, 21, 50, 100, 200)
+    kernel_sizes = (2, 3, 4, 5, 7, 11)
+    paddings = range(0, 5)
+    dilations = range(1, 6)
+    strides = range(1, 6)
     channel_indices = (ChannelPosition.FIRST, ChannelPosition.LAST)
 
     parameters = (input_channel_values,
@@ -253,8 +254,9 @@ def check_convolution2D():
         print("Load combinations ... ", end='')
         combinations = list(product(*parameters))
         print("[Ok]")
+        sleep(1)
 
-        for params in tqdm(combinations):
+        for params in tqdm(combinations, ncols=100):
             input_channels, input_height, input_width = params[0:3]
             kernel_height, kernel_width = params[3:5]
             padding_y, padding_x = params[5:7]
@@ -273,7 +275,7 @@ def check_convolution2D():
                         continue
 
                     print(f"{key}: Ok", file=fp)
-                except (AssertionError, IndexError, RuntimeError):
+                except (AssertionError, IndexError, RuntimeError) as e:
                     print(f"{key}: Error", file=fp)
                 except ValueError:
                     print(f"{key}: Not possible", file=fp)
@@ -283,8 +285,8 @@ def check_convolution2D():
 
 def main():
     try:
-        #with TimeMeasure():
-        #    check_convolution1D()
+        with TimeMeasure():
+            check_convolution1D()
 
         with TimeMeasure():
             check_convolution2D()

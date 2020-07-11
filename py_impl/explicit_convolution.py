@@ -155,7 +155,7 @@ def convolve2D(input: np.ndarray,
                 input_offset_y = kernel_y * options_y.dilation
 
                 for kernel_x in range(kernel_width_minimum, kernel_width_maximum):
-                    out_kernel_x = kernel_x * abs(kernel_width_minimum)
+                    out_kernel_x = kernel_x + abs(kernel_width_minimum)
                     input_offset_x = kernel_x * options_x.dilation
 
                     for out_index_y, input_index_y in enumerate(input_height_indices):
@@ -181,7 +181,7 @@ def convolve2D(input: np.ndarray,
                     input_y = input_index_y + input_offset_y
 
                     for kernel_x in range(kernel_width_minimum, kernel_width_maximum):
-                        out_kernel_x = kernel_x * abs(kernel_width_minimum)
+                        out_kernel_x = kernel_x + abs(kernel_width_minimum)
                         input_offset_x = kernel_x * options_x.dilation
                         input_x = input_index_x + input_offset_x
 
@@ -189,7 +189,7 @@ def convolve2D(input: np.ndarray,
                             for input_channel in range(input_channels):
                                 patch[out_index_y, out_index_x, input_channel, out_kernel_y, out_kernel_x] = input[input_y, input_x, input_channel]
 
-        reshaped_kernel = np.reshape(kernel, (output_channels, input_channels * kernel_height * kernel_width))
+        reshaped_kernel = np.transpose(np.reshape(kernel, (output_channels, input_channels * kernel_height * kernel_width)))
         reshaped_patch = np.reshape(patch, (output_height * output_width, input_channels * kernel_height * kernel_width))
         result = np.reshape(np.matmul(reshaped_patch, reshaped_kernel), (output_height, output_width, output_channels))
 
