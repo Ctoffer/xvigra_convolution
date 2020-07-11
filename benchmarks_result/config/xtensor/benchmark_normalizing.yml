@@ -1,0 +1,51 @@
+data:
+  key: '{group_name}_{variant}<{specialization}>/{x}_{aggregate}'
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_normalizing
+
+  variants:
+    - amax
+    - amax_unpacked
+
+  aggregates: ['min']
+  specializations: ['float']
+  x:
+    type: np.arange
+    attrs:
+      start: 1
+      stop: 50
+      step: 3
+    values: []
+
+graph:
+  title: ""
+
+  x_axis:
+    label: Size S
+    mode: normal
+
+  y_axis:
+    label: Minimum Time (ns)
+    mode: log
+
+  legend:
+    key: '{variant}'
+    entries:
+      amax: input / amax(input)
+      amax_unpacked: input / amax(input)[0]
+
+  line_style:
+    key: '{variant}'
+    entries:
+      amax: "-"
+      amax_unpacked: "-"
+
+  line_color:
+    key: '{variant}'
+    entries:
+      amax: "#55868C"
+      amax_unpacked: "#EEC584"
+

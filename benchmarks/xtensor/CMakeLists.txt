@@ -1,4 +1,5 @@
-set (TARGETS 
+set (TARGETS
+    benchmark_normalizing
     benchmark_strided-view_copy_complete_X
     benchmark_strided-view_copy_complete_Y
     benchmark_strided-view_copy_complete_Z
