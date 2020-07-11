@@ -870,10 +870,10 @@ TEST_CASE_TEMPLATE("SeparableConvolve2D: Test Invalid Configurations", T, TYPE_P
 
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-// ║ Test separableConvolve<1> - begin                                                                                ║
+// ║ Test separableConvolveND<1> - begin                                                                              ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Default Options", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("SeparableConvolveND<1>: Test Default Options", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
 
@@ -885,7 +885,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Default Options", T, TYPE_PAIRS) 
         xt::xtensor<KernelType, 3> fullKernel{{{1.0f, 1.3f, 1.7f, 2.11f}}};
 
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -896,14 +896,14 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Default Options", T, TYPE_PAIRS) 
         xt::xtensor<KernelType, 3> fullKernel{{{1.0f, 1.3f, 1.7f}}};
 
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
 }
 
 
-TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Channel Position", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("SeparableConvolveND<1>: Test Channel Position", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
 
@@ -916,7 +916,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Channel Position", T, TYPE_PAIRS)
         xt::xtensor<InputType, 2> input{{1, 2, 3, 4, 5, 6, 7, 8, 9}};
 
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel},std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel},std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -926,7 +926,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Channel Position", T, TYPE_PAIRS)
         xt::xtensor<InputType, 2> input{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}};
         
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -936,14 +936,14 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Channel Position", T, TYPE_PAIRS)
         xt::xtensor<InputType, 1> input{1, 2, 3, 4, 5, 6, 7, 8, 9};
         
         auto expected = xvigra::convolve1DImplicit(input, fullKernel, options);
-        auto actual = xvigra::separableConvolveImplicit<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveNDImplicit<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
 }
 
 
-TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Border Treatment", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("SeparableConvolveND<1>: Test Border Treatment", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
 
@@ -960,7 +960,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::constant(0));
 
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -969,7 +969,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::constant(2));
         
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -978,7 +978,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::asymmetricReflect());
         
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -987,7 +987,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::avoid());
         
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -996,7 +996,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::repeat());
         
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -1005,7 +1005,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::symmetricReflect());
         
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -1014,7 +1014,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::wrap());
         
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -1024,7 +1024,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatmentEnd(xvigra::BorderTreatment::asymmetricReflect());
         
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -1034,14 +1034,14 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatmentEnd(xvigra::BorderTreatment::avoid());
         
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
 }
 
 
-TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Different Padding, Stride, Dilation", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("SeparableConvolveND<1>: Test Different Padding, Stride, Dilation", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
 
@@ -1058,7 +1058,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Different Padding, Stride, Dilati
         options.setDilation(1);
 
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -1069,7 +1069,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Different Padding, Stride, Dilati
         options.setDilation(1);
 
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -1080,7 +1080,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Different Padding, Stride, Dilati
         options.setDilation(2);
 
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
@@ -1091,14 +1091,14 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Different Padding, Stride, Dilati
         options.setDilation(2);
 
         auto expected = xvigra::convolve1D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+        auto actual = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
 
         checkExpressions(actual, expected);
     }
 }
 
 
-TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Invalid Configurations", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("SeparableConvolveND<1>: Test Invalid Configurations", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
 
@@ -1108,11 +1108,11 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Invalid Configurations", T, TYPE_
         xvigra::KernelOptions options;
         options.setChannelPosition(xvigra::ChannelPosition::IMPLICIT);
 
-        auto function = [&](){return xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});};
+        auto function = [&](){return xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});};
 
         CHECK_THROWS_WITH_AS(
             function(),
-            "separableConvolve(): ChannelPosition for input can't be IMPLICIT.",
+            "separableConvolveND(): ChannelPosition for input can't be IMPLICIT.",
             std::invalid_argument
         );
     }
@@ -1123,27 +1123,27 @@ TEST_CASE_TEMPLATE("SeparableConvolve<1>: Test Invalid Configurations", T, TYPE_
         xvigra::KernelOptions options;
         options.setChannelPosition(xvigra::ChannelPosition::LAST);
 
-        auto function = [&](){return xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});};
+        auto function = [&](){return xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});};
 
         CHECK_THROWS_WITH_AS(
             function(),
-            "separableConvolve(): Number of dimensions of input does not match the given non-channel dimension template parameter!",
+            "separableConvolveND(): Number of dimensions of input does not match the given non-channel dimension template parameter!",
             std::invalid_argument
         );
     }
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-// ║ Test separableConvolve<1> - end                                                                                  ║
+// ║ Test separableConvolveND<1> - end                                                                                ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-// ║ Test separableConvolve<2> - begin                                                                                ║
+// ║ Test separableConvolveND<2> - begin                                                                              ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Default Options", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("SeparableConvolveND<2>: Test Default Options", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
 
@@ -1166,7 +1166,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Default Options", T, TYPE_PAIRS) 
         }}};
 
         auto expected = xvigra::convolve2D(input, fullKernel, options2D);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel}, 
             std::array{options2D.optionsY, options2D.optionsX}
@@ -1191,7 +1191,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Default Options", T, TYPE_PAIRS) 
         }}};
 
         auto expected = xvigra::convolve2D(input, fullKernel, options2D);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel}, 
             std::array{options2D.optionsY, options2D.optionsX}
@@ -1202,7 +1202,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Default Options", T, TYPE_PAIRS) 
 }
 
 
-TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Channel Position", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("SeparableConvolveND<2>: Test Channel Position", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
 
@@ -1225,7 +1225,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Channel Position", T, TYPE_PAIRS)
         }};
 
         auto expected = xvigra::convolve2D(input, fullKernel, options2D);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options2D.optionsY, options2D.optionsX}
@@ -1245,7 +1245,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Channel Position", T, TYPE_PAIRS)
         };
         
         auto expected = xvigra::convolve2D(input, fullKernel, options2D);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options2D.optionsY, options2D.optionsX}
@@ -1265,7 +1265,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Channel Position", T, TYPE_PAIRS)
         };
         
         auto expected = xvigra::convolve2DImplicit(input, fullKernel, options2D);
-        auto actual = xvigra::separableConvolveImplicit<2>(
+        auto actual = xvigra::separableConvolveNDImplicit<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options2D.optionsY, options2D.optionsX}
@@ -1276,7 +1276,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Channel Position", T, TYPE_PAIRS)
 }
 
 
-TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("SeparableConvolveND<2>: Test Border Treatment", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
 
@@ -1303,7 +1303,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::constant(0));
 
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options.optionsY, options.optionsX}
@@ -1316,7 +1316,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::constant(2));
         
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options.optionsY, options.optionsX}
@@ -1329,7 +1329,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::asymmetricReflect());
         
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options.optionsY, options.optionsX}
@@ -1342,7 +1342,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::avoid());
         
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options.optionsY, options.optionsX}
@@ -1355,7 +1355,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::repeat());
         
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options.optionsY, options.optionsX}
@@ -1368,7 +1368,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::symmetricReflect());
         
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options.optionsY, options.optionsX}
@@ -1381,7 +1381,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatment(xvigra::BorderTreatment::wrap());
         
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options.optionsY, options.optionsX}
@@ -1395,7 +1395,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatmentEnd(xvigra::BorderTreatment::asymmetricReflect());
         
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options.optionsY, options.optionsX}
@@ -1409,7 +1409,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS)
         options.setBorderTreatmentEnd(xvigra::BorderTreatment::avoid());
         
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernel, kernel},
             std::array{options.optionsY, options.optionsX}
@@ -1420,7 +1420,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Border Treatment", T, TYPE_PAIRS)
 }
 
 
-TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Different Padding, Stride, Dilation", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("SeparableConvolveND<2>: Test Different Padding, Stride, Dilation", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
 
@@ -1459,7 +1459,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Different Padding, Stride, Dilati
         options.setDilation(1, 1);
 
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernelY, kernelX},
             std::array{options.optionsY, options.optionsX}
@@ -1474,7 +1474,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Different Padding, Stride, Dilati
         options.setDilation(1, 1);
 
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernelY, kernelX},
             std::array{options.optionsY, options.optionsX}
@@ -1489,7 +1489,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Different Padding, Stride, Dilati
         options.setDilation(3, 4);
 
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernelY, kernelX},
             std::array{options.optionsY, options.optionsX}
@@ -1504,7 +1504,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Different Padding, Stride, Dilati
         options.setDilation(3, 4);
 
         auto expected = xvigra::convolve2D(input, fullKernel, options);
-        auto actual = xvigra::separableConvolve<2>(
+        auto actual = xvigra::separableConvolveND<2>(
             input, 
             std::array{kernelY, kernelX},
             std::array{options.optionsY, options.optionsX}
@@ -1515,7 +1515,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Different Padding, Stride, Dilati
 }
 
 
-TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Invalid Configurations", T, TYPE_PAIRS) {
+TEST_CASE_TEMPLATE("SeparableConvolveND<2>: Test Invalid Configurations", T, TYPE_PAIRS) {
     using InputType = typename T::first_type;
     using KernelType = typename T::second_type;
 
@@ -1531,7 +1531,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Invalid Configurations", T, TYPE_
         xvigra::KernelOptions options;
         options.setChannelPosition(xvigra::ChannelPosition::IMPLICIT);
 
-        auto function = [&](){return xvigra::separableConvolve<2>(
+        auto function = [&](){return xvigra::separableConvolveND<2>(
                 input, 
                 std::array{kernel, kernel},
                 std::array{options, options}
@@ -1540,7 +1540,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Invalid Configurations", T, TYPE_
 
         CHECK_THROWS_WITH_AS(
             function(),
-            "separableConvolve(): ChannelPosition for input can't be IMPLICIT.",
+            "separableConvolveND(): ChannelPosition for input can't be IMPLICIT.",
             std::invalid_argument
         );
     }
@@ -1551,11 +1551,11 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Invalid Configurations", T, TYPE_
         xvigra::KernelOptions options;
         options.setChannelPosition(xvigra::ChannelPosition::LAST);
 
-        auto function = [&](){return xvigra::separableConvolve<2>(input, std::array{kernel, kernel}, std::array{options, options});};
+        auto function = [&](){return xvigra::separableConvolveND<2>(input, std::array{kernel, kernel}, std::array{options, options});};
 
         CHECK_THROWS_WITH_AS(
             function(),
-            "separableConvolve(): Number of dimensions of input does not match the given non-channel dimension template parameter!",
+            "separableConvolveND(): Number of dimensions of input does not match the given non-channel dimension template parameter!",
             std::invalid_argument
         );
     }
@@ -1569,7 +1569,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Invalid Configurations", T, TYPE_
         xvigra::KernelOptions optionsX;
         optionsX.setChannelPosition(xvigra::ChannelPosition::FIRST);
 
-        auto function = [&](){return xvigra::separableConvolve<2>(
+        auto function = [&](){return xvigra::separableConvolveND<2>(
                 input, 
                 std::array{kernel, kernel},
                 std::array{optionsY, optionsX}
@@ -1578,12 +1578,12 @@ TEST_CASE_TEMPLATE("SeparableConvolve<2>: Test Invalid Configurations", T, TYPE_
 
         CHECK_THROWS_WITH_AS(
             function(),
-            "separableConvolve(): Given options don't contain a consistent ChannelPosition!",
+            "separableConvolveND(): Given options don't contain a consistent ChannelPosition!",
             std::invalid_argument
         );  
     }
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-// ║ Test separableConvolve<2> - end                                                                                  ║
+// ║ Test separableConvolveND<2> - end                                                                                ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝

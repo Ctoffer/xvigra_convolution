@@ -7,10 +7,10 @@ data:
     - group_4
 
   group_names:
-    group_1: benchmark_separableConvolve2D_inputSize
-    group_2: benchmark_separableConvolveND_2D_inputSize
-    group_3: benchmark_separableConvolve_2D_inputSize
-    group_4: benchmark_convolve2D_inputSize
+    group_1: benchmark_separableConvolve2D_kernelSize
+    group_2: benchmark_separableConvolveND_2D_kernelSize
+    group_3: benchmark_separableConvolve_2D_kernelSize
+    group_4: benchmark_convolve2D_kernelSize
 
 
   variants: ['channelFirst', 'channelLast']
@@ -19,9 +19,9 @@ data:
   x:
     type: np.arange
     attrs:
-      start: 50
-      stop: 2050
-      step: 50
+      start: 1
+      stop: 21
+      step: 1
     values: []
 
 graph:

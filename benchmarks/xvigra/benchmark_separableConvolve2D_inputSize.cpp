@@ -138,6 +138,108 @@ void benchmark_separableConvolve2D_inputSize_channelLast(benchmark::State& state
 
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ benchmark separableConvolveND<2> - begin                                                                         ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+template <typename ElementType>
+void benchmark_separableConvolveND_2D_inputSize_channelFirst(benchmark::State& state) {
+	int inputHeight = static_cast<int>(state.range(0) + 1);
+	int inputWidth = static_cast<int>(state.range(0) - 1);
+	int inputChannels = 3;
+	int kernelHeight = 8;
+	int kernelWidth = 7;
+	
+	std::array<int, 3> inputShape{inputChannels, inputHeight, inputWidth};
+	std::array<int, 1> kernelShapeY{kernelHeight};
+	std::array<int, 1> kernelShapeX{kernelWidth};
+
+	int padding = 3;
+	int stride = 4;
+	int dilation = 2;
+
+	xvigra::KernelOptions2D options2D;
+	options2D.setPadding(padding - 1, padding + 1);
+	options2D.setStride(stride + 1, stride - 1);
+	options2D.setDilation(dilation - 1, dilation + 1);
+	options2D.setChannelPosition(xvigra::ChannelPosition::FIRST);   
+
+	xt::xtensor<ElementType, 3> input;
+	xt::xtensor<ElementType, 1> kernelY;
+	xt::xtensor<ElementType, 1> kernelX;
+	
+	if constexpr (std::is_floating_point<ElementType>::value) {
+		input = xt::random::rand<ElementType>(inputShape);
+		kernelY = xt::random::rand<ElementType>(kernelShapeY);
+		kernelX = xt::random::rand<ElementType>(kernelShapeX);
+	} else {
+		input = xt::random::randint<ElementType>(inputShape);
+		kernelY = xt::random::randint<ElementType>(kernelShapeY);
+		kernelX = xt::random::randint<ElementType>(kernelShapeX);
+	}
+	
+	for (auto _ : state) {
+		 auto result = xvigra::separableConvolveND<2>(
+		 	input, 
+		 	std::array{kernelY, kernelX}, 
+		 	std::array{options2D.optionsY, options2D.optionsX}
+		 );
+		 benchmark::DoNotOptimize(result.data());
+	}
+}
+
+
+template <typename ElementType>
+void benchmark_separableConvolveND_2D_inputSize_channelLast(benchmark::State& state) {
+	int inputHeight = static_cast<int>(state.range(0) + 1);
+	int inputWidth = static_cast<int>(state.range(0) - 1);
+	int inputChannels = 3;
+	int kernelHeight = 8;
+	int kernelWidth = 7;
+	
+	std::array<int, 3> inputShape{inputHeight, inputWidth, inputChannels};
+	std::array<int, 1> kernelShapeY{kernelHeight};
+	std::array<int, 1> kernelShapeX{kernelWidth};
+
+	int padding = 3;
+	int stride = 4;
+	int dilation = 2;
+
+	xvigra::KernelOptions2D options2D;
+	options2D.setPadding(padding - 1, padding + 1);
+	options2D.setStride(stride + 1, stride - 1);
+	options2D.setDilation(dilation - 1, dilation + 1);
+	options2D.setChannelPosition(xvigra::ChannelPosition::LAST);   
+
+	xt::xtensor<ElementType, 3> input;
+	xt::xtensor<ElementType, 1> kernelY;
+	xt::xtensor<ElementType, 1> kernelX;
+	
+	if constexpr (std::is_floating_point<ElementType>::value) {
+		input = xt::random::rand<ElementType>(inputShape);
+		kernelY = xt::random::rand<ElementType>(kernelShapeY);
+		kernelX = xt::random::rand<ElementType>(kernelShapeX);
+	} else {
+		input = xt::random::randint<ElementType>(inputShape);
+		kernelY = xt::random::randint<ElementType>(kernelShapeY);
+		kernelX = xt::random::randint<ElementType>(kernelShapeX);
+	}
+	
+	for (auto _ : state) {
+		 auto result = xvigra::separableConvolveND<2>(
+		 	input, 
+		 	std::array{kernelY, kernelX}, 
+		 	std::array{options2D.optionsY, options2D.optionsX}
+		 );
+		 benchmark::DoNotOptimize(result.data());
+	}
+}
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║ benchmark separableConvolveND<2> - end                                                                           ║
+// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ benchmark separableConvolve<2> - begin                                                                           ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
@@ -237,6 +339,7 @@ void benchmark_separableConvolve_2D_inputSize_channelLast(benchmark::State& stat
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ benchmark separableConvolve<2> - end                                                                             ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
 
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -339,6 +442,9 @@ void benchmark_convolve2D_inputSize_channelLast(benchmark::State& state) {
 
 BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve2D_inputSize_channelFirst);
 BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve2D_inputSize_channelLast);
+
+BENCHMARK_SINGLE_VERSION(benchmark_separableConvolveND_2D_inputSize_channelFirst);
+BENCHMARK_SINGLE_VERSION(benchmark_separableConvolveND_2D_inputSize_channelLast);
 
 BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve_2D_inputSize_channelFirst);
 BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve_2D_inputSize_channelLast);

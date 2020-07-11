@@ -5,6 +5,8 @@ set (TARGETS
     benchmark_convolve2D_inputSize_channelLast
     benchmark_separableConvolve1D_inputSize
     benchmark_separableConvolve2D_inputSize
+    benchmark_separableConvolve1D_kernelSize
+    benchmark_separableConvolve2D_kernelSize
 )
 
 FOREACH(TARGET ${TARGETS})

@@ -14,9 +14,9 @@
 // ║ define - begin                                                                                                   ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-#define INPUT_SIZE_MIN 50
-#define INPUT_SIZE_MAX 2000
-#define INPUT_SIZE_STEP 50
+#define INPUT_SIZE_MIN 1
+#define INPUT_SIZE_MAX 21
+#define INPUT_SIZE_STEP 1
 
 
 #define BENCHMARK_SINGLE_VERSION(name)\
@@ -40,10 +40,10 @@
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 template <typename ElementType>
-void benchmark_separableConvolve1D_inputSize_channelFirst(benchmark::State& state) {
-	int inputWidth = static_cast<int>(state.range(0));
+void benchmark_separableConvolve1D_kernelSize_channelFirst(benchmark::State& state) {
+	int inputWidth = static_cast<int>(1500);
 	int inputChannels = 3;
-	int kernelWidth = 7;
+	int kernelWidth = state.range(0);
 	
 	std::array<int, 2> inputShape{inputChannels, inputWidth};
 	std::array<int, 1> kernelShape{kernelWidth};
@@ -74,10 +74,10 @@ void benchmark_separableConvolve1D_inputSize_channelFirst(benchmark::State& stat
 
 
 template <typename ElementType>
-void benchmark_separableConvolve1D_inputSize_channelLast(benchmark::State& state) {
-	int inputWidth = static_cast<int>(state.range(0));
+void benchmark_separableConvolve1D_kernelSize_channelLast(benchmark::State& state) {
+	int inputWidth = static_cast<int>(1500);
 	int inputChannels = 3;
-	int kernelWidth = 7;
+	int kernelWidth = state.range(0);
 	
 	std::array<int, 2> inputShape{inputWidth, inputChannels};
 	std::array<int, 1> kernelShape{kernelWidth};
@@ -116,10 +116,10 @@ void benchmark_separableConvolve1D_inputSize_channelLast(benchmark::State& state
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 template <typename ElementType>
-void benchmark_separableConvolveND_1D_inputSize_channelFirst(benchmark::State& state) {
-	int inputWidth = static_cast<int>(state.range(0));
+void benchmark_separableConvolveND_1D_kernelSize_channelFirst(benchmark::State& state) {
+	int inputWidth = static_cast<int>(1500);
 	int inputChannels = 3;
-	int kernelWidth = 7;
+	int kernelWidth = state.range(0);
 	
 	std::array<int, 2> inputShape{inputChannels, inputWidth};
 	std::array<int, 1> kernelShape{kernelWidth};
@@ -150,10 +150,10 @@ void benchmark_separableConvolveND_1D_inputSize_channelFirst(benchmark::State& s
 
 
 template <typename ElementType>
-void benchmark_separableConvolveND_1D_inputSize_channelLast(benchmark::State& state) {
-	int inputWidth = static_cast<int>(state.range(0));
+void benchmark_separableConvolveND_1D_kernelSize_channelLast(benchmark::State& state) {
+	int inputWidth = static_cast<int>(1500);
 	int inputChannels = 3;
-	int kernelWidth = 7;
+	int kernelWidth = state.range(0);
 	
 	std::array<int, 2> inputShape{inputWidth, inputChannels};
 	std::array<int, 1> kernelShape{kernelWidth};
@@ -186,15 +186,16 @@ void benchmark_separableConvolveND_1D_inputSize_channelLast(benchmark::State& st
 // ║ benchmark separableConvolveND<1> - end                                                                           ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
+
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ benchmark separableConvolve<1> - begin                                                                           ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 template <typename ElementType>
-void benchmark_separableConvolve_1D_inputSize_channelFirst(benchmark::State& state) {
-	int inputWidth = static_cast<int>(state.range(0));
+void benchmark_separableConvolve_1D_kernelSize_channelFirst(benchmark::State& state) {
+	int inputWidth = static_cast<int>(1500);
 	int inputChannels = 3;
-	int kernelWidth = 7;
+	int kernelWidth = state.range(0);
 	
 	std::array<int, 2> inputShape{inputChannels, inputWidth};
 	std::array<int, 1> kernelShape{kernelWidth};
@@ -225,10 +226,10 @@ void benchmark_separableConvolve_1D_inputSize_channelFirst(benchmark::State& sta
 
 
 template <typename ElementType>
-void benchmark_separableConvolve_1D_inputSize_channelLast(benchmark::State& state) {
-	int inputWidth = static_cast<int>(state.range(0));
+void benchmark_separableConvolve_1D_kernelSize_channelLast(benchmark::State& state) {
+	int inputWidth = static_cast<int>(1500);
 	int inputChannels = 3;
-	int kernelWidth = 7;
+	int kernelWidth = state.range(0);
 	
 	std::array<int, 2> inputShape{inputWidth, inputChannels};
 	std::array<int, 1> kernelShape{kernelWidth};
@@ -267,10 +268,10 @@ void benchmark_separableConvolve_1D_inputSize_channelLast(benchmark::State& stat
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 template <typename ElementType>
-void benchmark_convolve1D_inputSize_channelFirst(benchmark::State& state) {
-	int inputWidth = static_cast<int>(state.range(0));
+void benchmark_convolve1D_kernelSize_channelFirst(benchmark::State& state) {
+	int inputWidth = static_cast<int>(1500);
 	int inputChannels = 3;
-	int kernelWidth = 7;
+	int kernelWidth = state.range(0);
 	
 	std::array<int, 2> inputShape{inputChannels, inputWidth};
 	std::array<int, 3> kernelShape{inputChannels, inputChannels, kernelWidth};
@@ -301,10 +302,10 @@ void benchmark_convolve1D_inputSize_channelFirst(benchmark::State& state) {
 
 
 template <typename ElementType>
-void benchmark_convolve1D_inputSize_channelLast(benchmark::State& state) {
-	int inputWidth = static_cast<int>(state.range(0));
+void benchmark_convolve1D_kernelSize_channelLast(benchmark::State& state) {
+	int inputWidth = static_cast<int>(1500);
 	int inputChannels = 3;
-	int kernelWidth = 7;
+	int kernelWidth = state.range(0);
 	
 	std::array<int, 2> inputShape{inputWidth, inputChannels};
 	std::array<int, 3> kernelShape{inputChannels, inputChannels, kernelWidth};
@@ -342,17 +343,17 @@ void benchmark_convolve1D_inputSize_channelLast(benchmark::State& state) {
 // ║ run benchmarks - begin                                                                                           ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve1D_inputSize_channelFirst);
-BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve1D_inputSize_channelLast);
+BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve1D_kernelSize_channelFirst);
+BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve1D_kernelSize_channelLast);
 
-BENCHMARK_SINGLE_VERSION(benchmark_separableConvolveND_1D_inputSize_channelFirst);
-BENCHMARK_SINGLE_VERSION(benchmark_separableConvolveND_1D_inputSize_channelLast);
+BENCHMARK_SINGLE_VERSION(benchmark_separableConvolveND_1D_kernelSize_channelFirst);
+BENCHMARK_SINGLE_VERSION(benchmark_separableConvolveND_1D_kernelSize_channelLast);
 
-BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve_1D_inputSize_channelFirst);
-BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve_1D_inputSize_channelLast);
+BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve_1D_kernelSize_channelFirst);
+BENCHMARK_SINGLE_VERSION(benchmark_separableConvolve_1D_kernelSize_channelLast);
 
-BENCHMARK_SINGLE_VERSION(benchmark_convolve1D_inputSize_channelFirst);
-BENCHMARK_SINGLE_VERSION(benchmark_convolve1D_inputSize_channelLast);
+BENCHMARK_SINGLE_VERSION(benchmark_convolve1D_kernelSize_channelFirst);
+BENCHMARK_SINGLE_VERSION(benchmark_convolve1D_kernelSize_channelLast);
 
 
 BENCHMARK_MAIN();

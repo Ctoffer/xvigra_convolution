@@ -32,7 +32,7 @@ void runFirstWithSeparableConvolve1D() {
     std::cout << result.shape() << std::endl;
     std::cout << result << std::endl;
 
-    auto result2 = xvigra::separableConvolve<1>(
+    auto result2 = xvigra::separableConvolveND<1>(
         arr, 
         std::array{rawKernel}, 
         std::array{options}
@@ -59,7 +59,7 @@ void runLastWithSeparableConvolve1D() {
     std::cout << result.shape() << std::endl;
     std::cout << result << std::endl;
 
-    auto result2 = xvigra::separableConvolve<1>(
+    auto result2 = xvigra::separableConvolveND<1>(
         arr, 
         std::array{rawKernel}, 
         std::array{options}
@@ -120,7 +120,7 @@ void runFirstWithSeparableConvolve2D() {
     std::cout << std::endl;
     printTensor<ResultType>(result);
 
-    auto result2 = xvigra::separableConvolve<2>(
+    auto result2 = xvigra::separableConvolveND<2>(
         arr, 
         std::array{rawKernelY, rawKernelX}, 
         std::array{optionsY, optionsX}
@@ -161,7 +161,7 @@ void runLastWithSeparableConvolve2D() {
     std::cout << std::endl;
     printTensor<ResultType>(result);
 
-    auto result2 = xvigra::separableConvolve<2>(
+    auto result2 = xvigra::separableConvolveND<2>(
         arr, 
         std::array{rawKernelY, rawKernelX}, 
         std::array{optionsY, optionsX}

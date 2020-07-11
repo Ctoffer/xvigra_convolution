@@ -402,18 +402,18 @@ namespace xvigra {
 
 
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-    // ║ separableConvolve - begin                                                                                    ║
+    // ║ separableConvolveND - begin                                                                                  ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
     template <std::size_t N, typename T, typename KernelContainerType>
-    auto separableConvolve(
+    auto separableConvolveND(
         const xt::xexpression<T>& inputExpression,
         const std::array<KernelContainerType, N>& rawKernels,
         const std::array<xvigra::KernelOptions, N>& kernelOptions
     ) {
         for (std::size_t i = 0; i < N - 1; ++i) {
             if (kernelOptions[i].channelPosition != kernelOptions[i + 1].channelPosition) {
-                throw std::invalid_argument("separableConvolve(): Given options don't contain a consistent ChannelPosition!");
+                throw std::invalid_argument("separableConvolveND(): Given options don't contain a consistent ChannelPosition!");
             }
         }
 
@@ -429,7 +429,7 @@ namespace xvigra {
         std::size_t numberOfDimensions = input.dimension();
 
         if (numberOfDimensions != N + 1) {
-            throw std::invalid_argument("separableConvolve(): Number of dimensions of input does not match the given non-channel dimension template parameter!");
+            throw std::invalid_argument("separableConvolveND(): Number of dimensions of input does not match the given non-channel dimension template parameter!");
         }
 
         std::size_t locationOfChannel = 0;
@@ -445,7 +445,7 @@ namespace xvigra {
             startAxis = 1;
              endAxis = numberOfDimensions;
         } else {
-            throw std::invalid_argument("separableConvolve(): ChannelPosition for input can't be IMPLICIT.");
+            throw std::invalid_argument("separableConvolveND(): ChannelPosition for input can't be IMPLICIT.");
         }
         
         std::size_t channels = input.shape()[locationOfChannel];
@@ -489,6 +489,67 @@ namespace xvigra {
     }   
 
     template <std::size_t N, typename T, typename KernelContainerType>
+    auto separableConvolveNDImplicit(
+        const xt::xexpression<T>& inputExpression,
+        const std::array<KernelContainerType, N>& rawKernels,
+        const std::array<xvigra::KernelOptions, N>& kernelOptions
+    ) {
+        using InputContainerType = typename xt::xexpression<T>::derived_type;
+        using InputType = typename InputContainerType::value_type;
+        using KernelType = typename KernelContainerType::value_type;
+        using ResultType = typename std::common_type_t<InputType, KernelType>;
+
+        InputContainerType input = inputExpression.derived_cast();
+
+        auto normalizedInput = xt::expand_dims(input, input.dimension());
+
+        std::array<xvigra::KernelOptions, N> copiedOptions;
+        for (std::size_t i = 0; i < N; ++i) {
+            copiedOptions[i] = xvigra::KernelOptions(kernelOptions[i]);
+            copiedOptions[i].setChannelPosition(xvigra::ChannelPosition::LAST);
+        }
+
+        auto result = separableConvolveND<N>(
+            normalizedInput, 
+            rawKernels, 
+            copiedOptions
+        );
+
+        return xt::xtensor<ResultType, N>(xt::squeeze(result));
+    }
+
+    // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    // ║ separableConvolveND - end                                                                                    ║
+    // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    // ║ separableConvolveND - begin                                                                                  ║
+    // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+    template <std::size_t N, typename T, typename KernelContainerType>
+    auto separableConvolve(
+        const xt::xexpression<T>& inputExpression,
+        const std::array<KernelContainerType, N>& rawKernels,
+        const std::array<xvigra::KernelOptions, N>& kernelOptions
+    ) {
+        using InputContainerType = typename xt::xexpression<T>::derived_type;
+        using InputType = typename InputContainerType::value_type;
+        using KernelType = typename KernelContainerType::value_type;
+        using ResultType = typename std::common_type_t<InputType, KernelType>;
+
+        InputContainerType input = inputExpression.derived_cast();
+
+        if constexpr (N == 1) {
+            return separableConvolve1D(input, rawKernels[0], kernelOptions[0]);
+        } else if constexpr (N == 2) {
+            return separableConvolve2D(input, rawKernels, kernelOptions);
+        } else {
+            return separableConvolveND(input, rawKernels, kernelOptions);
+        }
+
+    }   
+
+    template <std::size_t N, typename T, typename KernelContainerType>
     auto separableConvolveImplicit(
         const xt::xexpression<T>& inputExpression,
         const std::array<KernelContainerType, N>& rawKernels,
@@ -519,7 +580,7 @@ namespace xvigra {
     }
 
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-    // ║ separableConvolve - end                                                                                      ║
+    // ║ separableConvolveND - end                                                                                    ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 }

@@ -148,7 +148,7 @@ int getBorderIndex(const xvigra::BorderTreatment& treatment, int index, int size
         }                                                                             \
     }                                                                                 \
                                                                                       \
-    patch(inputChannel, patchKernelX, outIndex) = value;\
+    patch(inputChannel, patchKernelX, outIndex) = value;                              \
 }
 
 #define XVIGRA_LEGACY_SET_END_BORDER_VALUE_CHANNEL_FIRST {\
