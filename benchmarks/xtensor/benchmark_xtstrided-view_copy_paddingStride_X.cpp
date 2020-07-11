@@ -8,36 +8,36 @@
 #define INPUT_SIZE_MAX 1250
 #define INPUT_SIZE_STEP 50
 
-#define SETUP_VARIABLES\
-    int size = state.range(0);\
-    \
-    int inputZ = size - 1;\
-    int inputY = size;\
-    int inputX = size + 1;\
-    \
-    int paddingStartZ = 2;\
-    int paddingEndZ = 1;\
-    int paddingStartY = 3;\
-    int paddingEndY = 2;\
-    int paddingStartX = 0;\
-    int paddingEndX = 0;\
-    \
-    int strideZ = 2;\
-    int strideY = 3;\
-    int strideX = 1;\
-    \
-    int outputY = static_cast<int>(std::ceil(static_cast<double>((inputZ - paddingStartZ - paddingEndZ)) / (strideZ)));\
+#define SETUP_VARIABLES                                                                                                   \
+    int size = state.range(0);                                                                                            \
+                                                                                                                          \
+    int inputZ = size - 1;                                                                                                \
+    int inputY = size;                                                                                                    \
+    int inputX = size + 1;                                                                                                \
+                                                                                                                          \
+    int paddingStartZ = 2;                                                                                                \
+    int paddingEndZ = 1;                                                                                                  \
+    int paddingStartY = 3;                                                                                                \
+    int paddingEndY = 2;                                                                                                  \
+    int paddingStartX = 0;                                                                                                \
+    int paddingEndX = 0;                                                                                                  \
+                                                                                                                          \
+    int strideZ = 2;                                                                                                      \
+    int strideY = 3;                                                                                                      \
+    int strideX = 1;                                                                                                      \
+                                                                                                                          \
+    int outputY = static_cast<int>(std::ceil(static_cast<double>((inputZ - paddingStartZ - paddingEndZ)) / (strideZ)));   \
     int outputX = static_cast<int>(std::ceil(static_cast<double>((inputY - paddingStartY - paddingEndY)) / (strideY)));
 
-#define BENCHMARK_SINGLE_VERSION(name)\
-    BENCHMARK_TEMPLATE(name, float)\
-    ->ComputeStatistics("min", [](const std::vector<double>& v) -> double {\
-        return *(std::min_element(std::begin(v), std::end(v)));\
-    })\
-    ->ComputeStatistics("max", [](const std::vector<double>& v) -> double {\
-        return *(std::max_element(std::begin(v), std::end(v)));\
-    })\
-    ->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)\
+#define BENCHMARK_SINGLE_VERSION(name)                                        \
+    BENCHMARK_TEMPLATE(name, float)                                           \
+    ->ComputeStatistics("min", [](const std::vector<double>& v) -> double {   \
+        return *(std::min_element(std::begin(v), std::end(v)));               \
+    })                                                                        \
+    ->ComputeStatistics("max", [](const std::vector<double>& v) -> double {   \
+        return *(std::max_element(std::begin(v), std::end(v)));               \
+    })                                                                        \
+    ->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)             \
     ->Unit(benchmark::kMillisecond)
 
 template <typename ElementType>

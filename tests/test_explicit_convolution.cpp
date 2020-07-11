@@ -21,14 +21,14 @@
 // ║ define - begin                                                                                                   ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-#define TYPE_PAIRS \
-    std::pair<short, float>, \
-    std::pair<short, double>, \
-    std::pair<int, float>, \
+#define TYPE_PAIRS              \
+    std::pair<short, float>,    \
+    std::pair<short, double>,   \
+    std::pair<int, float>,      \
     std::pair<int, double>
 
-#define FLOATING_TYPE_PAIRS \
-    std::pair<double, float>, \
+#define FLOATING_TYPE_PAIRS     \
+    std::pair<double, float>,   \
     std::pair<double, double>
 
 TYPE_TO_STRING(std::pair<short, float>);
@@ -38,7 +38,7 @@ TYPE_TO_STRING(std::pair<int, double>);
 TYPE_TO_STRING(std::pair<double, float>);
 TYPE_TO_STRING(std::pair<double, double>);
 
-#define EXPECTED_UNPADDED_RESULT\
+#define EXPECTED_UNPADDED_RESULT                     \
     8.7f, 12.7f, 16.7f, 20.7f, 24.7f, 28.7f, 32.7f
 
 #define ZERO_KERNEL {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}

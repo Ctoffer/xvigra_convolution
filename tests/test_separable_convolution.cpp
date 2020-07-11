@@ -26,10 +26,10 @@
 // ║ define - begin                                                                                                   ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-#define TYPE_PAIRS \
-    std::pair<short, float>, \
-    std::pair<short, double>, \
-    std::pair<int, float>, \
+#define TYPE_PAIRS              \
+    std::pair<short, float>,    \
+    std::pair<short, double>,   \
+    std::pair<int, float>,      \
     std::pair<int, double>
     
 TYPE_TO_STRING(std::pair<short, float>);
@@ -37,18 +37,18 @@ TYPE_TO_STRING(std::pair<short, double>);
 TYPE_TO_STRING(std::pair<int, float>);
 TYPE_TO_STRING(std::pair<int, double>);
     
-#define ZERO_2D {\
-    {0.00f, 0.00f, 0.00f},\
-    {0.00f, 0.00f, 0.00f},\
-    {0.00f, 0.00f, 0.00f},\
-    {0.00f, 0.00f, 0.00f}\
+#define ZERO_2D {            \
+    {0.00f, 0.00f, 0.00f},   \
+    {0.00f, 0.00f, 0.00f},   \
+    {0.00f, 0.00f, 0.00f},   \
+    {0.00f, 0.00f, 0.00f}    \
 }
 
-#define KERNEL_2D {\
-    {1.00f, 1.30f, 1.70f},\
-    {1.30f, 1.69f, 2.21f},\
-    {1.70f, 2.21f, 2.89f},\
-    {2.10f, 2.73f, 3.57f}\
+#define KERNEL_2D {          \
+    {1.00f, 1.30f, 1.70f},   \
+    {1.30f, 1.69f, 2.21f},   \
+    {1.70f, 2.21f, 2.89f},   \
+    {2.10f, 2.73f, 3.57f}    \
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗

@@ -37,10 +37,11 @@ def process_macro_block(macro_block):
         li = s.rsplit(old, occurrence)
         return new.join(li)
 
-    macro_block = [(nr, rreplace(line, '\\', '').rstrip()) for nr, line in macro_block]
+    macro_block = [(nr, rreplace(line, '\\', '').rstrip().replace('\t', 4 * ' ')) for nr, line in macro_block]
     max_line = max(len(line) for _, line in macro_block)
-    macro_block = [(nr, (line + ' ' * (max_line + 10))[:max_line + 3]) for nr, line in macro_block]
-    return [(nr, line + '\\') for nr, line in macro_block[:-1]] + [(macro_block[-1][0], macro_block[-1][1].rstrip())]
+    macro_block = [(nr, (line + ' ' * (max_line * 2))[:max_line + 3]) for nr, line in macro_block]
+    result = [(nr, line + '\\') for nr, line in macro_block[:-1]] + [(macro_block[-1][0], macro_block[-1][1].rstrip())]
+    return result
 
 
 def process_macro_blocks(macro_blocks):
@@ -54,7 +55,7 @@ def save_macro_blocks(in_file_name, out_file_name, flattened_blocks):
 
     with open(out_file_name, 'w', encoding='utf-8') as out_file:
         for nr, line in enumerate(in_lines):
-            line = line.rstrip()
+            line = line.replace('\n', '')
             if i < len(flattened_blocks):
                 block_nr, block_line = flattened_blocks[i]
             else:
@@ -67,7 +68,7 @@ def save_macro_blocks(in_file_name, out_file_name, flattened_blocks):
                 print(line, file=out_file)
 
 
-def sanitize_file(file_name, silent=True):
+def sanitize_file(file_name):
     macro_blocks = read_macro_blocks(file_name)
     if len(macro_blocks) == 0:
         return False
@@ -82,16 +83,20 @@ def sanitize_file(file_name, silent=True):
 
 def main():
     print("Start macro block formatting...")
-    dir = "./"
+    directories = ("./benchmarks", "./include")
+
     scanned, sanitized = 0, 0
-    for root, dirs, files in walk(dir):
-        for file in files:
-            if file.endswith(("hxx", "hpp", "cxx", "cpp")):
-                file_name = join(root, file)
-                scanned += 1
-                if sanitize_file(file_name):
-                    sanitized += 1
-                    print(f"    Sanitized macro blocks in '{file_name}'")
+
+    for directory in directories:
+        for root, directories, files in walk(directory):
+            for file in files:
+                if file.endswith(("hxx", "hpp", "cxx", "cpp")):
+                    file_name = join(root, file)
+                    scanned += 1
+                    if sanitize_file(file_name):
+                        sanitized += 1
+                        print(f"    Sanitized macro blocks in '{file_name}'")
+
     print("Finished")
     print(f"Sanitized C++ files: {sanitized} / {scanned} ({100 * sanitized / scanned:>5.2f})")
 

@@ -23,10 +23,10 @@
 // ║ define - begin                                                                                                   ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-#define TYPES \
-    std::uint16_t, \
-    int, \
-    float, \
+#define TYPES        \
+    std::uint16_t,   \
+    int,             \
+    float,           \
     double
 
 
@@ -41,59 +41,59 @@
 #define KERNEL_1D_ASYM_INT   {  10,   13,   17,   21,   23}
 
 
-#define ZERO_2D_SYM_FLOAT {\
-    ZERO_1D_SYM_FLOAT,\
-    ZERO_1D_SYM_FLOAT,\
-    ZERO_1D_SYM_FLOAT,\
-    ZERO_1D_SYM_FLOAT\
+#define ZERO_2D_SYM_FLOAT {   \
+    ZERO_1D_SYM_FLOAT,        \
+    ZERO_1D_SYM_FLOAT,        \
+    ZERO_1D_SYM_FLOAT,        \
+    ZERO_1D_SYM_FLOAT         \
 }
-#define ZERO_2D_SYM_INT {\
-    ZERO_1D_SYM_INT,\
-    ZERO_1D_SYM_INT,\
-    ZERO_1D_SYM_INT,\
-    ZERO_1D_SYM_INT\
+#define ZERO_2D_SYM_INT {   \
+    ZERO_1D_SYM_INT,        \
+    ZERO_1D_SYM_INT,        \
+    ZERO_1D_SYM_INT,        \
+    ZERO_1D_SYM_INT         \
 }
-#define ZERO_2D_ASYM_FLOAT {\
-    ZERO_1D_ASYM_FLOAT,\
-    ZERO_1D_ASYM_FLOAT,\
-    ZERO_1D_ASYM_FLOAT,\
-    ZERO_1D_ASYM_FLOAT,\
-    ZERO_1D_ASYM_FLOAT\
+#define ZERO_2D_ASYM_FLOAT {   \
+    ZERO_1D_ASYM_FLOAT,        \
+    ZERO_1D_ASYM_FLOAT,        \
+    ZERO_1D_ASYM_FLOAT,        \
+    ZERO_1D_ASYM_FLOAT,        \
+    ZERO_1D_ASYM_FLOAT         \
 }
-#define ZERO_2D_ASYM_INT {\
-    ZERO_1D_ASYM_INT,\
-    ZERO_1D_ASYM_INT,\
-    ZERO_1D_ASYM_INT,\
-    ZERO_1D_ASYM_INT,\
-    ZERO_1D_ASYM_INT\
+#define ZERO_2D_ASYM_INT {   \
+    ZERO_1D_ASYM_INT,        \
+    ZERO_1D_ASYM_INT,        \
+    ZERO_1D_ASYM_INT,        \
+    ZERO_1D_ASYM_INT,        \
+    ZERO_1D_ASYM_INT         \
 }
 
 
-#define KERNEL_2D_SYM_FLOAT {\
-    {1.00f, 1.30f, 1.70f, 2.10f},\
-    {1.30f, 1.69f, 2.21f, 2.73f},\
-    {1.70f, 2.21f, 2.89f, 3.57f},\
-    {2.10f, 2.73f, 3.57f, 4.41f}\
+#define KERNEL_2D_SYM_FLOAT {       \
+    {1.00f, 1.30f, 1.70f, 2.10f},   \
+    {1.30f, 1.69f, 2.21f, 2.73f},   \
+    {1.70f, 2.21f, 2.89f, 3.57f},   \
+    {2.10f, 2.73f, 3.57f, 4.41f}    \
 }
-#define KERNEL_2D_SYM_INT {\
-    {100, 130, 170, 210},\
-    {130, 169, 221, 273},\
-    {170, 221, 289, 357},\
-    {210, 273, 357, 441}\
+#define KERNEL_2D_SYM_INT {   \
+    {100, 130, 170, 210},     \
+    {130, 169, 221, 273},     \
+    {170, 221, 289, 357},     \
+    {210, 273, 357, 441}      \
 }
-#define KERNEL_2D_ASYM_FLOAT {\
-    {1.00f, 1.30f, 1.70f, 2.10f, 2.30f},\
-    {1.30f, 1.69f, 2.21f, 2.73f, 2.99f},\
-    {1.70f, 2.21f, 2.89f, 3.57f, 3.91f},\
-    {2.10f, 2.73f, 3.57f, 4.41f, 4.83f},\
-    {2.30f, 2.99f, 3.91f, 4.83f, 5.29f}\
+#define KERNEL_2D_ASYM_FLOAT {             \
+    {1.00f, 1.30f, 1.70f, 2.10f, 2.30f},   \
+    {1.30f, 1.69f, 2.21f, 2.73f, 2.99f},   \
+    {1.70f, 2.21f, 2.89f, 3.57f, 3.91f},   \
+    {2.10f, 2.73f, 3.57f, 4.41f, 4.83f},   \
+    {2.30f, 2.99f, 3.91f, 4.83f, 5.29f}    \
 }
-#define KERNEL_2D_ASYM_INT {\
-    {100, 130, 170, 210, 230},\
-    {130, 169, 221, 273, 299},\
-    {170, 221, 289, 357, 391},\
-    {210, 273, 357, 441, 483},\
-    {230, 299, 391, 483, 529}\
+#define KERNEL_2D_ASYM_INT {     \
+    {100, 130, 170, 210, 230},   \
+    {130, 169, 221, 273, 299},   \
+    {170, 221, 289, 357, 391},   \
+    {210, 273, 357, 441, 483},   \
+    {230, 299, 391, 483, 529}    \
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗

@@ -17,15 +17,15 @@
 #define INPUT_SIZE_STEP 50
 
 
-#define BENCHMARK_SINGLE_VERSION(name)\
-	BENCHMARK_TEMPLATE(name, float)\
-	->ComputeStatistics("min", [](const std::vector<double>& v) -> double {\
-    	return *(std::min_element(std::begin(v), std::end(v)));\
-  	})\
-	->ComputeStatistics("max", [](const std::vector<double>& v) -> double {\
-    	return *(std::max_element(std::begin(v), std::end(v)));\
-  	})\
-	->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
+#define BENCHMARK_SINGLE_VERSION(name)                                        \
+    BENCHMARK_TEMPLATE(name, float)                                           \
+    ->ComputeStatistics("min", [](const std::vector<double>& v) -> double {   \
+        return *(std::min_element(std::begin(v), std::end(v)));               \
+      })                                                                      \
+    ->ComputeStatistics("max", [](const std::vector<double>& v) -> double {   \
+        return *(std::max_element(std::begin(v), std::end(v)));               \
+      })                                                                      \
+    ->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ define - end                                                                                                     ║
