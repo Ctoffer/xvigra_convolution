@@ -3,6 +3,7 @@ import traceback
 from itertools import product
 from os import makedirs
 from time import sleep
+from os.path import dirname, basename, join as p_join
 
 import numpy as np
 import torch.nn.functional as F
@@ -103,11 +104,10 @@ def check_convolution1D():
                   channel_indices)
 
     with open(logfile, "w") as fp:
-        print("Load combinations ... ", end='')
-        combinations = list(product(*parameters))
-        print("[Ok]")
+        sleep(1)
+        number_of_combinations = np.prod([len(_) for _ in parameters])
 
-        for params in tqdm(combinations, ncols=100):
+        for params in tqdm(product(*parameters), ncols=100, total=number_of_combinations):
             input_channels, input_width = params[0:2]
             kernel_width = params[2]
             padding, dilation, stride = params[3:6]
@@ -132,14 +132,18 @@ def check_convolution1D():
 
 
 def print_results(logfile):
+    summary_path = p_join(dirname(logfile) + "_summary", basename(logfile))
     counters = {"Ok": 0, "Error": 0, "Not possible": 0}
     with open(logfile, "r") as fp:
         for line in fp:
             counters[line.split(":")[-1].strip()] += 1
 
     total = sum([v for v in counters.values()])
-    print({k: f"{100 * v / total:5.2f} %" for k, v in counters.items()})
-    print(f"Total number of tests: {total}")
+    with open(summary_path, "w", encoding='utf-8') as file:
+        print({k: f"{100 * v / total:5.2f} %" for k, v in counters.items()})
+        print(f"Total number of tests: {total}")
+        print({k: f"{100 * v / total:5.2f} %" for k, v in counters.items()}, file=file)
+        print(f"Total number of tests: {total}", file=file)
 
 
 def compare_convolve2D(data, silent=True):
@@ -230,11 +234,11 @@ def check_convolution2D():
     makedirs("test_result", exist_ok=True)
 
     input_channel_values = range(1, 4)
-    input_sizes = (7, 8, 13, 17, 21, 50, 100, 200)
-    kernel_sizes = (2, 3, 4, 5, 7, 11)
-    paddings = range(0, 5)
-    dilations = range(1, 6)
-    strides = range(1, 6)
+    input_sizes = (7, 8, 49, 50)
+    kernel_sizes = (2, 3, 8, 11)
+    paddings = range(0, 4)
+    dilations = range(1, 5)
+    strides = range(1, 5)
     channel_indices = (ChannelPosition.FIRST, ChannelPosition.LAST)
 
     parameters = (input_channel_values,
@@ -251,12 +255,10 @@ def check_convolution2D():
                   channel_indices)
 
     with open(logfile, "w") as fp:
-        print("Load combinations ... ", end='')
-        combinations = list(product(*parameters))
-        print("[Ok]")
         sleep(1)
+        number_of_combinations = np.prod([len(_) for _ in parameters])
 
-        for params in tqdm(combinations, ncols=100):
+        for params in tqdm(product(*parameters), ncols=100, total=number_of_combinations):
             input_channels, input_height, input_width = params[0:3]
             kernel_height, kernel_width = params[3:5]
             padding_y, padding_x = params[5:7]

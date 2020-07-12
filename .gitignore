@@ -1,3 +1,4 @@
 /build-linux/
 /build-windows/
 /.idea/
+/py_impl/test_result/
