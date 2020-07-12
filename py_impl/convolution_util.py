@@ -1,6 +1,5 @@
 from enum import Enum, auto
 from math import floor
-import numpy as np
 
 
 class ChannelPosition(Enum):
@@ -68,16 +67,6 @@ class KernelOptions:
                f" dilation={self.dilation}," \
                f" channel_position={self.channel_position})"
 
-
-def normalize_after_convolution(original_tensor):
-    arr = np.array(original_tensor)
-    arr -= np.amin(arr)
-    arr /= np.amax(arr)
-
-    if arr.dtype in (np.float32, np.float64):
-        return np.round(arr, 11)
-    else:
-        return arr * 255
 
 def calculate_output_size(input_size, kernel_size, options):
     non_strided_size = input_size + options.padding_total - options.dilation * (kernel_size - 1) - 1

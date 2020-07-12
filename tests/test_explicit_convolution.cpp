@@ -41,9 +41,21 @@ TYPE_TO_STRING(std::pair<double, double>);
 #define EXPECTED_UNPADDED_RESULT                     \
     8.7f, 12.7f, 16.7f, 20.7f, 24.7f, 28.7f, 32.7f
 
-#define ZERO_KERNEL {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}
-#define EDGE_KERNEL {{-1.0f, -1.0f, -1.0f}, {-1.0f,  9.0f, -1.0f}, {-1.0f, -1.0f, -1.0f}}
-#define IDENTITY_KERNEL {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}
+#define ZERO_KERNEL {     \
+    {0.0f, 0.0f, 0.0f},   \
+    {0.0f, 0.0f, 0.0f},   \
+    {0.0f, 0.0f, 0.0f}    \
+}
+#define EDGE_KERNEL {        \
+    {-1.0f, -1.0f, -1.0f},   \
+    {-1.0f,  8.0f, -1.0f},   \
+    {-1.0f, -1.0f, -1.0f}    \
+}
+#define IDENTITY_KERNEL {   \
+    {0.0f, 0.0f, 0.0f},     \
+    {0.0f, 1.0f, 0.0f},     \
+    {0.0f, 0.0f, 0.0f}      \
+ }
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ define - end                                                                                                     ║
@@ -56,10 +68,8 @@ TYPE_TO_STRING(std::pair<double, double>);
 
 constexpr double FLOAT_EPSILON = std::numeric_limits<float>::epsilon();
 
-constexpr auto TEST_IMAGE_PBM = "./resources/tests/Piercing-The-Ocean.pbm";
 constexpr auto TEST_IMAGE_PGM = "./resources/tests/Piercing-The-Ocean.pgm";
 constexpr auto TEST_IMAGE_PPM = "./resources/tests/Piercing-The-Ocean.ppm";
-constexpr auto TEST_IMAGE_PNG = "./resources/tests/Piercing-The-Ocean.png";
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ constexpr - end                                                                                                  ║
@@ -194,128 +204,6 @@ void checkConvolution2DWithImage(
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ utility - end                                                                                                    ║
-// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-
-
-// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-// ║ Test getBorderIndex - begin                                                                                      ║
-// ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-
-// FIXME Test macros!
-// TEST_CASE("Test getBorderIndex") {
-//     constexpr int size = 5;
-
-//     SUBCASE("Begin") {
-//         constexpr bool isBegin = true;
-
-//         SUBCASE("BorderTreatment::constant(0)") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 0, size), 0);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), -1, size), -1);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), -2, size), -1);
-//         }
-
-//         SUBCASE("BorderTreatment::constant(2)") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 0, size), 0);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), -1, size), -1);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), -2, size), -1);
-//         }
-
-//         SUBCASE("BorderTreatment::asymmetricReflect()") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 0, size), 0);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), -1, size), 1);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), -2, size), 2);
-//         }
-
-//         SUBCASE("BorderTreatment::avoid()") {
-//            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), 0, size), 0);
-//            CHECK_THROWS_WITH_AS(
-//                xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), -1, size),
-//                "getBorderIndex(): Border treatment AVOID should not be used here!",
-//                std::domain_error
-//            );
-//            CHECK_THROWS_WITH_AS(
-//                xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), -2, size),
-//                "getBorderIndex(): Border treatment AVOID should not be used here!",
-//                std::domain_error
-//            );
-//         }
-
-//         SUBCASE("BorderTreatment::repeat()") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 0, size), 0);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), -1, size), 0);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), -2, size), 0);
-//         }  
-
-//         SUBCASE("BorderTreatment::symmetricReflect()") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 0, size), 0);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), -1, size), 0);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), -2, size), 1);
-//         }
-
-//         SUBCASE("BorderTreatment::wrap()") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 0, size), 0);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), -1, size), 4);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), -2, size), 3);
-//         }
-//     }
-
-//     SUBCASE("End") {
-//         constexpr bool isBegin = false;
-
-//         SUBCASE("BorderTreatment::constant(0)") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 4, size), 4);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 5, size), -1);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(0), 6, size), -1);
-//         }
-
-//         SUBCASE("BorderTreatment::constant(2)") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 4, size), 4);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 5, size), -1);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::constant(2), 6, size), -1);
-//         }
-
-//         SUBCASE("BorderTreatment::asymmetricReflect()") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 4, size), 4);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 5, size), 3);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::asymmetricReflect(), 6, size), 2);
-//         }
-
-//         SUBCASE("BorderTreatment::avoid()") {
-//            CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), 4, size), 4);
-//            CHECK_THROWS_WITH_AS(
-//                xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), 5, size),
-//                "getBorderIndex(): Border treatment AVOID should not be used here!",
-//                std::domain_error
-//            );
-//            CHECK_THROWS_WITH_AS(
-//                xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::avoid(), 6, size),
-//                "getBorderIndex(): Border treatment AVOID should not be used here!",
-//                std::domain_error
-//            );
-//         }
-
-//         SUBCASE("BorderTreatment::repeat()") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 4, size), 4);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 5, size), 4);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::repeat(), 6, size), 4);
-//         }  
-
-//         SUBCASE("BorderTreatment::symmetricReflect()") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 4, size), 4);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 5, size), 4);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::symmetricReflect(), 6, size), 3);
-//         }
-
-//         SUBCASE("BorderTreatment::wrap()") {
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 4, size), 4);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 5, size), 0);
-//             CHECK_EQ(xvigra::getBorderIndex<isBegin>(xvigra::BorderTreatment::wrap(), 6, size), 1);
-//         }
-//     }
-// }
-
-// ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-// ║ Test getBorderIndex - end                                                                                        ║
 // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 
@@ -1053,7 +941,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1068,7 +956,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1083,7 +971,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/AVOID/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-1x1/AVOID/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1098,7 +986,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/AVOID/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-1x1/AVOID/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1113,7 +1001,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/CONSTANT_0/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-1x1/CONSTANT_0/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1128,7 +1016,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/CONSTANT_0/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-1x1/CONSTANT_0/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1143,7 +1031,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/CONSTANT_2/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-1x1/CONSTANT_2/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1158,7 +1046,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/CONSTANT_2/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-1x1/CONSTANT_2/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1173,7 +1061,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/REPEAT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-1x1/REPEAT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1188,7 +1076,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/REPEAT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-1x1/REPEAT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1203,7 +1091,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1218,7 +1106,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1233,7 +1121,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/WRAP/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-1x1/WRAP/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1248,7 +1136,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-1x1/WRAP/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-1x1/WRAP/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1269,7 +1157,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-1x1-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1284,7 +1172,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-1x1-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1299,7 +1187,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/AVOID/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-1x1-1x1/AVOID/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1314,7 +1202,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/AVOID/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-1x1-1x1/AVOID/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1329,7 +1217,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/CONSTANT_0/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-1x1-1x1/CONSTANT_0/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1344,7 +1232,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/CONSTANT_0/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-1x1-1x1/CONSTANT_0/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1359,7 +1247,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/CONSTANT_2/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-1x1-1x1/CONSTANT_2/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1374,7 +1262,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/CONSTANT_2/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-1x1-1x1/CONSTANT_2/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1389,7 +1277,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/REPEAT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-1x1-1x1/REPEAT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1404,7 +1292,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/REPEAT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-1x1-1x1/REPEAT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1419,7 +1307,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-1x1-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1434,7 +1322,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-1x1-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1449,7 +1337,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/WRAP/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-1x1-1x1/WRAP/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1464,7 +1352,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-1x1-1x1/WRAP/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-1x1-1x1/WRAP/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1485,7 +1373,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-4x5-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1500,7 +1388,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-4x5-1x1/ASYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1515,7 +1403,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/AVOID/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-4x5-1x1/AVOID/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1530,7 +1418,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/AVOID/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-4x5-1x1/AVOID/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1545,7 +1433,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/CONSTANT_0/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-4x5-1x1/CONSTANT_0/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1560,7 +1448,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/CONSTANT_0/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-4x5-1x1/CONSTANT_0/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1575,7 +1463,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/CONSTANT_2/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-4x5-1x1/CONSTANT_2/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1590,7 +1478,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/CONSTANT_2/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-4x5-1x1/CONSTANT_2/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1605,7 +1493,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/REPEAT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-4x5-1x1/REPEAT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1620,7 +1508,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/REPEAT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-4x5-1x1/REPEAT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1635,7 +1523,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-4x5-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1650,7 +1538,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-4x5-1x1/SYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1665,7 +1553,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/WRAP/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-4x5-1x1/WRAP/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1680,7 +1568,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-4x5-1x1/WRAP/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-4x5-1x1/WRAP/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1701,7 +1589,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/ASYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-2x3/ASYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1716,7 +1604,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/ASYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-2x3/ASYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1731,7 +1619,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/AVOID/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-2x3/AVOID/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1746,7 +1634,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/AVOID/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-2x3/AVOID/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1761,7 +1649,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/CONSTANT_0/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-2x3/CONSTANT_0/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1776,7 +1664,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/CONSTANT_0/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-2x3/CONSTANT_0/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1791,7 +1679,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/CONSTANT_2/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-2x3/CONSTANT_2/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1806,7 +1694,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/CONSTANT_2/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-2x3/CONSTANT_2/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1821,7 +1709,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/REPEAT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-2x3/REPEAT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1836,7 +1724,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/REPEAT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-2x3/REPEAT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1851,7 +1739,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/SYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-2x3/SYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1866,7 +1754,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/SYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-2x3/SYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1881,7 +1769,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/WRAP/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/0x0-1x1-2x3/WRAP/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1896,7 +1784,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/0x0-1x1-2x3/WRAP/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/0x0-1x1-2x3/WRAP/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1917,7 +1805,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/ASYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-4x5-2x3/ASYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1932,7 +1820,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/ASYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-4x5-2x3/ASYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1947,7 +1835,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/AVOID/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-4x5-2x3/AVOID/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1962,7 +1850,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/AVOID/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-4x5-2x3/AVOID/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -1977,7 +1865,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/CONSTANT_0/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-4x5-2x3/CONSTANT_0/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -1992,7 +1880,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/CONSTANT_0/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-4x5-2x3/CONSTANT_0/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -2007,7 +1895,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/CONSTANT_2/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-4x5-2x3/CONSTANT_2/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -2022,7 +1910,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/CONSTANT_2/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-4x5-2x3/CONSTANT_2/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -2037,7 +1925,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/REPEAT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-4x5-2x3/REPEAT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -2052,7 +1940,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/REPEAT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-4x5-2x3/REPEAT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -2067,7 +1955,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/SYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-4x5-2x3/SYMMETRIC_REFLECT/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -2082,7 +1970,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/SYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-4x5-2x3/SYMMETRIC_REFLECT/Piercing-The-Ocean.ppm"
                 );
             }
         }
@@ -2097,7 +1985,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PGM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/WRAP/Piercing-The-Ocean.pgm"
+                    "./resources/tests/cc/3x2-4x5-2x3/WRAP/Piercing-The-Ocean.pgm"
                 );
             }
 
@@ -2112,7 +2000,7 @@ TEST_CASE_TEMPLATE("Convolve2D: Test With Images", T, FLOATING_TYPE_PAIRS) {
                     TEST_IMAGE_PPM,
                     kernel,
                     options, 
-                    "./resources/tests/3x2-4x5-2x3/WRAP/Piercing-The-Ocean.ppm"
+                    "./resources/tests/cc/3x2-4x5-2x3/WRAP/Piercing-The-Ocean.ppm"
                 );
             }
         }

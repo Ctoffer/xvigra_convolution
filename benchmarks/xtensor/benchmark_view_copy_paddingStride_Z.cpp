@@ -38,7 +38,7 @@
     ->Unit(benchmark::kMillisecond)
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_paddingStride_Z_assign(benchmark::State& state) {
+void benchmark_view_copy_paddingStride_Z_assign(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
@@ -61,7 +61,7 @@ void benchmark_xstrided_view_copy_paddingStride_Z_assign(benchmark::State& state
 }
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_paddingStride_Z_iterator(benchmark::State& state) {
+void benchmark_view_copy_paddingStride_Z_iterator(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
@@ -84,7 +84,7 @@ void benchmark_xstrided_view_copy_paddingStride_Z_iterator(benchmark::State& sta
 }
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_paddingStride_Z_rawAgainstCache(benchmark::State& state) {
+void benchmark_view_copy_paddingStride_Z_rawAgainstCache(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
@@ -114,7 +114,7 @@ void benchmark_xstrided_view_copy_paddingStride_Z_rawAgainstCache(benchmark::Sta
 }
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_paddingStride_Z_rawCacheAligned(benchmark::State& state) {
+void benchmark_view_copy_paddingStride_Z_rawCacheAligned(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
@@ -143,9 +143,9 @@ void benchmark_xstrided_view_copy_paddingStride_Z_rawCacheAligned(benchmark::Sta
     }
 }
 
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_paddingStride_Z_assign);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_paddingStride_Z_iterator);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_paddingStride_Z_rawAgainstCache);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_paddingStride_Z_rawCacheAligned);
+BENCHMARK_SINGLE_VERSION(benchmark_view_copy_paddingStride_Z_assign);
+BENCHMARK_SINGLE_VERSION(benchmark_view_copy_paddingStride_Z_iterator);
+BENCHMARK_SINGLE_VERSION(benchmark_view_copy_paddingStride_Z_rawAgainstCache);
+BENCHMARK_SINGLE_VERSION(benchmark_view_copy_paddingStride_Z_rawCacheAligned);
 
 BENCHMARK_MAIN();

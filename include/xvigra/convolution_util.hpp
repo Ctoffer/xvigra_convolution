@@ -400,15 +400,14 @@ namespace xvigra {
     xt::xtensor<T, 3> normalizeAfterConvolution(
         const xt::xtensor<T, 3>& originalTensor
     ) {
-        xt::xtensor<T, 3> arr(originalTensor);
-        arr -= xt::amin(arr)[0];
-        arr /= xt::amax(arr)[0];
-
+        xt::xtensor<T, 3> result = originalTensor;
         if constexpr (std::is_floating_point_v<T>) {
-            return xvigra::roundExpression(arr, 11);
+            result = xt::clip(result, 0.0, 1.0);
+            result = xvigra::roundExpression(result, 11);
         } else {
-           return arr * 255;
+            result = xt::clip(result, 0, 255);
         }
+        return result;
     }
 
     inline int calculateOutputSize(
