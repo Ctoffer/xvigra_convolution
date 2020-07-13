@@ -1,0 +1,2 @@
+{'Ok': '100.00 %', 'Error': ' 0.00 %', 'Not possible': ' 0.00 %'}
+Total number of tests: 98220

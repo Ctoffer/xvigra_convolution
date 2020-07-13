@@ -107,7 +107,7 @@ def check_convolution1D():
         sleep(1)
         number_of_combinations = np.prod([len(_) for _ in parameters])
 
-        for params in tqdm(product(*parameters), ncols=100, total=number_of_combinations):
+        for params in tqdm(product(*parameters), ncols=100, total=number_of_combinations, mininterval=5):
             input_channels, input_width = params[0:2]
             kernel_width = params[2]
             padding, dilation, stride = params[3:6]
@@ -139,6 +139,7 @@ def print_results(logfile):
             counters[line.split(":")[-1].strip()] += 1
 
     total = sum([v for v in counters.values()])
+    makedirs(dirname(summary_path), exist_ok=True)
     with open(summary_path, "w", encoding='utf-8') as file:
         print({k: f"{100 * v / total:5.2f} %" for k, v in counters.items()})
         print(f"Total number of tests: {total}")
@@ -258,7 +259,7 @@ def check_convolution2D():
         sleep(1)
         number_of_combinations = np.prod([len(_) for _ in parameters])
 
-        for params in tqdm(product(*parameters), ncols=100, total=number_of_combinations):
+        for params in tqdm(product(*parameters), ncols=100, total=number_of_combinations, mininterval=5):
             input_channels, input_height, input_width = params[0:3]
             kernel_height, kernel_width = params[3:5]
             padding_y, padding_x = params[5:7]
