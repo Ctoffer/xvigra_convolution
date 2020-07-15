@@ -124,7 +124,10 @@ void benchmark_separableConvolve2D_inputSize_channelLast(benchmark::State& state
 		kernelY = xt::random::randint<ElementType>(kernelShapeY);
 		kernelX = xt::random::randint<ElementType>(kernelShapeX);
 	}
-	
+
+	auto kernels = std::array{kernelY, kernelX};
+	auto options = std::array{options2D.optionsY, options2D.optionsX};
+
 	for (auto _ : state) {
 		 auto result = xvigra::separableConvolve2D(
 		 	input, 
@@ -393,14 +396,15 @@ void benchmark_convolve2D_inputSize_channelFirst(benchmark::State& state) {
 		kernel = xt::random::randint<ElementType>(kernelShape);
 	}
 
-	auto kernels = std::array{kernelY, kernelX};
-	auto options = std::array{options2D.optionsY, options2D.optionsX};
+	auto optionsY = options2D.optionsY;
+	auto optionsX = options2D.optionsX;
 
 	for (auto _ : state) {
 		 auto result = xvigra::convolve2D(
 		 	input, 
 		 	kernel, 
-		 	options2D
+		 	optionsY,
+		 	optionsX
 		 );
 		 benchmark::DoNotOptimize(result.data());
 	}
@@ -439,14 +443,15 @@ void benchmark_convolve2D_inputSize_channelLast(benchmark::State& state) {
 		kernel = xt::random::randint<ElementType>(kernelShape);
 	}
 
-	auto kernels = std::array{kernelY, kernelX};
-	auto options = std::array{options2D.optionsY, options2D.optionsX};
+	auto optionsY = options2D.optionsY;
+	auto optionsX = options2D.optionsX;
 
 	for (auto _ : state) {
 		 auto result = xvigra::convolve2D(
 		 	input, 
-		 	kernel, 
-		 	options2D
+		 	kernel,
+		 	optionsY,
+		 	optionsX
 		 );
 		 benchmark::DoNotOptimize(result.data());
 	}
