@@ -16,7 +16,7 @@
 
 #define INPUT_SIZE_MIN 50
 #define INPUT_SIZE_MAX 2000
-#define INPUT_SIZE_STEP 50
+#define INPUT_SIZE_STEP 195
 
 
 #define BENCHMARK_SINGLE_VERSION(name)                                        \
@@ -141,9 +141,12 @@ void benchmark_separableConvolveND_1D_inputSize_channelFirst(benchmark::State& s
 		input = xt::random::randint<ElementType>(inputShape);
 		kernel = xt::random::randint<ElementType>(kernelShape);
 	}
+
+	auto kernelArray = std::array{kernel};
+	auto optionsArray = std::array{options};
 	
 	for (auto _ : state) {
-		 auto result = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
+		 auto result = xvigra::separableConvolveND<1>(input, kernelArray, optionsArray);
 		 benchmark::DoNotOptimize(result.data());
 	}
 }
@@ -175,9 +178,12 @@ void benchmark_separableConvolveND_1D_inputSize_channelLast(benchmark::State& st
 		input = xt::random::randint<ElementType>(inputShape);
 		kernel = xt::random::randint<ElementType>(kernelShape);
 	}
+
+	auto kernelArray = std::array{kernel};
+	auto optionsArray = std::array{options};
 	
 	for (auto _ : state) {
-		 auto result = xvigra::separableConvolveND<1>(input, std::array{kernel}, std::array{options});
+		 auto result = xvigra::separableConvolveND<1>(input, kernelArray, optionsArray);
 		 benchmark::DoNotOptimize(result.data());
 	}
 }
@@ -216,9 +222,12 @@ void benchmark_separableConvolve_1D_inputSize_channelFirst(benchmark::State& sta
 		input = xt::random::randint<ElementType>(inputShape);
 		kernel = xt::random::randint<ElementType>(kernelShape);
 	}
+
+	auto kernelArray = std::array{kernel};
+	auto optionsArray = std::array{options};
 	
 	for (auto _ : state) {
-		 auto result = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+		 auto result = xvigra::separableConvolve<1>(input, kernelArray, optionsArray);
 		 benchmark::DoNotOptimize(result.data());
 	}
 }
@@ -250,9 +259,12 @@ void benchmark_separableConvolve_1D_inputSize_channelLast(benchmark::State& stat
 		input = xt::random::randint<ElementType>(inputShape);
 		kernel = xt::random::randint<ElementType>(kernelShape);
 	}
+
+	auto kernelArray = std::array{kernel};
+	auto optionsArray = std::array{options};
 	
 	for (auto _ : state) {
-		 auto result = xvigra::separableConvolve<1>(input, std::array{kernel}, std::array{options});
+		 auto result = xvigra::separableConvolve<1>(input, kernelArray, optionsArray);
 		 benchmark::DoNotOptimize(result.data());
 	}
 }

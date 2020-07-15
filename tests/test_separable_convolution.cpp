@@ -368,7 +368,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve1D: Test Invalid Configurations", T, TYPE_P
 
         CHECK_THROWS_WITH_AS(
             function(),
-            "separableConvolve1D(): Need 2 dimensional (W x C) input!",
+            "separableConvolve1D(): Need 2 dimensional (W x C or C x W) input!",
             std::invalid_argument
         );
     }
@@ -383,7 +383,7 @@ TEST_CASE_TEMPLATE("SeparableConvolve1D: Test Invalid Configurations", T, TYPE_P
 
         CHECK_THROWS_WITH_AS(
             function(),
-            "separableConvolve1D(): Need 2 dimensional (W x C) input!",
+            "separableConvolve1D(): Need 2 dimensional (W x C or C x W) input!",
             std::invalid_argument
         );
     }
