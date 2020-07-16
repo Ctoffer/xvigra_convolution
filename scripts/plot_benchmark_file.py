@@ -172,7 +172,7 @@ def plot_data(graph_config, x_data, y_values, specialization, group_id, variant,
     line_style = getattr(graph_config.line_style.entries, line_style_key)
     line_color = getattr(graph_config.line_color.entries, line_color_key)
 
-    plot_kwargs = {'label': label, 'linestyle': line_style, 'color': line_color}
+    plot_kwargs = {'label': label, 'linestyle': line_style, 'color': line_color, 'marker': 'x'}
 
     if mode == ('normal', 'normal'):
         plot_function = plt.plot

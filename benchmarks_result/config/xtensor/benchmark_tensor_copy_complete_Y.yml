@@ -1,0 +1,56 @@
+data:
+  key: '{group_name}_{variant}<{specialization}>/{x}_{aggregate}'
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_tensor_copy_complete_Y
+
+  variants:
+    - againstCache
+    - cacheAligned
+    - rawAgainstCache
+    - rawCacheAligned
+
+  aggregates: ['min']
+  specializations: ['float']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 1100
+      step: 100
+    values: []
+
+graph:
+  title: ""
+
+  x_axis:
+    label: Size S
+    mode: normal
+
+  y_axis:
+    label: Minimum Time (ms)
+    mode: normal
+
+  legend:
+    key: '{variant}'
+    entries:
+      againstCache: tensor to tensor, against cache
+      cacheAligned: tensor to tensor, cache aligned
+      rawAgainstCache: raw to raw, against cache
+      rawCacheAligned: raw to raw, cache aligned
+
+  line_style:
+    key: '{group_id}'
+    entries:
+      group_1: "-"
+
+  line_color:
+    key: '{variant}'
+    entries:
+      againstCache: "#9a0707"
+      cacheAligned: "#f26161"
+      rawAgainstCache: "#0200b9"
+      rawCacheAligned: "#007dff"
+

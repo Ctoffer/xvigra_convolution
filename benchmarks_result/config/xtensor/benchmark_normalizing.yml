@@ -11,7 +11,7 @@ data:
     - amax_unpacked
 
   aggregates: ['min']
-  specializations: ['float']
+  specializations: ['xt::xarray<float>', 'xt::xtensor<float, 3>']
   x:
     type: np.arange
     attrs:
@@ -32,10 +32,12 @@ graph:
     mode: log
 
   legend:
-    key: '{variant}'
+    key: '{specialization}_{variant}'
     entries:
-      amax: input / amax(input)
-      amax_unpacked: input / amax(input)[0]
+      xt::xarray<float>_amax: xarray, input / amax(input)
+      xt::xarray<float>_amax_unpacked: xarray, input / amax(input)[0]
+      xt::xtensor<float, 3>_amax: xtensor, input / amax(input)
+      xt::xtensor<float, 3>_amax_unpacked: xtensor, input / amax(input)[0]
 
   line_style:
     key: '{variant}'
@@ -44,8 +46,10 @@ graph:
       amax_unpacked: "-"
 
   line_color:
-    key: '{variant}'
+    key: '{specialization}_{variant}'
     entries:
-      amax: "#55868C"
-      amax_unpacked: "#EEC584"
+      xt::xarray<float>_amax: "#ea0909"
+      xt::xarray<float>_amax_unpacked: "#9a0707"
+      xt::xtensor<float, 3>_amax: "#8fa4c3"
+      xt::xtensor<float, 3>_amax_unpacked: "#283347"
 

@@ -2,7 +2,7 @@
 
 #include "raw/array_view_3d.hpp"
 #include "xtensor/xtensor.hpp"
-#include "xtensor/xstrided_view.hpp"
+#include "xtensor/xview.hpp"
 
 #define INPUT_SIZE_MIN 50
 #define INPUT_SIZE_MAX 1100
@@ -38,107 +38,55 @@
     ->Unit(benchmark::kMillisecond)
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_complete_X_assign(benchmark::State& state) {
+void benchmark_tensor_copy_complete_X_againstCache(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
     xt::xtensor<ElementType, 2> res = xt::ones<ElementType>({outputY, outputX});
+
     int i = 0;
     for(auto& elem: data) {
         elem = i++;
     }
 
     int x = inputX / 2;
-    auto view = xt::strided_view(data, {xt::all(), xt::all(), x});
 
     for (auto _ : state) {
-        res = view;
-        benchmark::DoNotOptimize(res.data());
-    }
-}
-
-template <typename ElementType>
-void benchmark_xstrided_view_copy_complete_X_iterator(benchmark::State& state) {
-    SETUP_VARIABLES
-
-    xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
-    xt::xtensor<ElementType, 2> res = xt::ones<ElementType>({outputY, outputX});
-    int i = 0;
-    for(auto& elem: data) {
-        elem = i++;
-    }
-
-    int x = inputX / 2;
-    auto view = xt::strided_view(data, {xt::all(), xt::all(), x});
-
-    for (auto _ : state) {
-        std::copy(view.begin(), view.end(), res.begin());
-        benchmark::DoNotOptimize(res.data());
-    }
-}
-
-template <typename ElementType>
-void benchmark_xstrided_view_copy_complete_X_operatorCallAgainstCache(benchmark::State& state) {
-    SETUP_VARIABLES
-
-    xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
-    xt::xtensor<ElementType, 2> res = xt::ones<ElementType>({outputY, outputX});
-    int i = 0;
-    for(auto& elem: data) {
-        elem = i++;
-    }
-
-    int x = inputX / 2;
-    auto view = xt::strided_view(data, {xt::all(), xt::all(), x});
-
-    for (auto _ : state) {
-        std::copy(view.begin(), view.end(), res.begin());
-        benchmark::DoNotOptimize(res.data());
-    }
-
-     for (auto _ : state) {
         for(int y = 0; y < outputX; ++y) {
             for(int z = 0; z < outputY; ++z) {
-                view(z, y) = data(z, y, x);
+                res(z, y) = data(z, y, x);
             }
         }
-
         benchmark::DoNotOptimize(res.data());
     }
 }
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_complete_X_operatorCallCacheAligned(benchmark::State& state) {
+void benchmark_tensor_copy_complete_X_cacheAligned(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
     xt::xtensor<ElementType, 2> res = xt::ones<ElementType>({outputY, outputX});
+
     int i = 0;
     for(auto& elem: data) {
         elem = i++;
     }
 
     int x = inputX / 2;
-    auto view = xt::strided_view(data, {xt::all(), xt::all(), x});
 
     for (auto _ : state) {
-        std::copy(view.begin(), view.end(), res.begin());
-        benchmark::DoNotOptimize(res.data());
-    }
-
-     for (auto _ : state) {
-         for(int z = 0; z < outputY; ++z) {
+        for(int z = 0; z < outputY; ++z) {
             for(int y = 0; y < outputX; ++y) {
-                view(z, y) = data(z, y, x);
+                res(z, y) = data(z, y, x);
             }
         }
-
         benchmark::DoNotOptimize(res.data());
     }
 }
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_complete_X_rawAgainstCache(benchmark::State& state) {
+void benchmark_tensor_copy_complete_X_rawAgainstCache(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
@@ -168,7 +116,7 @@ void benchmark_xstrided_view_copy_complete_X_rawAgainstCache(benchmark::State& s
 }
 
 template <typename ElementType>
-void benchmark_xstrided_view_copy_complete_X_rawCacheAligned(benchmark::State& state) {
+void benchmark_tensor_copy_complete_X_rawCacheAligned(benchmark::State& state) {
     SETUP_VARIABLES
 
     xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
@@ -197,11 +145,9 @@ void benchmark_xstrided_view_copy_complete_X_rawCacheAligned(benchmark::State& s
     }
 }
 
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_complete_X_assign);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_complete_X_iterator);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_complete_X_operatorCallAgainstCache);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_complete_X_operatorCallCacheAligned);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_complete_X_rawAgainstCache);
-BENCHMARK_SINGLE_VERSION(benchmark_xstrided_view_copy_complete_X_rawCacheAligned);
+BENCHMARK_SINGLE_VERSION(benchmark_tensor_copy_complete_X_againstCache);
+BENCHMARK_SINGLE_VERSION(benchmark_tensor_copy_complete_X_cacheAligned);
+BENCHMARK_SINGLE_VERSION(benchmark_tensor_copy_complete_X_rawAgainstCache);
+BENCHMARK_SINGLE_VERSION(benchmark_tensor_copy_complete_X_rawCacheAligned);
 
 BENCHMARK_MAIN();
