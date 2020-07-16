@@ -16,7 +16,7 @@
 
 #define INPUT_SIZE_MIN 1
 #define INPUT_SIZE_MAX 21
-#define INPUT_SIZE_STEP 3
+#define INPUT_SIZE_STEP 1
 
 
 #define BENCHMARK_SINGLE_VERSION(name)                                        \

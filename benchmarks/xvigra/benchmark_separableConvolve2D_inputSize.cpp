@@ -16,7 +16,7 @@
 
 #define INPUT_SIZE_MIN 50
 #define INPUT_SIZE_MAX 2000
-#define INPUT_SIZE_STEP 195
+#define INPUT_SIZE_STEP 50
 
 
 #define BENCHMARK_SINGLE_VERSION(name)                                        \
@@ -189,8 +189,8 @@ void benchmark_separableConvolveND_2D_inputSize_channelFirst(benchmark::State& s
 	for (auto _ : state) {
 		 auto result = xvigra::separableConvolveND<2>(
 		 	input, 
-		 	std::array{kernelY, kernelX}, 
-		 	std::array{options2D.optionsY, options2D.optionsX}
+		 	kernels,
+		 	options
 		 );
 		 benchmark::DoNotOptimize(result.data());
 	}
@@ -239,8 +239,8 @@ void benchmark_separableConvolveND_2D_inputSize_channelLast(benchmark::State& st
 	for (auto _ : state) {
 		 auto result = xvigra::separableConvolveND<2>(
 		 	input, 
-		 	std::array{kernelY, kernelX}, 
-		 	std::array{options2D.optionsY, options2D.optionsX}
+		 	kernels,
+		 	options
 		 );
 		 benchmark::DoNotOptimize(result.data());
 	}
@@ -297,8 +297,8 @@ void benchmark_separableConvolve_2D_inputSize_channelFirst(benchmark::State& sta
 	for (auto _ : state) {
 		 auto result = xvigra::separableConvolve<2>(
 		 	input, 
-		 	std::array{kernelY, kernelX}, 
-		 	std::array{options2D.optionsY, options2D.optionsX}
+		 	kernels,
+		 	options
 		 );
 		 benchmark::DoNotOptimize(result.data());
 	}
@@ -347,8 +347,8 @@ void benchmark_separableConvolve_2D_inputSize_channelLast(benchmark::State& stat
 	for (auto _ : state) {
 		 auto result = xvigra::separableConvolve<2>(
 		 	input, 
-		 	std::array{kernelY, kernelX}, 
-		 	std::array{options2D.optionsY, options2D.optionsX}
+		 	kernels,
+		 	options
 		 );
 		 benchmark::DoNotOptimize(result.data());
 	}
