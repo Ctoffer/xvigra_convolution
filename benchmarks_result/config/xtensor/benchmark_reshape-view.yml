@@ -1,0 +1,60 @@
+data:
+  key: '{group_name}_{variant}<{specialization}>/{x}_{aggregate}'
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_reshape
+
+  variants:
+    - complete
+    - complete_operatorCallAgainstCache
+    - complete_operatorCallCacheAligned
+
+  aggregates: ['min']
+  specializations: ['xt::xarray<float>, xt::xarray<float>', 'xt::xtensor<float, 2>, xt::xtensor<float, 4>']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 1100
+      step: 100
+    values: []
+
+graph:
+  title: ""
+
+  x_axis:
+    label: Size S
+    mode: normal
+
+  y_axis:
+    label: Minimum Time (ms)
+    mode: normal
+
+  legend:
+    key: '{specialization}_{variant}'
+    entries:
+      xt::xarray<float>, xt::xarray<float>_complete: xt::xarray & assign
+      xt::xarray<float>, xt::xarray<float>_complete_operatorCallAgainstCache: xt::xarray & operator() against cache
+      xt::xarray<float>, xt::xarray<float>_complete_operatorCallCacheAligned: xt::xarray & operator() cache aligned
+      xt::xtensor<float, 2>, xt::xtensor<float, 4>_complete: xt::xtensor & assign
+      xt::xtensor<float, 2>, xt::xtensor<float, 4>_complete_operatorCallAgainstCache: xt::xtensor & operator() against cache
+      xt::xtensor<float, 2>, xt::xtensor<float, 4>_complete_operatorCallCacheAligned: xt::xtensor & operator() cache aligned
+
+  line_style:
+    key: '{variant}'
+    entries:
+      complete: "-"
+      complete_operatorCallAgainstCache: ":"
+      complete_operatorCallCacheAligned: "--"
+
+  line_color:
+    key: '{specialization}_{variant}'
+    entries:
+      xt::xarray<float>, xt::xarray<float>_complete: "#9a0707"
+      xt::xarray<float>, xt::xarray<float>_complete_operatorCallAgainstCache: "#ea0909"
+      xt::xarray<float>, xt::xarray<float>_complete_operatorCallCacheAligned: "#f26161"
+      xt::xtensor<float, 2>, xt::xtensor<float, 4>_complete: "#1000ff"
+      xt::xtensor<float, 2>, xt::xtensor<float, 4>_complete_operatorCallAgainstCache: "#007dff"
+      xt::xtensor<float, 2>, xt::xtensor<float, 4>_complete_operatorCallCacheAligned: "#00bbd1"

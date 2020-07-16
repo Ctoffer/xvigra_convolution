@@ -1,6 +1,7 @@
 set (TARGETS
     benchmark_normalizing
     benchmark_transpose-view
+    benchmark_reshape-view
     benchmark_tensor_copy_complete_X
     benchmark_tensor_copy_complete_Y
     benchmark_tensor_copy_complete_Z

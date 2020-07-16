@@ -60,9 +60,10 @@ def main():
         "xtensor": (
             #"benchmark_normalizing",
             #"benchmark_transpose-view",
-            "benchmark_tensor_copy_complete_X",
-            "benchmark_tensor_copy_complete_Y",
-            "benchmark_tensor_copy_complete_Z",
+            "benchmark_reshape-view",
+            #"benchmark_tensor_copy_complete_X",
+            #"benchmark_tensor_copy_complete_Y",
+            #"benchmark_tensor_copy_complete_Z",
             #"benchmark_strided-view_copy_complete_X",
             #"benchmark_strided-view_copy_complete_Y",
             #"benchmark_strided-view_copy_complete_Z",
