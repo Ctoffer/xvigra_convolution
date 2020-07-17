@@ -1,10 +1,8 @@
-import platform
 import os.path
+import platform
 import subprocess
-import sys
 
 from util import TimeMeasure, string_framed_line
-from plot_benchmark import main as plot
 
 
 def build_all():
@@ -107,12 +105,6 @@ def main():
         for file_name in benchmark_files:
             with TimeMeasure(f"{'─' * 100}\nRunning {file_name}:", f"Total time: {{}}\n{'─' * 100}\n"):
                 call_benchmark(file_name, benchmark_parameters[folder_name], folder=folder_name)
-            print("\nPlotting...")
-            try:
-                plot(file_name, os_name=platform.system(), folder=folder_name)
-                print("Finished plot\n")
-            except BaseException as e:
-                print("Failed plot", e)
 
 
 if __name__ == "__main__":
