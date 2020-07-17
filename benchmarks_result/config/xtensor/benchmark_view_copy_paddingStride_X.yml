@@ -45,18 +45,18 @@ graph:
       rawAgainstCache: raw data copy against cache
       rawCacheAligned: raw data copy cache aligned
 
-    line_style:
-      key: '{group_id}'
-      entries:
-        group_1: "-"
+  line_style:
+    key: '{group_id}'
+    entries:
+      group_1: "-"
 
-    line_color:
-      key: '{variant}'
-      entries:
-        assign: "#ff0000"
-        iterator: "#ffa500"
-        operatorCallAgainstCache: "#cccc00"
-        operatorCallCacheAligned: "#008000"
-        rawAgainstCache: "#0000ff"
-        rawCacheAligned: "#4b0082"
+  line_color:
+    key: '{variant}'
+    entries:
+      assign: "#ff0000"
+      iterator: "#ffa500"
+      operatorCallAgainstCache: "#cccc00"
+      operatorCallCacheAligned: "#008000"
+      rawAgainstCache: "#0000ff"
+      rawCacheAligned: "#4b0082"
 

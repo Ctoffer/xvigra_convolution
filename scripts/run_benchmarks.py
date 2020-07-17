@@ -52,7 +52,7 @@ def main():
     benchmark_parameters = {
         "format": "console",
         "min_time": 0.25,
-        "repetitions": 2,
+        "repetitions": 10,
         "report_aggregates_only": True
     }
 
