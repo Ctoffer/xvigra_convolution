@@ -1,0 +1,51 @@
+data:
+  top_levels: ["_"]
+
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_reshape
+
+  variants:
+    - complete
+    - complete_operatorCallAgainstCache
+    - complete_operatorCallCacheAligned
+
+  aggregates: ['min']
+  specializations: ['xt::xarray<float>, xt::xarray<float>', 'xt::xtensor<float, 2>, xt::xtensor<float, 4>']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 1100
+      step: 100
+    values: []
+
+table:
+  group_headers:
+    key: '{specialization}'
+    values:
+      xt::xarray<float>, xt::xarray<float>: xt::xarray<float>, xt::xarray<float>
+      xt::xtensor<float, 2>, xt::xtensor<float, 4>: xt::xtensor<float, 2>, xt::xtensor<float, 4>
+
+  subgroup_headers:
+    key: '{variant}'
+    values:
+      complete: rv-c-a
+      complete_operatorCallAgainstCache: rv-c-cAC
+      complete_operatorCallCacheAligned: rv-c-cCA
+
+  subgroup_data:
+    values:
+      xt::xarray<float>, xt::xarray<float>:
+        file: 'benchmark_reshape-view.json'
+        key: 'benchmark_reshape_{variant}<xt::xarray<float>, xt::xarray<float>>/{x}_min'
+      xt::xtensor<float, 2>, xt::xtensor<float, 4>:
+        file: 'benchmark_reshape-view.json'
+        key: 'benchmark_reshape_{variant}<xt::xtensor<float, 2>, xt::xtensor<float, 4>>/{x}_min'
+
+  color_modes:
+    values:
+      xt::xarray<float>, xt::xarray<float>: "Reds"
+      xt::xtensor<float, 2>, xt::xtensor<float, 4>: "Blues"

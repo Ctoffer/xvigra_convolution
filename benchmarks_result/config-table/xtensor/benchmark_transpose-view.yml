@@ -1,0 +1,51 @@
+data:
+  top_levels: ["_"]
+
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_transpose
+
+  variants:
+    - complete
+    - complete_operatorCallAgainstCache
+    - complete_operatorCallCacheAligned
+
+  aggregates: ['min']
+  specializations: ['xt::xarray<float>', 'xt::xtensor<float, 2>']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 1100
+      step: 100
+    values: []
+
+table:
+  group_headers:
+    key: '{specialization}'
+    values:
+      xt::xarray<float>: xt::xarray<float>
+      xt::xtensor<float, 2>: xt::xtensor<float, 2>
+
+  subgroup_headers:
+    key: '{variant}'
+    values:
+      complete: t-c-a
+      complete_operatorCallAgainstCache: t-c-cAC
+      complete_operatorCallCacheAligned: t-c-cCA
+
+  subgroup_data:
+    values:
+      xt::xarray<float>:
+        file: 'benchmark_transpose-view.json'
+        key: 'benchmark_transpose_{variant}<xt::xarray<float>>/{x}_min'
+      xt::xtensor<float, 2>:
+        file: 'benchmark_transpose-view.json'
+        key: 'benchmark_transpose_{variant}<xt::xtensor<float, 2>>/{x}_min'
+
+  color_modes:
+    values:
+      xt::xarray<float>: "Reds"
+      xt::xtensor<float, 2>: "Blues"

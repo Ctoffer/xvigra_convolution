@@ -1,0 +1,57 @@
+data:
+  top_levels: ["channelFirst", "channelLast"]
+
+  group_ids:
+    - group_1
+    - group_2
+    - group_3
+    - group_4
+
+  group_names:
+    group_1: benchmark_separableConvolve1D_inputSize
+    group_2: benchmark_separableConvolveND_1D_inputSize
+    group_3: benchmark_separableConvolve_1D_inputSize
+    group_4: benchmark_convolve1D_inputSize
+
+  variants:
+    - channelFirst
+    - channelLast
+
+  aggregates: ['min']
+  specializations: ['float']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 2050
+      step: 50
+    values: []
+
+table:
+  group_headers:
+    key: '{variant}'
+    values:
+      channelFirst: Channel First
+      channelLast: Channel Last
+
+  subgroup_headers:
+    key: '{group_id}'
+    values:
+      group_1: sC1d-iS
+      group_2: sCNd-iS
+      group_3: sCd-iS
+      group_4: c1d-iS
+
+  subgroup_data:
+    values:
+      Channel First:
+        file: 'benchmark_separableConvolve1D_inputSize.json'
+        key: '{group_name}_channelFirst<float>/{x}_min'
+      Channel Last:
+        file: 'benchmark_separableConvolve1D_inputSize.json'
+        key: '{group_name}_channelLast<float>/{x}_min'
+
+  color_modes:
+    values:
+      Channel First: "Reds"
+      Channel Last: "Blues"

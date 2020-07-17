@@ -56,15 +56,14 @@ class FileContext:
         )
 
     def __init__(self, data_dir, config_dir, out_dir, file_name):
+        self.data_dir = data_dir
+        self.config_dir = config_dir
+        self.out_dir = out_dir
+        self.file_name = file_name
+
         self._data_file = p_join(data_dir, file_name + ".json")
         self._config_file = p_join(config_dir, file_name + ".yml")
         self._out_file = p_join(out_dir, file_name + ".svg")
-
-        if not p_exists(self._data_file):
-            raise ValueError(f"Data file '{self._data_file}' does not exist!")
-
-        if not p_exists(self._config_file):
-            raise ValueError(f"Config file '{self._config_file}' does not exist!")
 
         if not p_exists(p_dirname(self._out_file)):
             makedirs(p_dirname(self._out_file))

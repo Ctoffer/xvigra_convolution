@@ -1,0 +1,51 @@
+data:
+  top_levels: ["_"]
+
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_normalizing
+
+  variants:
+    - amax
+    - amax_unpacked
+
+  aggregates: ['min']
+  specializations: ['xt::xarray<float>', 'xt::xtensor<float, 3>']
+  x:
+    type: np.arange
+    attrs:
+      start: 1
+      stop: 50
+      step: 3
+    values: []
+
+table:
+  group_headers:
+    key: '{specialization}'
+    values:
+      xt::xarray<float>: xt::xarray<float>
+      xt::xtensor<float, 3>: xt::xtensor<float, 3>
+
+  subgroup_headers:
+    key: '{variant}'
+    values:
+      amax: amax
+      amax_unpacked: amax-u
+
+  subgroup_data:
+    values:
+      xt::xarray<float>:
+        file: 'benchmark_normalizing.json'
+        key: 'benchmark_normalizing_{variant}<xt::xarray<float>>/{x}_min'
+      xt::xtensor<float, 3>:
+        file: 'benchmark_normalizing.json'
+        key: 'benchmark_normalizing_{variant}<xt::xtensor<float, 3>>/{x}_min'
+
+  color_modes:
+    values:
+      xt::xarray<float>: "Reds"
+      xt::xtensor<float, 3>: "Blues"
+      
+    
