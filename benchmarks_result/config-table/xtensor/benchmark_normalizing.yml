@@ -21,6 +21,8 @@ data:
       step: 3
     values: []
 
+  axis_label: Size S
+
 table:
   group_headers:
     key: '{specialization}'

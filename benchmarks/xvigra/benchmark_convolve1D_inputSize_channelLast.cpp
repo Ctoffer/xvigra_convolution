@@ -25,7 +25,8 @@
     ->ComputeStatistics("max", [](const std::vector<double>& v) -> double {   \
         return *(std::max_element(std::begin(v), std::end(v)));               \
       })                                                                      \
-    ->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP)
+    ->DenseRange(INPUT_SIZE_MIN, INPUT_SIZE_MAX, INPUT_SIZE_STEP) \
+    ->Unit(benchmark::kMicrosecond)
 
 // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 // ║ define - end                                                                                                     ║

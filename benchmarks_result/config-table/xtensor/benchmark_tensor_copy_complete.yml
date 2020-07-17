@@ -23,6 +23,8 @@ data:
       step: 100
     values: []
 
+  axis_label: Size S
+
 table:
   group_headers:
     key: '{top_level}'

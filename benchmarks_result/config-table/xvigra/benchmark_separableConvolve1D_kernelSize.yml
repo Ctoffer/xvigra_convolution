@@ -27,6 +27,8 @@ data:
       step: 1
     values: []
 
+  axis_label: Kernelsize $K_{S}$
+
 table:
   group_headers:
     key: '{variant}'

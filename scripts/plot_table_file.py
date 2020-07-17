@@ -24,42 +24,54 @@ def get_color_colors_of_block(values, mode):
     return cell_colors
 
 
-def draw_double_header_table(group_headers, subgroup_headers, subgroup_data: dict, color_modes):
+def draw_double_header_table(group_headers, subgroup_headers, subgroup_data: dict, color_modes, data_config):
     row_numbers = set(map(len, subgroup_data.values()))
     if len(row_numbers) != 1:
         raise ValueError("Subgroup-data has different number of rows for different keys!")
     else:
         row_numbers = tuple(row_numbers)
-    number_of_rows = row_numbers[0] + 2
+    number_of_rows = row_numbers[0]
 
+    axis_label = data_config.axis_label
     longest_numbers = ([max(list(arr.flatten()), key=lambda x: len(str(x))) for arr in subgroup_data.values()])
     subgroup_header_length = len(max(subgroup_headers, key=len)) - max(subgroup_headers, key=len).count('-')
-    factor = max(len(str(max(map(str, longest_numbers), key=len))), subgroup_header_length) / 7
+    factor = max(len(str(max(map(str, longest_numbers), key=len))), subgroup_header_length, len(axis_label)) / 7
 
     fig_width = int(factor * len(group_headers) * len(subgroup_headers))
-    fig_height = (row_numbers[0] // 2) - 1
+    fig_height = (row_numbers[0] // 3)
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+
+    cell_width = 1 / (len(subgroup_headers) * len(group_headers) + 1)
 
     fig.patch.set_visible(False)
     ax.axis('off')
     ax.axis('tight')
 
     ax.table(
+        cellText=np.expand_dims(parse_x(data_config.x), axis=1),
+        colLabels=[axis_label],
+        bbox=[0, 0, cell_width, (row_numbers[0] - 1) / number_of_rows],
+        cellLoc='center',
+    )
+
+    ax.table(
         cellText=[[''] * len(group_headers)],
         colLabels=group_headers,
-        bbox=[0, (number_of_rows - 3) / number_of_rows, 1, 2 / number_of_rows],
+        bbox=[cell_width, (number_of_rows - 2) / number_of_rows, 1 - cell_width, 2 / number_of_rows],
         cellLoc='center',
     )
 
     for i, group in enumerate(group_headers):
-        right_shift = len(str(max(np.floor(subgroup_data[group]), key=lambda x: len(str(int(x[0]))))))
-        s = f' >{right_shift + 5}.4f'
+        longest_cell_number = max(list(np.floor(subgroup_data[group]).astype(int).flatten()), key=lambda x: len(str(x)))
+        right_shift = len(str(longest_cell_number))
+        s = f' >{right_shift + 0}.4f'
 
         ax.table(
             cellText=[[("{value:" + s + "}").format(value=value) for value in row] for row in subgroup_data[group]],
             colLabels=subgroup_headers,
             cellColours=get_color_colors_of_block(subgroup_data[group], color_modes[group]),
-            bbox=[i / len(group_headers), 0, 1 / len(group_headers), row_numbers[0] / number_of_rows],
+            bbox=[cell_width + i * cell_width * len(subgroup_headers), 0, cell_width * len(subgroup_headers),
+                  (row_numbers[0] - 1) / number_of_rows],
             cellLoc='right',
         )
 
@@ -133,10 +145,13 @@ def draw_table(data_dir, config_dir, out_dir, name):
     )
     color_modes = {key: getattr(table_config.color_modes.values, key) for key in group_headers}
 
-    figure = draw_double_header_table(group_headers, subgroup_headers, subgroup_data, color_modes)
+    figure = draw_double_header_table(group_headers, subgroup_headers, subgroup_data, color_modes, data_config)
 
     makedirs(out_dir, exist_ok=True)
     figure.savefig(p_join(out_dir, f"{name}.png"), dpi=240)
+    plt.clf()
+    plt.cla()
+    plt.close(figure)
 
 
 def main(file_context: FileContext):

@@ -4,22 +4,22 @@ from plot_table import main as table
 def main():
     benchmark_tables = {
         "xtensor": (
-        #    "benchmark_normalizing",
-        #    "benchmark_transpose-view",
-        #    "benchmark_reshape-view",
-        #    "benchmark_tensor_copy_complete",
-        #    "benchmark_strided-view_copy_complete",
-        #    "benchmark_strided-view_copy_paddingStride",
-        #    "benchmark_view_copy_complete",
-        #    "benchmark_view_copy_paddingStride",
+            "benchmark_normalizing",
+            "benchmark_transpose-view",
+            "benchmark_reshape-view",
+            "benchmark_tensor_copy_complete",
+            "benchmark_strided-view_copy_complete",
+            "benchmark_strided-view_copy_paddingStride",
+            "benchmark_view_copy_complete",
+            "benchmark_view_copy_paddingStride",
         ),
         "xvigra": (
-        #    "benchmark_convolve1D_inputSize",
-        #    "benchmark_convolve2D_inputSize",
-        #    "benchmark_separableConvolve1D_inputSize",
-        #    "benchmark_separableConvolve2D_inputSize",
-        #    "benchmark_separableConvolve1D_kernelSize",
-        #    "benchmark_separableConvolve2D_kernelSize"
+            "benchmark_convolve1D_inputSize",
+            "benchmark_convolve2D_inputSize",
+            "benchmark_separableConvolve1D_inputSize",
+            "benchmark_separableConvolve2D_inputSize",
+            "benchmark_separableConvolve1D_kernelSize",
+            "benchmark_separableConvolve2D_kernelSize"
         )
     }
 

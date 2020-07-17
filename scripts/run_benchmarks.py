@@ -7,7 +7,6 @@ from util import TimeMeasure, string_framed_line
 from plot_benchmark import main as plot
 
 
-
 def build_all():
     os_name = platform.system()
     is_windows = "Windows" == os_name
@@ -90,16 +89,16 @@ def main():
             "benchmark_view_copy_paddingStride_Y",
             "benchmark_view_copy_paddingStride_Z",
         ),
-        # "xvigra": (
-        #   "benchmark_convolve1D_inputSize_channelFirst",
-        #   "benchmark_convolve1D_inputSize_channelLast",
-        #   "benchmark_convolve2D_inputSize_channelFirst",
-        #   "benchmark_convolve2D_inputSize_channelLast",
-        #   "benchmark_separableConvolve1D_inputSize",
-        #   "benchmark_separableConvolve2D_inputSize",
-        #   "benchmark_separableConvolve1D_kernelSize",
-        #   "benchmark_separableConvolve2D_kernelSize"
-        # )
+        "xvigra": (
+            "benchmark_convolve1D_inputSize_channelFirst",
+            "benchmark_convolve1D_inputSize_channelLast",
+            #   "benchmark_convolve2D_inputSize_channelFirst",
+            #   "benchmark_convolve2D_inputSize_channelLast",
+            #   "benchmark_separableConvolve1D_inputSize",
+            #   "benchmark_separableConvolve2D_inputSize",
+            #   "benchmark_separableConvolve1D_kernelSize",
+            #   "benchmark_separableConvolve2D_kernelSize"
+        )
     }
 
     build_all()
