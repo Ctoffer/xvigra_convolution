@@ -5,8 +5,8 @@
 #include "xtensor/xview.hpp"
 
 #define INPUT_SIZE_MIN 50
-#define INPUT_SIZE_MAX 1250
-#define INPUT_SIZE_STEP 50
+#define INPUT_SIZE_MAX 1100
+#define INPUT_SIZE_STEP 100
 
 #define SETUP_VARIABLES                                                                                                   \
     int size = state.range(0);                                                                                            \
@@ -78,6 +78,56 @@ void benchmark_view_copy_complete_Z_iterator(benchmark::State& state) {
 }
 
 template <typename ElementType>
+void benchmark_view_copy_complete_Z_operatorCallAgainstCache(benchmark::State& state) {
+    SETUP_VARIABLES
+
+    xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
+    xt::xtensor<ElementType, 2> res = xt::ones<ElementType>({outputY, outputX});
+    int i = 0;
+    for(auto& elem: data) {
+        elem = i++;
+    }
+
+    int z = inputZ / 2;
+    auto view = xt::view(data, z, xt::all(), xt::all());
+
+    for (auto _ : state) {
+        for(int x = 0; x < outputX; ++x) {
+            for(int y = 0; y < outputY; ++y) {
+                res(y, x) = view(y, x);
+            }
+        }
+
+        benchmark::DoNotOptimize(res.data());
+    }
+}
+
+template <typename ElementType>
+void benchmark_view_copy_complete_Z_operatorCallCacheAligned(benchmark::State& state) {
+    SETUP_VARIABLES
+
+    xt::xtensor<ElementType, 3> data = xt::ones<ElementType>({inputZ, inputY, inputX});
+    xt::xtensor<ElementType, 2> res = xt::ones<ElementType>({outputY, outputX});
+    int i = 0;
+    for(auto& elem: data) {
+        elem = i++;
+    }
+
+    int z = inputZ / 2;
+    auto view = xt::view(data, z, xt::all(), xt::all());
+
+    for (auto _ : state) {
+         for(int y = 0; y < outputY; ++y) {
+            for(int x = 0; x < outputX; ++x) {
+                res(y, x) = view(y, x);
+            }
+        }
+
+        benchmark::DoNotOptimize(res.data());
+    }
+}
+
+template <typename ElementType>
 void benchmark_view_copy_complete_Z_rawAgainstCache(benchmark::State& state) {
     SETUP_VARIABLES
 
@@ -139,6 +189,8 @@ void benchmark_view_copy_complete_Z_rawCacheAligned(benchmark::State& state) {
 
 BENCHMARK_SINGLE_VERSION(benchmark_view_copy_complete_Z_assign);
 BENCHMARK_SINGLE_VERSION(benchmark_view_copy_complete_Z_iterator);
+BENCHMARK_SINGLE_VERSION(benchmark_view_copy_complete_Z_operatorCallAgainstCache);
+BENCHMARK_SINGLE_VERSION(benchmark_view_copy_complete_Z_operatorCallCacheAligned);
 BENCHMARK_SINGLE_VERSION(benchmark_view_copy_complete_Z_rawAgainstCache);
 BENCHMARK_SINGLE_VERSION(benchmark_view_copy_complete_Z_rawCacheAligned);
 

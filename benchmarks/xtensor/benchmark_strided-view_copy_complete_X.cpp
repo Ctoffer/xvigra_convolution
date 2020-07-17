@@ -92,14 +92,9 @@ void benchmark_xstrided_view_copy_complete_X_operatorCallAgainstCache(benchmark:
     auto view = xt::strided_view(data, {xt::all(), xt::all(), x});
 
     for (auto _ : state) {
-        std::copy(view.begin(), view.end(), res.begin());
-        benchmark::DoNotOptimize(res.data());
-    }
-
-     for (auto _ : state) {
         for(int y = 0; y < outputX; ++y) {
             for(int z = 0; z < outputY; ++z) {
-                view(z, y) = data(z, y, x);
+                res(z, y) = view(z, y);
             }
         }
 
@@ -122,14 +117,9 @@ void benchmark_xstrided_view_copy_complete_X_operatorCallCacheAligned(benchmark:
     auto view = xt::strided_view(data, {xt::all(), xt::all(), x});
 
     for (auto _ : state) {
-        std::copy(view.begin(), view.end(), res.begin());
-        benchmark::DoNotOptimize(res.data());
-    }
-
-     for (auto _ : state) {
          for(int z = 0; z < outputY; ++z) {
             for(int y = 0; y < outputX; ++y) {
-                view(z, y) = data(z, y, x);
+                 res(z, y) = view(z, y);
             }
         }
 
