@@ -52,7 +52,7 @@ def main():
     benchmark_parameters = {
         "format": "console",
         "min_time": 0.25,
-        "repetitions": 5,
+        "repetitions": 2,
         "report_aggregates_only": True
     }
 
@@ -96,8 +96,11 @@ def main():
             with TimeMeasure(f"{'─' * 100}\nRunning {file_name}:", f"Total time: {{}}\n{'─' * 100}\n"):
                 call_benchmark(file_name, benchmark_parameters, folder=folder_name)
             print("\nPlotting...")
-            plot(file_name, os_name=platform.system(), folder=folder_name)
-            print("Finished plot\n")
+            try:
+                plot(file_name, os_name=platform.system(), folder=folder_name)
+                print("Finished plot\n")
+            except BaseException as e:
+                print("Failed plot", e)
 
 
 if __name__ == "__main__":
