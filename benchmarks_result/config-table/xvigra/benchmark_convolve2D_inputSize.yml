@@ -29,7 +29,7 @@ data:
       step: 50
     values: []
 
-  axis_label: Size S
+  axis_label: "    Size S    "
 
 table:
   group_headers:
