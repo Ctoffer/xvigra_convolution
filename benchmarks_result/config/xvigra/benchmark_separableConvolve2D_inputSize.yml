@@ -19,13 +19,15 @@ data:
   x:
     type: np.arange
     attrs:
-      start: 50
+      start: 1500
       stop: 2050
       step: 50
     values: []
 
 graph:
-  title: SeparableConvolve Implementations vs Explicit Implementation
+  figsize: [6, 10]
+  font_legend_size: 12
+  title: ""
 
   x_axis:
     label: Size S

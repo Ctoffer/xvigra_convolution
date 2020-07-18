@@ -19,13 +19,15 @@ data:
   x:
     type: np.arange
     attrs:
-      start: 50
-      stop: 2050
+      start: 1000
+      stop: 1550
       step: 50
     values: []
 
 graph:
-  title: SeparableConvolve Implementations vs Explicit Implementation
+  figsize: [6, 10]
+  font_legend_size: 12
+  title: ""
 
   x_axis:
     label: Size S
@@ -38,14 +40,14 @@ graph:
   legend:
     key: '{group_id}_{variant}'
     entries:
-      group_1_channelFirst: 'separableConvolve1D (Channel First)'
-      group_1_channelLast:  'separableConvolve1D (Channel Last)'
-      group_2_channelFirst: 'separableConvolveND [N=1] (Channel First)'
-      group_2_channelLast:  'separableConvolveND [N=1] (Channel Last)'
-      group_3_channelFirst: 'separableConvolve [N=1] (Channel First)'
-      group_3_channelLast:  'separableConvolve [N=1] (Channel Last)'
-      group_4_channelFirst: 'convolve1D (Channel First)'
-      group_4_channelLast:  'convolve1D (Channel Last)'
+      group_1_channelFirst: sC1D-iS-cF
+      group_1_channelLast:  sC1D-iS-cL
+      group_2_channelFirst: sCN1D-iS-cF
+      group_2_channelLast:  sCN1D-iS-cL
+      group_3_channelFirst: sC1-iS-cF
+      group_3_channelLast:  sC1-iS-cL
+      group_4_channelFirst: c1D-iS-cF
+      group_4_channelLast:  c1D-iS-cL
 
   line_style:
     key: '{variant}'

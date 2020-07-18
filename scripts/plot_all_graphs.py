@@ -3,26 +3,26 @@ from plot_benchmark import main as graph
 
 def main():
     benchmark_graphs = {
-        "xtensor": (
-            "benchmark_normalizing",
-            "benchmark_transpose-view",
-            "benchmark_reshape-view",
-            "benchmark_tensor_copy_complete_X",
-            "benchmark_tensor_copy_complete_Y",
-            "benchmark_tensor_copy_complete_Z",
-            "benchmark_strided-view_copy_complete_X",
-            "benchmark_strided-view_copy_complete_Y",
-            "benchmark_strided-view_copy_complete_Z",
-            "benchmark_strided-view_copy_paddingStride_X",
-            "benchmark_strided-view_copy_paddingStride_Y",
-            "benchmark_strided-view_copy_paddingStride_Z",
-            "benchmark_view_copy_complete_X",
-            "benchmark_view_copy_complete_Y",
-            "benchmark_view_copy_complete_Z",
-            "benchmark_view_copy_paddingStride_X",
-            "benchmark_view_copy_paddingStride_Y",
-            "benchmark_view_copy_paddingStride_Z",
-        ),
+        #"xtensor": (
+        #    "benchmark_normalizing",
+        #    "benchmark_transpose-view",
+        #    "benchmark_reshape-view",
+        #    "benchmark_tensor_copy_complete_X",
+        #    "benchmark_tensor_copy_complete_Y",
+        #    "benchmark_tensor_copy_complete_Z",
+        #    "benchmark_strided-view_copy_complete_X",
+        #    "benchmark_strided-view_copy_complete_Y",
+        #    "benchmark_strided-view_copy_complete_Z",
+        #    "benchmark_strided-view_copy_paddingStride_X",
+        #    "benchmark_strided-view_copy_paddingStride_Y",
+        #    "benchmark_strided-view_copy_paddingStride_Z",
+        #    "benchmark_view_copy_complete_X",
+        #    "benchmark_view_copy_complete_Y",
+        #    "benchmark_view_copy_complete_Z",
+        #    "benchmark_view_copy_paddingStride_X",
+        #    "benchmark_view_copy_paddingStride_Y",
+        #    "benchmark_view_copy_paddingStride_Z",
+        #),
         "xvigra": (
             "benchmark_convolve1D_inputSize_channelFirst",
             "benchmark_convolve1D_inputSize_channelLast",
@@ -30,8 +30,8 @@ def main():
             "benchmark_convolve2D_inputSize_channelLast",
             "benchmark_separableConvolve1D_inputSize",
             "benchmark_separableConvolve2D_inputSize",
-            "benchmark_separableConvolve1D_kernelSize",
-            "benchmark_separableConvolve2D_kernelSize"
+        #    "benchmark_separableConvolve1D_kernelSize",
+        #    "benchmark_separableConvolve2D_kernelSize"
         )
     }
 

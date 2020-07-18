@@ -25,7 +25,9 @@ data:
     values: []
 
 graph:
-  title: SeparableConvolve Implementations vs Explicit Implementation
+  figsize: [6, 10]
+  font_legend_size: 12
+  title: ""
 
   x_axis:
     label: Size S

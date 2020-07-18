@@ -37,7 +37,7 @@ def draw_double_header_table(group_headers, subgroup_headers, subgroup_data: dic
     subgroup_header_length = len(max(subgroup_headers, key=len)) - max(subgroup_headers, key=len).count('-')
     max_num_len = len(str(max(map(str, longest_numbers), key=len)))
     factor = max(int(0.6 * max_num_len), int(0.6 * subgroup_header_length), int(0.5 * len(axis_label))) / 7
-    print(int(0.6 * max_num_len), int(0.6 * subgroup_header_length), int(0.5 * len(axis_label)))
+    # print(int(0.6 * max_num_len), int(0.6 * subgroup_header_length), int(0.5 * len(axis_label)))
     group_dependent_factors = {1: 1.7, 2: 1, 3: 1.7}
     subgroup_dependent_factors = {4: 1.1, 5: 1, 6: 1}
 

@@ -135,6 +135,13 @@ def group_data(benchmark_data, data_config):
     return x_values, y_values
 
 
+def get_attr_or_default(obj, attr_name, default):
+    if hasattr(obj, attr_name):
+        return getattr(obj, attr_name)
+    else:
+        return default
+
+
 def init_plot(graph_config):
     title = graph_config.title
     x_axis_name = graph_config.x_axis.label
@@ -142,9 +149,14 @@ def init_plot(graph_config):
 
     plt.rc('xtick', labelsize=12)
     plt.rc('ytick', labelsize=16)
-    plt.rc('legend', fontsize=12)
 
-    plt.figure(figsize=(10, 3))
+
+    fig_size = get_attr_or_default(graph_config, "figsize", (10, 6))
+    font_legend_size = get_attr_or_default(graph_config, "font_legend_size", 12)
+
+    plt.rc('legend', fontsize=font_legend_size)
+
+    plt.figure(figsize=fig_size)
 
     if len(title) > 0:
         plt.title(title, fontsize=20)
@@ -206,7 +218,6 @@ def plot_all(file_context, yml_config):
 
     plt.legend(loc="upper left")
     out_file = file_context.out_file.replace('.svg', '.png')
-    print(f"Save diagram to {out_file}")
     plt.savefig(out_file, dpi=240, bbox_inches='tight')
     plt.close()
 
