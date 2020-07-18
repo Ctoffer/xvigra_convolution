@@ -33,10 +33,10 @@ table:
   subgroup_headers:
     key: '{specialization}_{variant}'
     values:
-      xt::xarray<float>_amax: xa-d-amax
-      xt::xarray<float>_amax_unpacked: xa-d-amaxU
-      xt::xtensor<float, 3>_amax: xt-d-amax
-      xt::xtensor<float, 3>_amax_unpacked: xt-d-amaxU
+      xt::xarray<float>_amax: xa-d-co-amax
+      xt::xarray<float>_amax_unpacked: xa-d-co-amaxU
+      xt::xtensor<float, 3>_amax: xt-d-co-amax
+      xt::xtensor<float, 3>_amax_unpacked: xt-d-co-amaxU
 
   subgroup_data:
     values:

@@ -1,0 +1,54 @@
+data:
+  top_levels: ["X"]
+
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_view_copy_paddingStride_X
+
+  variants:
+    - assign
+    - iterator
+    - operatorCallAgainstCache
+    - operatorCallCacheAligned
+    - rawAgainstCache
+    - rawCacheAligned
+
+  aggregates: ['min']
+  specializations: ['float']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 1100
+      step: 100
+    values: []
+
+  axis_label: Size S
+
+table:
+  group_headers:
+    key: '{top_level}'
+    values:
+      X: X
+
+  subgroup_headers:
+    key: '{variant}'
+    values:
+      assign: v-c-pSX-a
+      iterator: v-c-pSX-i
+      operatorCallAgainstCache: v-c-pSX-cAC
+      operatorCallCacheAligned: v-c-pSX-cCA
+      rawAgainstCache: v-c-pSX-rAC
+      rawCacheAligned: v-c-pSX-rCA
+
+  subgroup_data:
+    values:
+      X:
+        file: 'benchmark_view_copy_paddingStride_X.json'
+        key: 'benchmark_view_copy_paddingStride_X_{variant}<float>/{x}_min'
+
+  color_modes:
+    values:
+      X: "Reds"

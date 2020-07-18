@@ -1,0 +1,54 @@
+data:
+  top_levels: ["Z"]
+
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_xstrided_view_copy_paddingStride_Z
+
+  variants:
+    - assign
+    - iterator
+    - operatorCallAgainstCache
+    - operatorCallCacheAligned
+    - rawAgainstCache
+    - rawCacheAligned
+
+  aggregates: ['min']
+  specializations: ['float']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 1100
+      step: 100
+    values: []
+
+  axis_label: Size S
+
+table:
+  group_headers:
+    key: '{top_level}'
+    values:
+      Z: Z
+
+  subgroup_headers:
+    key: '{variant}'
+    values:
+      assign: sv-c-pSZ-a
+      iterator: sv-c-pSZ-i
+      operatorCallAgainstCache: sv-c-pSZ-cAC
+      operatorCallCacheAligned: sv-c-pSZ-cCA
+      rawAgainstCache: sv-c-pSZ-rAC
+      rawCacheAligned: sv-c-pSZ-rCA
+
+  subgroup_data:
+    values:
+      Z:
+        file: 'benchmark_strided-view_copy_paddingStride_Z.json'
+        key: 'benchmark_xstrided_view_copy_paddingStride_Z_{variant}<float>/{x}_min'
+
+  color_modes:
+    values:
+      Z: "Blues"

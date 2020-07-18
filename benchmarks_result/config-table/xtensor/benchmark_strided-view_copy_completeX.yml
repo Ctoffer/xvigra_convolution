@@ -1,5 +1,5 @@
 data:
-  top_levels: ["X", "Y", "Z"]
+  top_levels: ["X"]
 
   group_ids:
     - group_1
@@ -32,33 +32,23 @@ table:
     key: '{top_level}'
     values:
       X: X
-      Y: Y
-      Z: Z
 
   subgroup_headers:
     key: '{variant}'
     values:
-      assign: sv-c-c-a
-      iterator: sv-c-c-i
-      operatorCallAgainstCache: sv-c-c-cAC
-      operatorCallCacheAligned: sv-c-c-cCA
-      rawAgainstCache: sv-c-c-rAC
-      rawCacheAligned: sv-c-c-rCA
+      assign: sv-c-coX-a
+      iterator: sv-c-coX-i
+      operatorCallAgainstCache: sv-c-coX-cAC
+      operatorCallCacheAligned: sv-c-coX-cCA
+      rawAgainstCache: sv-c-coX-rAC
+      rawCacheAligned: sv-c-coX-rCA
 
   subgroup_data:
     values:
       X:
         file: 'benchmark_strided-view_copy_complete_X.json'
         key: 'benchmark_xstrided_view_copy_complete_X_{variant}<float>/{x}_min'
-      Y:
-        file: 'benchmark_strided-view_copy_complete_Y.json'
-        key: 'benchmark_xstrided_view_copy_complete_Y_{variant}<float>/{x}_min'
-      Z:
-        file: 'benchmark_strided-view_copy_complete_Z.json'
-        key: 'benchmark_xstrided_view_copy_complete_Z_{variant}<float>/{x}_min'
 
   color_modes:
     values:
       X: "Reds"
-      Y: "Greens"
-      Z: "Blues"

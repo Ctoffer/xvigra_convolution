@@ -1,0 +1,50 @@
+data:
+  top_levels: ["Y"]
+
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_tensor_copy_complete_Y
+
+  variants:
+    - againstCache
+    - cacheAligned
+    - rawAgainstCache
+    - rawCacheAligned
+
+  aggregates: ['min']
+  specializations: ['float']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 1100
+      step: 100
+    values: []
+
+  axis_label: Size S
+
+table:
+  group_headers:
+    key: '{top_level}'
+    values:
+      Y: Y
+
+  subgroup_headers:
+    key: '{variant}'
+    values:
+      againstCache: xt-c-coY-cAC
+      cacheAligned: xt-c-coY-cCA
+      rawAgainstCache: xt-c-coY-rAC
+      rawCacheAligned: xt-c-coY-rCA
+
+  subgroup_data:
+    values:
+      Y:
+        file: 'benchmark_tensor_copy_complete_Y.json'
+        key: 'benchmark_tensor_copy_complete_Y_{variant}<float>/{x}_min'
+
+  color_modes:
+    values:
+      Y: "Greens"

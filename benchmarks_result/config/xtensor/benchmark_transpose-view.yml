@@ -35,12 +35,12 @@ graph:
   legend:
     key: '{specialization}_{variant}'
     entries:
-      xt::xarray<float>_complete: xt::xarray & assign
-      xt::xarray<float>_complete_operatorCallAgainstCache: xt::xarray & operator() against cache
-      xt::xarray<float>_complete_operatorCallCacheAligned: xt::xarray & operator() cache aligned
-      xt::xtensor<float, 2>_complete: xt::xtensor & assign
-      xt::xtensor<float, 2>_complete_operatorCallAgainstCache: xt::xtensor & operator() against cache
-      xt::xtensor<float, 2>_complete_operatorCallCacheAligned: xt::xtensor & operator() cache aligned
+      xt::xarray<float>_complete: txa-c-co-a
+      xt::xarray<float>_complete_operatorCallAgainstCache: txa-c-co-cAC
+      xt::xarray<float>_complete_operatorCallCacheAligned: txa-c-co-cCA
+      xt::xtensor<float, 2>_complete: txt-c-co-a
+      xt::xtensor<float, 2>_complete_operatorCallAgainstCache: txt-c-co-cAC
+      xt::xtensor<float, 2>_complete_operatorCallCacheAligned: txt-c-co-cCA
 
   line_style:
     key: '{variant}'

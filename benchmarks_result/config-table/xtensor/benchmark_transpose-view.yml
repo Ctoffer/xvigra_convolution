@@ -32,11 +32,14 @@ table:
       xt::xtensor<float, 2>: xt::xtensor<float, 2>
 
   subgroup_headers:
-    key: '{variant}'
+    key: '{specialization}_{variant}'
     values:
-      complete: t-c-a
-      complete_operatorCallAgainstCache: t-c-cAC
-      complete_operatorCallCacheAligned: t-c-cCA
+      xt::xarray<float>_complete: txa-c-co-a
+      xt::xarray<float>_complete_operatorCallAgainstCache: txa-c-co-cAC
+      xt::xarray<float>_complete_operatorCallCacheAligned: txa-c-co-cCA
+      xt::xtensor<float, 2>_complete: txt-c-co-a
+      xt::xtensor<float, 2>_complete_operatorCallAgainstCache: txt-c-co-cAC
+      xt::xtensor<float, 2>_complete_operatorCallCacheAligned: txt-c-co-cCA
 
   subgroup_data:
     values:

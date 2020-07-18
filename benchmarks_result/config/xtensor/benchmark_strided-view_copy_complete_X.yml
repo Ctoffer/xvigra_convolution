@@ -38,12 +38,12 @@ graph:
   legend:
     key: '{variant}'
     entries:
-      assign: assign operator
-      iterator: std::copy with iterators
-      operatorCallAgainstCache: copy via operator() against cache
-      operatorCallCacheAligned: copy via operator() cache aligned
-      rawAgainstCache: raw data copy against cache
-      rawCacheAligned: raw data copy cache aligned
+      assign: sv-c-coX-a
+      iterator: sv-c-coX-i
+      operatorCallAgainstCache: sv-c-coX-cAC
+      operatorCallCacheAligned: sv-c-coX-cCA
+      rawAgainstCache: sv-c-coX-rAC
+      rawCacheAligned: sv-c-coX-rCA
 
   line_style:
     key: '{group_id}'

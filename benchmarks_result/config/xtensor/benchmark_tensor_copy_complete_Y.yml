@@ -36,10 +36,10 @@ graph:
   legend:
     key: '{variant}'
     entries:
-      againstCache: tensor to tensor, against cache
-      cacheAligned: tensor to tensor, cache aligned
-      rawAgainstCache: raw to raw, against cache
-      rawCacheAligned: raw to raw, cache aligned
+      againstCache: xt-c-coY-cAC
+      cacheAligned: xt-c-coY-cCA
+      rawAgainstCache: xt-c-coY-rAC
+      rawCacheAligned: xt-c-coY-rCA
 
   line_style:
     key: '{group_id}'

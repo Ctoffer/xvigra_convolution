@@ -34,10 +34,10 @@ graph:
   legend:
     key: '{specialization}_{variant}'
     entries:
-      xt::xarray<float>_amax: xarray, input / amax(input)
-      xt::xarray<float>_amax_unpacked: xarray, input / amax(input)[0]
-      xt::xtensor<float, 3>_amax: xtensor, input / amax(input)
-      xt::xtensor<float, 3>_amax_unpacked: xtensor, input / amax(input)[0]
+      xt::xarray<float>_amax: xa-d-co-amax
+      xt::xarray<float>_amax_unpacked: xa-d-co-amaxU
+      xt::xtensor<float, 3>_amax: xt-d-co-amax
+      xt::xtensor<float, 3>_amax_unpacked: xt-d-co-amaxU
 
   line_style:
     key: '{variant}'

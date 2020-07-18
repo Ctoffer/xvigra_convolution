@@ -35,9 +35,16 @@ def draw_double_header_table(group_headers, subgroup_headers, subgroup_data: dic
     axis_label = data_config.axis_label
     longest_numbers = ([max(list(arr.flatten()), key=lambda x: len(str(x))) for arr in subgroup_data.values()])
     subgroup_header_length = len(max(subgroup_headers, key=len)) - max(subgroup_headers, key=len).count('-')
-    factor = max(len(str(max(map(str, longest_numbers), key=len))), subgroup_header_length, len(axis_label)) / 7
+    max_num_len = len(str(max(map(str, longest_numbers), key=len)))
+    factor = max(int(0.6 * max_num_len), int(0.6 * subgroup_header_length), int(0.5 * len(axis_label))) / 7
 
-    fig_width = int(factor * len(group_headers) * len(subgroup_headers))
+    group_dependent_factors = {1: 1.7, 2: 1, 3: 1.7}
+    subgroup_dependent_factors = {4: 1.1, 5: 1, 6: 1}
+
+    fig_width = int(factor
+                    * len(group_headers) * group_dependent_factors[len(group_headers)]
+                    * len(subgroup_headers) * subgroup_dependent_factors[len(subgroup_headers)]
+                    )
     fig_height = (row_numbers[0] // 3)
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 

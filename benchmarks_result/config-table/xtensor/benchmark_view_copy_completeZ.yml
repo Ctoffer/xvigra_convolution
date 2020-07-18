@@ -1,0 +1,54 @@
+data:
+  top_levels: ["Z"]
+
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_view_copy_complete_Z
+
+  variants:
+    - assign
+    - iterator
+    - operatorCallAgainstCache
+    - operatorCallCacheAligned
+    - rawAgainstCache
+    - rawCacheAligned
+
+  aggregates: ['min']
+  specializations: ['float']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 1100
+      step: 100
+    values: []
+
+  axis_label: Size S
+
+table:
+  group_headers:
+    key: '{top_level}'
+    values:
+      Z: Z
+
+  subgroup_headers:
+    key: '{variant}'
+    values:
+      assign: v-c-coZ-a
+      iterator: v-c-coZ-i
+      operatorCallAgainstCache: v-c-coZ-cAC
+      operatorCallCacheAligned: v-c-coZ-cCA
+      rawAgainstCache: v-c-coZ-rAC
+      rawCacheAligned: v-c-coZ-rCA
+
+  subgroup_data:
+    values:
+      Z:
+        file: 'benchmark_view_copy_complete_Z.json'
+        key: 'benchmark_view_copy_complete_Z_{variant}<float>/{x}_min'
+
+  color_modes:
+    values:
+      Z: "Blues"

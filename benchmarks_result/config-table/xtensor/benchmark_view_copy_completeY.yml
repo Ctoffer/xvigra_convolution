@@ -1,0 +1,54 @@
+data:
+  top_levels: ["Y"]
+
+  group_ids:
+    - group_1
+
+  group_names:
+    group_1: benchmark_view_copy_complete_Y
+
+  variants:
+    - assign
+    - iterator
+    - operatorCallAgainstCache
+    - operatorCallCacheAligned
+    - rawAgainstCache
+    - rawCacheAligned
+
+  aggregates: ['min']
+  specializations: ['float']
+  x:
+    type: np.arange
+    attrs:
+      start: 50
+      stop: 1100
+      step: 100
+    values: []
+
+  axis_label: Size S
+
+table:
+  group_headers:
+    key: '{top_level}'
+    values:
+      Y: Y
+
+  subgroup_headers:
+    key: '{variant}'
+    values:
+      assign: v-c-coY-a
+      iterator: v-c-coY-i
+      operatorCallAgainstCache: v-c-coY-cAC
+      operatorCallCacheAligned: v-c-coY-cCA
+      rawAgainstCache: v-c-coY-rAC
+      rawCacheAligned: v-c-coY-rCA
+
+  subgroup_data:
+    values:
+      Y:
+        file: 'benchmark_view_copy_complete_Y.json'
+        key: 'benchmark_view_copy_complete_Y_{variant}<float>/{x}_min'
+
+  color_modes:
+    values:
+      Y: "Greens"

@@ -1,11 +1,11 @@
 data:
-  top_levels: ["X", "Y", "Z"]
+  top_levels: ["Z"]
 
   group_ids:
     - group_1
 
   group_names:
-    group_1: benchmark_tensor_copy_complete_X
+    group_1: benchmark_tensor_copy_complete_Z
 
   variants:
     - againstCache
@@ -29,32 +29,22 @@ table:
   group_headers:
     key: '{top_level}'
     values:
-      X: X
-      Y: Y
       Z: Z
 
   subgroup_headers:
     key: '{variant}'
     values:
-      againstCache: xt-c-c-cAC
-      cacheAligned: xt-c-c-cCA
-      rawAgainstCache: xt-c-c-rAC
-      rawCacheAligned: xt-c-c-rCA
+      againstCache: xt-c-coZ-cAC
+      cacheAligned: xt-c-coZ-cCA
+      rawAgainstCache: xt-c-coZ-rAC
+      rawCacheAligned: xt-c-coZ-rCA
 
   subgroup_data:
     values:
-      X:
-        file: 'benchmark_tensor_copy_complete_X.json'
-        key: 'benchmark_tensor_copy_complete_X_{variant}<float>/{x}_min'
-      Y:
-        file: 'benchmark_tensor_copy_complete_Y.json'
-        key: 'benchmark_tensor_copy_complete_Y_{variant}<float>/{x}_min'
       Z:
         file: 'benchmark_tensor_copy_complete_Z.json'
         key: 'benchmark_tensor_copy_complete_Z_{variant}<float>/{x}_min'
 
   color_modes:
     values:
-      X: "Reds"
-      Y: "Greens"
       Z: "Blues"
