@@ -144,7 +144,7 @@ def init_plot(graph_config):
     plt.rc('ytick', labelsize=16)
     plt.rc('legend', fontsize=12)
 
-    plt.figure(figsize=(24, 9))
+    plt.figure(figsize=(10, 3))
 
     if len(title) > 0:
         plt.title(title, fontsize=20)
@@ -205,8 +205,9 @@ def plot_all(file_context, yml_config):
                     plot_data(graph_config, x_values, y_values, specialization, group_id, variant, aggregate)
 
     plt.legend(loc="upper left")
-    print(f"Save diagram to {file_context.out_file}")
-    plt.savefig(file_context.out_file, bbox_inches='tight')
+    out_file = file_context.out_file.replace('.svg', '.png')
+    print(f"Save diagram to {out_file}")
+    plt.savefig(out_file, dpi=240, bbox_inches='tight')
     plt.close()
 
 

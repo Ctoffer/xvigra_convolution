@@ -31,10 +31,12 @@ table:
       xt::xtensor<float, 3>: xt::xtensor<float, 3>
 
   subgroup_headers:
-    key: '{variant}'
+    key: '{specialization}_{variant}'
     values:
-      amax: amax
-      amax_unpacked: amax-u
+      xt::xarray<float>_amax: xa-d-amax
+      xt::xarray<float>_amax_unpacked: xa-d-amaxU
+      xt::xtensor<float, 3>_amax: xt-d-amax
+      xt::xtensor<float, 3>_amax_unpacked: xt-d-amaxU
 
   subgroup_data:
     values:
