@@ -19,7 +19,7 @@ def get_color_colors_of_block(values, mode):
         amin = np.amin(vals[i, :])
         vals[i, :] -= amin
         vals[i, :] /= np.amax(vals[i, :])
-        cell_colors.append([color_map(val / 2 + 0.25) for val in vals[i, :]])
+        cell_colors.append([color_map(val / 3 + 0.33) for val in vals[i, :]])
 
     return cell_colors
 

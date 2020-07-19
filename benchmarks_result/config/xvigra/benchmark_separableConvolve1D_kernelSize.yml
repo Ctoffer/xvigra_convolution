@@ -66,8 +66,8 @@ graph:
   line_color:
     key: '{group_id}'
     entries:
-      group_1: "#55868C"
-      group_2: "#EEC584"
-      group_3: "#9900FF"
-      group_4: "#CE4257"
+      group_1: "#ff0000"
+      group_2: "#ffa500"
+      group_3: "#cccc00"
+      group_4: "#4b0082"
 
