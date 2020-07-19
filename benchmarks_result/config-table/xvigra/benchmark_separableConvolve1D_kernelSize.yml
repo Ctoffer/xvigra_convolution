@@ -37,12 +37,16 @@ table:
       channelLast: Channel Last
 
   subgroup_headers:
-    key: '{group_id}'
+    key: '{top_level}_{group_id}'
     values:
-      group_1: sC1d-kS
-      group_2: sCNd-kS
-      group_3: sCd-kS
-      group_4: c1d-kS
+      channelFirst_group_1: sC1d-kS-cF
+      channelFirst_group_2: sCNd-kS-cF
+      channelFirst_group_3: sCd-kS-cF
+      channelFirst_group_4: c1d-kS-cF
+      channelLast_group_1: sC1d-kS-cL
+      channelLast_group_2: sCNd-kS-cL
+      channelLast_group_3: sCd-kS-cL
+      channelLast_group_4: c1d-kS-cL
 
   subgroup_data:
     values:

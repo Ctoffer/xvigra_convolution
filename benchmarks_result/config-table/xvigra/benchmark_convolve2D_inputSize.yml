@@ -39,13 +39,18 @@ table:
       channelLast: Channel Last
 
   subgroup_headers:
-    key: '{group_id}'
+    key: '{top_level}_{group_id}'
     values:
-      group_1: c2d-v1-iS
-      group_2: c2d-v2-iS
-      group_3: c2d-v3-iS
-      group_4: c2d-v4-iS
-      group_5: c2d-v5-iS
+      channelFirst_group_1: " c2d-v1-iS-cF "
+      channelFirst_group_2: c2d-v2-iS-cF
+      channelFirst_group_3: c2d-v3-iS-cF
+      channelFirst_group_4: c2d-v4-iS-cF
+      channelFirst_group_5: c2d-v5-iS-cF
+      channelLast_group_1: c2d-v1-iS-cL
+      channelLast_group_2: c2d-v2-iS-cL
+      channelLast_group_3: c2d-v3-iS-cL
+      channelLast_group_4: c2d-v4-iS-cL
+      channelLast_group_5: c2d-v5-iS-cL
 
   subgroup_data:
     values:

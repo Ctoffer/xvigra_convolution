@@ -43,11 +43,11 @@ graph:
   legend:
     key: '{group_id}_{variant}'
     entries:
-      group_1_channelFirst: convolve2D V.1
-      group_2_channelFirst: convolve2D V.2
-      group_3_channelFirst: convolve2D V.3
-      group_4_channelFirst: convolve2D V.4
-      group_5_channelFirst: convolve2D V.5
+      group_1_channelFirst: c2D-v1-cF
+      group_2_channelFirst: c2D-v2-cF
+      group_3_channelFirst: c2D-v3-cF
+      group_4_channelFirst: c2D-v4-cF
+      group_5_channelFirst: c2D-v5-cF
 
   line_style:
     key: '{variant}'

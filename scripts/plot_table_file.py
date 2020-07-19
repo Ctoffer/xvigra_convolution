@@ -34,12 +34,12 @@ def draw_double_header_table(group_headers, subgroup_headers, subgroup_data: dic
 
     axis_label = data_config.axis_label
     longest_numbers = ([max(list(arr.flatten()), key=lambda x: len(str(x))) for arr in subgroup_data.values()])
-    subgroup_header_length = len(max(subgroup_headers, key=len)) - max(subgroup_headers, key=len).count('-')
+    subgroup_header_length = len(max(subgroup_headers, key=len))
     max_num_len = len(str(max(map(str, longest_numbers), key=len)))
-    factor = max(int(0.6 * max_num_len), int(0.6 * subgroup_header_length), int(0.5 * len(axis_label))) / 7
+    factor = max(int(0.6 * max_num_len), int(0.5 * subgroup_header_length), int(0.5 * len(axis_label))) / 7
     # print(int(0.6 * max_num_len), int(0.6 * subgroup_header_length), int(0.5 * len(axis_label)))
     group_dependent_factors = {1: 1.7, 2: 1, 3: 1.7}
-    subgroup_dependent_factors = {4: 1.1, 5: 1, 6: 1}
+    subgroup_dependent_factors = {4: 1.1, 5: 1, 6: 1, 8: 0.5, 10: 0.6, 12: 0.6}
 
     fig_width = int(factor
                     * len(group_headers) * group_dependent_factors[len(group_headers)]
@@ -48,7 +48,11 @@ def draw_double_header_table(group_headers, subgroup_headers, subgroup_data: dic
     fig_height = (row_numbers[0] // 3)
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
-    cell_width = 1 / (len(subgroup_headers) * len(group_headers) + 1)
+    col_len = subgroup_data[group_headers[0]].shape[1]
+    if len(subgroup_headers) == col_len:
+        cell_width = 1 / (len(subgroup_headers) * len(group_headers) + 1)
+    else:
+        cell_width = 1 / (len(subgroup_headers) + 1)
 
     fig.patch.set_visible(False)
     ax.axis('off')
@@ -72,15 +76,29 @@ def draw_double_header_table(group_headers, subgroup_headers, subgroup_data: dic
         longest_cell_number = max(list(np.floor(subgroup_data[group]).astype(int).flatten()), key=lambda x: len(str(x)))
         right_shift = len(str(longest_cell_number))
         s = f' >{right_shift + 0}.4f'
+        col_len = subgroup_data[group].shape[1]
+        if len(subgroup_headers) == col_len:
+            column_labels = subgroup_headers
 
-        ax.table(
-            cellText=[[("{value:" + s + "}").format(value=value) for value in row] for row in subgroup_data[group]],
-            colLabels=subgroup_headers,
-            cellColours=get_color_colors_of_block(subgroup_data[group], color_modes[group]),
-            bbox=[cell_width + i * cell_width * len(subgroup_headers), 0, cell_width * len(subgroup_headers),
-                  (row_numbers[0] - 1) / number_of_rows],
-            cellLoc='right',
-        )
+            ax.table(
+                cellText=[[("{value:" + s + "}").format(value=value) for value in row] for row in subgroup_data[group]],
+                colLabels=column_labels,
+                cellColours=get_color_colors_of_block(subgroup_data[group], color_modes[group]),
+                bbox=[cell_width + i * cell_width * len(subgroup_headers), 0, cell_width * len(subgroup_headers),
+                      (row_numbers[0] - 1) / number_of_rows],
+                cellLoc='right',
+            )
+        else:
+            column_labels = subgroup_headers[i * col_len:col_len + i * col_len]
+
+            ax.table(
+                cellText=[[("{value:" + s + "}").format(value=value) for value in row] for row in subgroup_data[group]],
+                colLabels=column_labels,
+                cellColours=get_color_colors_of_block(subgroup_data[group], color_modes[group]),
+                bbox=[cell_width + i * cell_width * len(subgroup_headers) / len(group_headers), 0, cell_width * len(subgroup_headers) / len(group_headers),
+                      (row_numbers[0] - 1) / number_of_rows],
+                cellLoc='right',
+            )
 
     fig.tight_layout()
     return fig

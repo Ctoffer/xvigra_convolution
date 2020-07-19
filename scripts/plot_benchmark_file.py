@@ -150,7 +150,6 @@ def init_plot(graph_config):
     plt.rc('xtick', labelsize=12)
     plt.rc('ytick', labelsize=16)
 
-
     fig_size = get_attr_or_default(graph_config, "figsize", (10, 6))
     font_legend_size = get_attr_or_default(graph_config, "font_legend_size", 12)
 
@@ -164,6 +163,8 @@ def init_plot(graph_config):
     plt.ylabel(y_axis_name, fontsize=18)
 
     plt.grid(axis='y')
+    if hasattr(graph_config, "x"):
+        plt.xticks(parse_x(graph_config.x))
 
 
 def plot_data(graph_config, x_data, y_values, specialization, group_id, variant, aggregate):

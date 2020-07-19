@@ -45,12 +45,12 @@ graph:
   legend:
     key: '{group_id}_{variant}'
     entries:
-      group_1_channelLast: convolve1D V.1
-      group_2_channelLast: convolve1D V.2
-      group_3_channelLast: convolve1D V.3
-      group_4_channelLast: convolve1D V.4
-      group_5_channelLast: convolve1D V.5
-      group_6_channelLast: convolve1D V.6
+      group_1_channelLast: c1D-v1-cL
+      group_2_channelLast: c1D-v2-cL
+      group_3_channelLast: c1D-v3-cL
+      group_4_channelLast: c1D-v4-cL
+      group_5_channelLast: c1D-v5-cL
+      group_6_channelLast: c1D-v6-cL
 
   line_style:
     key: '{variant}'

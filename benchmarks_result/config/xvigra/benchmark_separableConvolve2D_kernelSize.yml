@@ -33,6 +33,14 @@ graph:
     label: Size S
     mode: normal
 
+  x:
+    type: list
+    attrs:
+      start: 1500
+      stop: 2050
+      step: 50
+    values: [1, 5, 10, 15, 20]
+
   y_axis:
     label: Minimum Time (ms)
     mode: normal
@@ -40,14 +48,14 @@ graph:
   legend:
     key: '{group_id}_{variant}'
     entries:
-      group_1_channelFirst: 'separableConvolve2D (Channel First)'
-      group_1_channelLast:  'separableConvolve2D (Channel Last)'
-      group_2_channelFirst: 'separableConvolveND [N=2] (Channel First)'
-      group_2_channelLast:  'separableConvolveND [N=2] (Channel Last)'
-      group_3_channelFirst: 'separableConvolve [N=2] (Channel First)'
-      group_3_channelLast:  'separableConvolve [N=2] (Channel Last)'
-      group_4_channelFirst: 'convolve2D (Channel First)'
-      group_4_channelLast:  'convolve2D (Channel Last)'
+      group_1_channelFirst: sC2D-kS-cF
+      group_1_channelLast:  sC2D-kS-cL
+      group_2_channelFirst: sCN2D-kS-cF
+      group_2_channelLast:  sCN2D-kS-cL
+      group_3_channelFirst: sC2-kS-cF
+      group_3_channelLast:  sC2-kS-cL
+      group_4_channelFirst: c2D-kS-cF
+      group_4_channelLast:  c2D-kS-cL
 
   line_style:
     key: '{variant}'
