@@ -19,8 +19,8 @@ data:
   x:
     type: np.arange
     attrs:
-      start: 1000
-      stop: 1550
+      start: 1500
+      stop: 2050
       step: 50
     values: []
 

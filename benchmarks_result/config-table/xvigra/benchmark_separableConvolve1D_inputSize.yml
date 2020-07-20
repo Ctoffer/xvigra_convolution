@@ -39,14 +39,14 @@ table:
   subgroup_headers:
     key: '{top_level}_{group_id}'
     values:
-      channelFirst_group_1: sC1d-iS-cF
-      channelFirst_group_2: sCNd-iS-cF
-      channelFirst_group_3: sCd-iS-cF
-      channelFirst_group_4: c1d-iS-cF
-      channelLast_group_1: sC1d-iS-cL
-      channelLast_group_2: sCNd-iS-cL
-      channelLast_group_3: sCd-iS-cL
-      channelLast_group_4: c1d-iS-cL
+      channelFirst_group_1: sC1D-iS-cF
+      channelFirst_group_2: sCN1D-iS-cF
+      channelFirst_group_3: sC1-iS-cF
+      channelFirst_group_4: c1D-iS-cF
+      channelLast_group_1: sC1D-iS-cL
+      channelLast_group_2: sCN1D-iS-cL
+      channelLast_group_3: sC1-iS-cL
+      channelLast_group_4: c1D-iS-cL
 
   subgroup_data:
     values:

@@ -30,7 +30,7 @@ graph:
   title: ""
 
   x_axis:
-    label: Size S
+    label: Kernelsize K
     mode: normal
 
   x:
