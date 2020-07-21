@@ -23,6 +23,7 @@ set(XTENSOR_USE_XSIMD 0)
 
 # Include directories
 include_directories("include")
+include_directories("include/vigra/include/")
 include_directories("src")
 
 # Find installed libraries

@@ -3,6 +3,7 @@ set(TARGETS
     demo_explicit_convolution
     demo_separable
     demo_xexpression
+    demo_convolution
 )
 
 set (ALL_LIBS
