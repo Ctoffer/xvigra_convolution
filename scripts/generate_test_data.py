@@ -75,16 +75,11 @@ def read_image(file_name, file_extension):
     return image
 
 
-def get_correct_filter(channels):
+def get_correct_filter(channels, kernel=((-1, -1, -1), (-1, 8, -1), (-1, -1, -1))):
     zero = [
         [0, 0, 0],
         [0, 0, 0],
         [0, 0, 0]
-    ]
-    kernel = [
-        [-1, -1, -1],
-        [-1, 8, -1],
-        [-1, -1, -1]
     ]
 
     if channels == 1:

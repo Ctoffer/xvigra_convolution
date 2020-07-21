@@ -40,7 +40,7 @@ table:
     key: '{top_level}_{group_id}'
     values:
       channelFirst_group_1: sC2D-iS-cF
-      channelFirst_group_2: sCN2D-iS-cF
+      channelFirst_group_2: "    sCN2D-iS-cF    "
       channelFirst_group_3: sC2-iS-cF
       channelFirst_group_4: c2D-iS-cF
       channelLast_group_1: sC2D-iS-cL

@@ -27,7 +27,7 @@ data:
       step: 1
     values: []
 
-  axis_label: Kernelsize $K_{S}$
+  axis_label: "  Kernelsize  K  "
 
 table:
   group_headers:
