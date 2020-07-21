@@ -268,6 +268,29 @@ namespace xvigra {
     // ║ convolve1D - begin                                                                                               ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
+     /*
+     * <p>
+     * Calculates the explicit 1-dimensional convolution of the input with the given 1-dimensional kernel based on the
+     * GEMM-based algorithm of Chellapilla K., Puri S. and Simard P. .
+     * This function requires an input of shape  W x C or C x W and a kernel with at least 1 dimension or at maximum
+     * a full filter of 3 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::FIRST or ChannelPosition::LAST inputs; for ChannelPosition::IMPLICIT
+     * use xvigra::convolve1DImplicit.
+     * </p>
+     *
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpression xexpression containing the kernel data
+     * @param options object containing information about padding, stride, dilation, channel position and border
+                      treatment
+     * @return the result of the 1-dimensional convolution between the input and kernel as xt::xtensor
+     * @throws std::invalid_argument * if input does not match the required shape
+                                     * if IMPLICIT channel position is requested.
+                                     * if the input channels in the input and kernel do not align
+                                     * if the padded input is smaller than the dilated kernel
+     */
     template <typename T, typename O>
     auto convolve1D(
         const xt::xexpression<T>& inputExpression,
@@ -421,6 +444,27 @@ namespace xvigra {
     }
 
 
+    /*
+     * <p>
+     * Calculates the explicit 1-dimensional convolution of the input with the given 1-dimensional kernel based on the
+     * GEMM-based algorithm of Chellapilla K., Puri S. and Simard P. .
+     * This function requires an input of shape W and a kernel with at least 1 dimension or at maximum
+     * a full filter of 3 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::IMPLICIT inputs; for ChannelPosition::FIRST or ChannelPosition::LAST
+     * use xvigra::convolve1D.
+     * </p>
+     *
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpression xexpression containing the kernel data
+     * @param kernelOptions object containing information about padding, stride, dilation, channel position and border
+                            treatment
+     * @return the result of the 1-dimensional convolution between the input and kernel as xt::xtensor
+     * @throws std::invalid_argument * if input does not match the required shape
+                                     * if the given channel position is not ChannelPosition::IMPLICIT
+     */
     template <typename T, typename O>
     auto convolve1DImplicit(
         const xt::xexpression<T>& inputExpression,
@@ -461,6 +505,29 @@ namespace xvigra {
     // ║ convolve2D - begin                                                                                               ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
+     /*
+     * <p>
+     * Calculates the explicit 2-dimensional convolution of the input with the given 2-dimensional kernel based on the
+     * GEMM-based algorithm of Chellapilla K., Puri S. and Simard P. .
+     * This function requires an input of shape H x W x C or C x H x W and a kernel with at least 2 dimension or at maximum
+     * a full filter of 4 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull2D.
+     * This function can only process ChannelPosition::FIRST or ChannelPosition::LAST inputs; for ChannelPosition::IMPLICIT
+     * use xvigra::convolve2DImplicit.
+     * </p>
+     *
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpression xexpression containing the kernel data
+     * @param options object containing information about padding, stride, dilation, channel position and border
+                      treatment
+     * @return the result of the 2-dimensional convolution between the input and kernel as xt::xtensor
+     * @throws std::invalid_argument * if input does not match the required shape
+                                     * if IMPLICIT channel position is requested.
+                                     * if the input channels in the input and kernel do not align
+                                     * if the padded input is smaller than the dilated kernel
+     */
     template <typename T, typename O>
     auto convolve2D(
         const xt::xexpression<T>& inputExpression,
@@ -685,7 +752,27 @@ namespace xvigra {
         );
     }
 
-
+    /*
+     * <p>
+     * Calculates the explicit 2-dimensional convolution of the input with the given 2-dimensional kernel based on the
+     * GEMM-based algorithm of Chellapilla K., Puri S. and Simard P. .
+     * This function requires an input of shape H x W x C or C x H x W and a kernel with at least 2 dimension or at maximum
+     * a full filter of 4 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::IMPLICIT inputs; for ChannelPosition::FIRST or ChannelPosition::LAST
+     * use xvigra::convolve2D.
+     * </p>
+     *
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpression xexpression containing the kernel data
+     * @param kernelOptions object containing information about padding, stride, dilation, channel position and border
+                            treatment
+     * @return the result of the 2-dimensional convolution between the input and kernel as xt::xtensor
+     * @throws std::invalid_argument * if input does not match the required shape
+                                     * if the given channel position is not ChannelPosition::IMPLICIT
+     */
     template <typename T, typename O>
     auto convolve2DImplicit(
         const xt::xexpression<T>& inputExpression,

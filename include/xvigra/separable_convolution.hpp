@@ -96,7 +96,20 @@ namespace xvigra {
         return result;
     }
 
-
+    /*
+     * <p>
+     * Generates a slice vector containing xt::all() at position Dim and fills all other entries with the
+     * corresponding decomposed parts of the given compound index.
+     * </p>
+     *
+     * @tparam Dim number of dimensions in the shape.
+     * @param compoundIndex number of dimensions in the shape.
+     * @param shape the desired shape of the slice vector
+     * @param currentAxis axis which should be ignored.
+     * @param startAxis (inclusive) the first axis that should be used.
+     * @param endAxis (exclusive) the last axis that should be used.
+     * @return a slice vector containing the decomposed compound indices and xt::all at position Dim.
+     */
     template <std::size_t Dim>
     xt::xstrided_slice_vector decomposeIndex(
         std::size_t compoundIndex,
@@ -129,6 +142,26 @@ namespace xvigra {
     // ║ separableConvolve1D - begin                                                                                  ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
+    /*
+     * <p>
+     * Calculates the 1-dimensional separable convolution of the input with the given 1-dimensional kernel based on xvigra::convolve1D.
+     * This function requires an input of shape  W x C or C x W and a kernel with at least 1 dimension or at maximum
+     * a full filter of 3 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::FIRST or ChannelPosition::LAST inputs; for ChannelPosition::IMPLICIT
+     * use xvigra::separableConvolve1DImplicit.
+     * </p>
+     *
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpression xexpression containing the kernel data
+     * @param kernelOptions object containing information about padding, stride, dilation, channel position and border
+                            treatment
+     * @return the result of the 1-dimensional convolution between the input and kernel as xt::xtensor
+     * @throws std::invalid_argument if input does not match the required shape or if IMPLICIT channel position is
+                                     requested.
+     */
     template <typename O, typename T>
     auto separableConvolve1D(
         const xt::xexpression<T>& inputExpression,
@@ -166,6 +199,25 @@ namespace xvigra {
         return xt::xtensor<ResultType, 2>(xvigra::convolve1D(input, kernel, kernelOptions));
     }
 
+    /*
+     * <p>
+     * Calculates the 1-dimensional separable convolution of the input with the given 1-dimensional kernel based on xvigra::convolve1D.
+     * This function requires an input of shape W and a kernel with at least 1 dimension or at maximum
+     * a full filter of 3 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::IMPLICIT inputs; for ChannelPosition::FIRST or ChannelPosition::LAST
+     * use xvigra::separableConvolve1D.
+     * </p>
+     *
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpression xexpression containing the kernel data
+     * @param kernelOptions object containing information about padding, stride, dilation, channel position and border
+                            treatment
+     * @return the result of the 1-dimensional convolution between the input and kernel as xt::xtensor
+     * @throws std::invalid_argument if input does not match the required shape
+     */
     template <typename T, typename O>
     auto separableConvolve1DImplicit(
         const xt::xexpression<T>& inputExpression,
@@ -263,7 +315,27 @@ namespace xvigra {
         }
     }
 
-
+    /*
+     * <p>
+     * Calculates the 2-dimensional separable convolution of the input with the given 1-dimensional kernels based on
+     * xvigra::convolve1D.
+     * This function requires an input of shape H x W x C or C x H x W and two kernels with at least 1 dimension or at maximum
+     * a full filter of 3 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::FIRST or ChannelPosition::LAST inputs; for ChannelPosition::IMPLICIT
+     * use xvigra::separableConvolve2DImplicit.
+     * </p>
+     *
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpressions array with two 1-dimensional kernels
+     * @param kernelOptions array of options for each dimension containing independent information about padding, stride,
+                            dilation and border treatment
+     * @return the result of the 2-dimensional convolution between the input and 1-dimensional kernels as xt::xtensor
+     * @throws std::invalid_argument if input does not match the required shape or if IMPLICIT channel position is
+                                     requested.
+     */
     template <typename T, typename KernelContainerType>
     auto separableConvolve2D(
         const xt::xexpression<T>& inputExpression,
@@ -346,7 +418,25 @@ namespace xvigra {
         );
     }
 
-
+    /*
+     * <p>
+     * Calculates the 2-dimensional separable convolution of the input with the given 1-dimensional kernels based on xvigra::convolve1D.
+     * This function requires an input of shape W and two kernels with at least 2 dimension or at maximum
+     * a full filter of 3 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::IMPLICIT inputs; for ChannelPosition::FIRST or ChannelPosition::LAST
+     * use xvigra::separableConvolve2D.
+     * </p>
+     *
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpressions array with two 1-dimensional kernels
+     * @param kernelOptions array of options for each dimension containing independent information about padding, stride,
+                            dilation and border treatment
+     * @return the result of the 2-dimensional convolution between the input and 1-dimensional kernels as xt::xtensor
+     * @throws std::invalid_argument if input does not match the required shape
+     */
     template <typename T, typename KernelContainerType>
     auto separableConvolve2DImplicit(
         const xt::xexpression<T>& inputExpression,
@@ -390,6 +480,28 @@ namespace xvigra {
     // ║ separableConvolveND - begin                                                                                  ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
+     /*
+     * <p>
+     * Calculates the N-dimensional separable convolution of the input with the given 1-dimensional kernels based on
+     * xvigra::convolve1D.
+     * This function requires an input of shape D_N x ... x D_1 x C or C x D_N x ... x D_1 and N kernels with at least 1
+     * dimension or at maximum a full filter of 3 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::FIRST or ChannelPosition::LAST inputs; for ChannelPosition::IMPLICIT
+     * use xvigra::separableConvolveNDImplicit.
+     * </p>
+     *
+     * @tparam N number non-channel dimensions in the input
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpressions array with N 1-dimensional kernels
+     * @param kernelOptions array of options for each dimension containing independent information about padding, stride,
+                            dilation and border treatment
+     * @return the result of the N-dimensional convolution between the input and 1-dimensional kernels as xt::xtensor
+     * @throws std::invalid_argument if input does not match the required shape or if IMPLICIT channel position is
+                                     requested.
+     */
     template <std::size_t N, typename T, typename KernelContainerType>
     auto separableConvolveND(
         const xt::xexpression<T>& inputExpression,
@@ -473,6 +585,26 @@ namespace xvigra {
         return result;
     }
 
+    /*
+     * <p>
+     * Calculates the N-dimensional separable convolution of the input with the given 1-dimensional kernels based on xvigra::convolve1D.
+     * This function requires an input of shape D_N x ... x D_1 x C or C x D_N x ... x D_1 and N kernels with at least
+     * 2 dimension or at maximum a full filter of 3 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::IMPLICIT inputs; for ChannelPosition::FIRST or ChannelPosition::LAST
+     * use xvigra::separableConvolveND.
+     * </p>
+     *
+     * @tparam N number non-channel dimensions in the input
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpressions array with N 1-dimensional kernels
+     * @param kernelOptions array of options for each dimension containing independent information about padding, stride,
+                            dilation and border treatment
+     * @return the result of the N-dimensional convolution between the input and 1-dimensional kernels as xt::xtensor
+     * @throws std::invalid_argument if input does not match the required shape
+     */
     template <std::size_t N, typename T, typename KernelContainerType>
     auto separableConvolveNDImplicit(
         const xt::xexpression<T>& inputExpression,
@@ -511,6 +643,28 @@ namespace xvigra {
     // ║ separableConvolve - begin                                                                                    ║
     // ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
+    /*
+     * <p>
+     * Calculates the N-dimensional separable convolution of the input with the given 1-dimensional kernels based on
+     * xvigra::separableConvolve1D, xvigra::separableConvolve2D and xvigra::separableConvolveND.
+     * This function requires an input of shape D_N x ... x D_1 x C or C x D_N x ... x D_1 and N kernels with at least 1
+     * dimension or at maximum a full filter of 3 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::FIRST or ChannelPosition::LAST inputs; for ChannelPosition::IMPLICIT
+     * use xvigra::separableConvolveImplicit.
+     * </p>
+     *
+     * @tparam N number non-channel dimensions in the input
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpressions array with N 1-dimensional kernels
+     * @param kernelOptions array of options for each dimension containing independent information about padding, stride,
+                            dilation and border treatment
+     * @return the result of the N-dimensional convolution between the input and 1-dimensional kernels as xt::xtensor
+     * @throws std::invalid_argument if input does not match the required shape or if IMPLICIT channel position is
+                                     requested.
+     */
     template <std::size_t N, typename T, typename KernelContainerType>
     auto separableConvolve(
         const xt::xexpression<T>& inputExpression,
@@ -531,6 +685,27 @@ namespace xvigra {
 
     }
 
+    /*
+     * <p>
+     * Calculates the N-dimensional separable convolution of the input with the given 1-dimensional kernels based on
+     * xvigra::separableConvolve1D, xvigra::separableConvolve2D and xvigra::separableConvolveND.
+     * This function requires an input of shape D_N x ... x D_1 x C or C x D_N x ... x D_1 and N kernels with at least
+     * 2 dimension or at maximum a full filter of 3 dimensions.
+     * Missing kernel dimensions are inserted by xvigra::promoteKernelToFull1D.
+     * This function can only process ChannelPosition::IMPLICIT inputs; for ChannelPosition::FIRST or ChannelPosition::LAST
+     * use xvigra::separableConvolve.
+     * </p>
+     *
+     * @tparam N number non-channel dimensions in the input
+     * @tparam O derived type of the input xexpression
+     * @tparam T derived type of the kernel xexpression
+     * @param inputExpression xexpression containing the input data
+     * @param rawKernelExpressions array with N 1-dimensional kernels
+     * @param kernelOptions array of options for each dimension containing independent information about padding, stride,
+                            dilation and border treatment
+     * @return the result of the N-dimensional convolution between the input and 1-dimensional kernels as xt::xtensor
+     * @throws std::invalid_argument if input does not match the required shape
+     */
     template <std::size_t N, typename T, typename KernelContainerType>
     auto separableConvolveImplicit(
         const xt::xexpression<T>& inputExpression,
