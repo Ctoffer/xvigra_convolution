@@ -21,21 +21,20 @@ void runGaussianSmoothingDemo() {
 
 void runGaussianSharpeningDemo() {
     xt::xtensor<float, 3> image = xvigra::loadImageAsXTensor<float>(
-        "./resources/src/demo_small.pgm"
+        "./resources/src/Piercing-The-Ocean.pgm"
     );
-    auto result = xvigra::gaussianSharpening<2>(image, 2.3, 0.5);
+    auto result = xvigra::gaussianSharpening<2>(image, 0.4, 2.5);
+    auto res = xvigra::normalizeAfterConvolution<float>(result);
     xvigra::saveImage(
         "./resources/src/demo_gaussian_sharpening.pgm",
-        xvigra::normalizeAfterConvolution<float>(result)
+        res
     );
 }
 
 
 int main() {
-    // FIXME Something seems broken in the implementation, but after several hours of debugging I didn't find
-    //       the issue. Unfortunately, the time frame of my thesis work is over
     runGaussianSmoothingDemo();
-    //runGaussianSharpeningDemo();
+    runGaussianSharpeningDemo();
 
     return 0;
 }

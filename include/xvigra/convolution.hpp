@@ -39,6 +39,7 @@ namespace xvigra {
           for(std::size_t i = 0; i < N; ++i) {
                 xvigra::KernelOptions option;
                 option.setBorderTreatment(xvigra::BorderTreatment::asymmetricReflect());
+                option.setPadding(gaussianKernels[i].shape()[0] / 2);
                 options[i] = option;
           }
 
@@ -59,7 +60,6 @@ namespace xvigra {
                             double sharpeningFactor,
                             double scale) {
           using SourceContainerType = typename xt::xexpression<T>::derived_type;
-          using SourceType = typename SourceContainerType::value_type;
 
           SourceContainerType source = sourceExpression.derived_cast();
           std::array<double, N> scales;
@@ -69,8 +69,7 @@ namespace xvigra {
 
           auto smoothed = gaussianSmoothing<N>(source, scales);
 
-          xt::xtensor<SourceType, N> result = (1 - sharpeningFactor) * source - sharpeningFactor * smoothed;
-          return result;
+          return xt::eval((1.0 + sharpeningFactor) * source - sharpeningFactor * smoothed);
     }
 
     // ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗

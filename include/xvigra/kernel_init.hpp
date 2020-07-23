@@ -29,7 +29,7 @@ namespace xvigra {
             }
 
             using ShapeType = typename xt::xarray<KernelValueType>::shape_type;
-            xt::xarray<KernelValueType> array(ShapeType{radius*2 + 1});
+            xt::xarray<KernelValueType> array(ShapeType{static_cast<typename ShapeType::value_type>(radius*2 + 1)});
 
             std::size_t i = 0;
             for (int x = -radius; x <= radius; ++x, ++i) {
