@@ -72,8 +72,8 @@ message(STATUS "OpenImageIO_VERSION: " ${OpenImageIO_VERSION})
 message(STATUS "")
 
 enable_testing()
-# add_subdirectory(tests)
+add_subdirectory(tests)
 
-# add_subdirectory(benchmarks)
+add_subdirectory(benchmarks)
 
 add_subdirectory(src)
