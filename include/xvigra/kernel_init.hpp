@@ -32,7 +32,7 @@ namespace xvigra {
             xt::xarray<KernelValueType> array(ShapeType{radius*2 + 1});
 
             std::size_t i = 0;
-            for (std::size_t x = static_cast<std::size_t>(-radius); x <= static_cast<std::size_t>(radius); ++x, ++i) {
+            for (int x = -radius; x <= radius; ++x, ++i) {
                 array[i] = gauss(x);
             }
 

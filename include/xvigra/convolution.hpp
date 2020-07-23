@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iostream>
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xexpression.hpp"
@@ -40,6 +41,7 @@ namespace xvigra {
                 option.setBorderTreatment(xvigra::BorderTreatment::asymmetricReflect());
                 options[i] = option;
           }
+
 
           return xvigra::separableConvolve(source, gaussianKernels, options);
     }
